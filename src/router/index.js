@@ -1,5 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import LoginRegisterView from '../views/LoginRegisterView.vue'
+import UserCommonView from '../views/UserCommonView.vue'
+import UserHomePage from '../views/UserView/UserHomePage.vue'
+import UserTradingPage from '../views/UserView/UserTradingPage.vue'
+import UserShoppingCartPage from '../views/UserView/UserShoppingCartPage.vue'
+import UserRequestPage from '../views/UserView/UserRequestPage.vue'
+import UserMessagePage from '../views/UserView/UserMessagePage.vue'
+import UserProfilePage from '../views/UserView/UserProfilePage.vue'
+import ItemDetailPage from '../views/UserView/ItemDetailPage.vue'
 
 const routes = [
   {
@@ -14,6 +23,46 @@ const routes = [
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
+  },  
+  {
+    path: '/loginregister',
+    name: 'loginregister',
+    component: LoginRegisterView
+  },
+  {
+    path: '/userhome',
+    name: 'userhome',
+    component: UserCommonView,
+    children: [
+      {
+        path: 'userhomepage',
+        component: UserHomePage
+      },
+      {
+        path: 'usertradingpage',
+        component: UserTradingPage
+      },
+      {
+        path: 'usershoppingcartpage',
+        component: UserShoppingCartPage
+      },
+      {
+        path: 'userrequestpage',
+        component: UserRequestPage
+      },
+      {
+        path: 'usermessagepage',
+        component: UserMessagePage
+      },
+      {
+        path: 'userprofilepage',
+        component: UserProfilePage
+      },
+      {
+        path: 'itemdetailpage/:id',
+        component: ItemDetailPage
+      }
+    ]
   }
 ]
 
