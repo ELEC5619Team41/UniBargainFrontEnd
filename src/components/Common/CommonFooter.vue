@@ -1,0 +1,49 @@
+<template>
+    <div class="background" style="display: flex;">
+        <div style="width: 30%; height: 100%; justify-content: center; display: flex; align-items: center;">
+            <div style="height: 40px; width: 40px; background-color: white; "></div>
+            <p class="text" style="padding-left: 30px;">Unibargain</p>
+        </div>
+        <div style="width: 70%; display: flex; align-items: center; justify-content: right; margin-right: 50px;">
+            <ClickableText class="text" :text="this.$t('ContactUs')"></ClickableText>
+            <ClickableText class="text" :text="this.$t('Complain')"></ClickableText>
+            <ClickableText class="text" :text="this.$t('Report')"></ClickableText>
+        </div>
+    </div>
+</template>
+
+<script>
+import ClickableText from './ClickableText.vue';
+
+export default {
+    name: "CommonFooter",
+    components: { ClickableText }
+}
+</script>
+
+<style scoped>
+.background {
+    width: 100%;
+    height: 50px;
+    background-color: rgb(87, 87, 87);
+    bottom: 0;
+    position: fixed;
+}
+
+.centerButton {
+    height: 100%;
+    width: 20%;
+    background-color: rgb(87, 87, 87);
+    outline: none;
+    border: none;
+}
+
+.selected {
+    background-color: rgb(196, 196, 196);
+}
+
+.text{
+    color: white;
+    margin-right: 80px;
+}
+</style>

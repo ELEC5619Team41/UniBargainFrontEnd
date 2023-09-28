@@ -1,0 +1,30 @@
+{
+  "name": "unibargain",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "i18n:report": "vue-cli-service i18n:report --src \"./src/**/*.?(js|vue)\" --locales \"./src/locales/**/*.json\""
+  },
+  "dependencies": {
+    "@fullcalendar/core": "^6.1.8",
+    "@fullcalendar/icalendar": "^6.1.8",
+    "@fullcalendar/interaction": "^6.1.8",
+    "@fullcalendar/list": "^6.1.8",
+    "@fullcalendar/timegrid": "^6.1.8",
+    "@fullcalendar/vue3": "^6.1.8",
+    "core-js": "^3.8.3",
+    "ical.js": "^1.5.0",
+    "vue": "^3.2.13",
+    "vue-i18n": "^9.2.2",
+    "vue-router": "^4.0.3"
+  },
+  "devDependencies": {
+    "@intlify/vue-i18n-loader": "^3.0.0",
+    "@vue/cli-plugin-babel": "~5.0.0",
+    "@vue/cli-plugin-router": "~5.0.0",
+    "@vue/cli-service": "~5.0.0",
+    "vue-cli-plugin-i18n": "~2.3.2"
+  }
+}
