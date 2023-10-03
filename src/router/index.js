@@ -9,6 +9,9 @@ import UserRequestPage from '../views/UserView/UserRequestPage.vue'
 import UserMessagePage from '../views/UserView/UserMessagePage.vue'
 import UserProfilePage from '../views/UserView/UserProfilePage.vue'
 import ItemDetailPage from '../views/UserView/ItemDetailPage.vue'
+import PublishIdlePage from "@/views/UserView/PublishIdlePage";
+import SeekTradeItem from "@/views/UserView/SeekTradeItem";
+import TransactionPage from "@/views/UserView/TransactionPage";
 
 const routes = [
   {
@@ -61,6 +64,18 @@ const routes = [
       {
         path: 'itemdetailpage/:id',
         component: ItemDetailPage
+      },
+      {
+        path: 'publishidlepage',
+        component: PublishIdlePage
+      },
+      {
+        path: 'seektradepage',
+        component: SeekTradeItem
+      },
+      {
+        path: 'transactionpage',
+        component: TransactionPage
       }
     ]
   }
