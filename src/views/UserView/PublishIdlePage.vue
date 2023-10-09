@@ -23,17 +23,49 @@
 
     <div class="division">
       <h3>item description</h3>
-      <input style="width: 80%; align-items: center; height: 100px; margin-bottom: 50px; border-radius: 10px; border: gray solid">
+      <input style="width: 80%; align-items: center; height: 100px; margin-bottom: 50px; border-radius: 10px; border: gray solid" type="text">
+    </div>
+
+    <div class="division" >
+      <h3 style="left: ">item image</h3>
+      <div >
+        add image
+      </div>
     </div>
 
     <div class="division">
-      <h3>item image</h3>
+      <div style="display: flex; flex-direction: row">
+
+        <div class="item-basic-info-element">
+          <h3>basic information</h3>
+          <input class="info-input" type="text">
+        </div>
+
+        <div class="item-basic-info-element">
+          <h3>basic information</h3>
+          <input class="info-input" type="text">
+        </div>
+
+        <div class="item-basic-info-element">
+          <h3>basic information</h3>
+          <input class="info-input" type="text">
+        </div>
+      </div>
+
     </div>
 
     <div class="division">
-      <h3>item image</h3>
+      <div>
+        <h3>address</h3>
+      </div>
+      <input style="width: 80%; align-items: center; height: 100px; margin-bottom: 50px; border-radius: 10px; border: gray solid" type="text">
     </div>
 
+    <div class="division" style="float: bottom ; display: flex">
+      <round-corner-button text="submit" style="margin-left: 20%"></round-corner-button>
+      <round-corner-button text="cancel" style="margin-left: 40%; margin-right: 20%"></round-corner-button>
+
+    </div>
 
 
 
@@ -41,8 +73,10 @@
   </div>
 </template>
 <script>
+import RoundCornerButton from "@/components/Common/RoundCornerButton";
 export default {
-  name: "PublishIdlePage"
+  name: "PublishIdlePage",
+  components: {RoundCornerButton}
 }
 </script>
 
