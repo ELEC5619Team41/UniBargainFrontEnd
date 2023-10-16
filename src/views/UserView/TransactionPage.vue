@@ -56,6 +56,7 @@ export default {
   data(){
     return {
       totalPrice: 0,
+      Signal:false,
       Address:[
         {
           num:"01",
@@ -132,10 +133,6 @@ export default {
           name:"after-pay"
         }
       ]
-
-
-
-
       // OrderInfo:[{
       //   orderNumber:"01",
       //   orderName:"TurboCharge Pro Wireless Earbuds",
@@ -154,6 +151,21 @@ export default {
       this.totalPrice= parseFloat(price).toFixed(2)
 
   },
+  methods:{
+    setSignal(signal)
+    {
+      this.signal= signal;
+    },
+    redirect()
+    {
+      if(this.signal)
+      {
+
+      }
+    }
+
+
+  }
 
 }
 </script>

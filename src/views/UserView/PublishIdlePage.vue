@@ -18,6 +18,11 @@
           <input class="info-input" type="text">
         </div>
       </div>
+      <b-alert v-model="showDismissibleAlert" variant="danger" dismissible>
+        Dismissible Alert!
+      </b-alert>
+
+
     </div>
 
 
@@ -76,7 +81,12 @@
 import RoundCornerButton from "@/components/Common/RoundCornerButton";
 export default {
   name: "PublishIdlePage",
-  components: {RoundCornerButton}
+  components: {RoundCornerButton},
+  methods:{
+    Submit(){
+
+    }
+  }
 }
 </script>
 

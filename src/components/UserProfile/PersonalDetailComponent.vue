@@ -35,6 +35,7 @@
 <script>
 import LabelTextFieldHorizontal from '@/components/Common/LabelTextFieldHorizontal.vue'
 import RoundCornerButton from '@/components/Common/RoundCornerButton.vue'
+import SendRequestComponent from "@/components/Common/SendRequestComponent";
 export default {
     name: "UserProfilePage",
     components: {
@@ -52,6 +53,7 @@ export default {
                 mobileNumber: '',
 
             },
+          url:'',
 
             preview: null,
 
@@ -74,7 +76,8 @@ export default {
         },
 
         submitData() {
-            console.log(this.uploadData)
+            console.log(this.uploadData);
+            fetch(this.url,SendRequestComponent.method.Request(this.uploadData));
         }
     }
 }

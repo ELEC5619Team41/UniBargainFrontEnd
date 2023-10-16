@@ -38,10 +38,12 @@ export default {
   data() {
     return {
       PostData: [{
-      UserName:"DJ",
+          UserName:"DJ",
+          ItemId:'1',
           UserImageUrl: "./assets/logo.png",
           PostName: "Relx5",
           PostMsg: "idle relx5,good price and quality",
+          ItemUrl:'',
           Comment:
       [
         {
@@ -60,6 +62,7 @@ export default {
     },
         {
           UserName:"DJ",
+          ItemId:'2',
           UserImageUrl: "./assets/logo.png",
           PostName: "Relx5",
           PostMsg: "idle relx5,good price and quality",

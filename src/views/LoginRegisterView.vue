@@ -11,11 +11,11 @@
 <script>
 import RegisterComponent from "../components/LoginRegister/RegisterComponent.vue";
 import LoginComponent from "@/components/LoginRegister/LoginComponent.vue";
-
+import SendRequestComponent from "@/components/Common/SendRequestComponent";
 export default {
   name: "loginregister",
   components: {
-    RegisterComponent, LoginComponent
+    RegisterComponent, LoginComponent,SendRequestComponent
   },
   data() {
     return{
@@ -25,7 +25,7 @@ export default {
   methods:{
     setLoginRegister(){
       this.isLoginInterface = !this.isLoginInterface
-    }
+    },
   }
 };
 </script>

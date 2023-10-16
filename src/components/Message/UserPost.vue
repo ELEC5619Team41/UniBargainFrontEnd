@@ -4,7 +4,6 @@
     <div class="owner">
       <div style="width: 10%; height: 20px; background-color: #42b983;">
 <!--        <img src="" alt="userimage">-->
-       <div></div>
       </div>
       <div style="margin-left: 10%"><h2>{{this.post.UserName}}</h2></div>
       <div style="margin-left: 60%"> <button class="centerButton"> chat </button></div>
@@ -16,9 +15,7 @@
 <!--        <div v-for="pic in this.post.PostPictureUrl">-->
 <!--          <img src="{{pic}}" alt="item_image">-->
 <!--        </div>-->
-        <div style="width: 100%; height: 500px;background-color: #42b983; ">
-          <div></div>
-        </div>
+        <PictureViewer :item-id = post.ItemId :Item-url = post.ItemUrl></PictureViewer>
       </div>
 
     </div>
@@ -34,12 +31,21 @@
 </template>
 
 <script>
+import PictureViewer from "@/components/Common/PictureViewer";
+
 export default {
   name: "UserPost",
+  components:{
+    PictureViewer
+  },
   props: {
     post:Object
 
-      }
+      },
+  // mounted()
+  // {
+  //   console.log(this.post);
+  // }
   //     {
   //   UserName:{
   //     type:String,

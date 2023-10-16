@@ -58,6 +58,7 @@ import LabelTextField from "../Common/LabelTextField.vue";
 import RoundCornerButton from "../Common/RoundCornerButton.vue";
 import BirthDaySelect from "./BirthDaySelect.vue";
 import ClickableText from "../Common/ClickableText.vue";
+import SendRequestComponent from "@/components/Common/SendRequestComponent";
 export default {
   name: "RegisterComponent",
   components: {
@@ -65,10 +66,12 @@ export default {
     RoundCornerButton,
     BirthDaySelect,
     ClickableText,
+    SendRequestComponent
   },
   emits: ["change-to-login"],
   data() {
     return {
+      url:'/user/register',
       form: {
         agreement: false,
         year: 1990,
@@ -84,8 +87,28 @@ export default {
   },
   methods: {
     requestRegister() {
+      this.SendRegisterRequest()
       console.log(this.form);
     },
-  },
+
+    SendRegisterRequest(){
+      const body = {
+        username: this.form.username,
+        password: this.form.password,
+        name: this.form.name,
+        email: this.form.email,
+        avatar: this.form.avatar,
+        extend:
+            {
+              year:this.form.year,
+              month: this.form.month,
+              day:this.form.day,
+              gender: this.form.gender
+            }
+      };
+      fetch( this.url,SendRequestComponent.method.Request(body));
+    }// send request to back end
+  }
+
 };
 </script>

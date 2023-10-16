@@ -48,25 +48,37 @@
 import ClickableText from "../Common/ClickableText.vue";
 import LabelTextField from "../Common/LabelTextField.vue";
 import RoundCornerButton from "../Common/RoundCornerButton.vue";
+import SendRequestComponent from "@/components/Common/SendRequestComponent";
 export default {
   name: "LoginComponent",
   components: {
     ClickableText,
     LabelTextField,
     RoundCornerButton,
+
+    SendRequestComponent
   },
   data() {
     return {
         email: '',
         password: '',
+        url:'/user/login'
     };
   },
   emits: ["change-to-login"],
   methods:{
     requestLogin(){
-        console.log('email', this.email, ', password', this.password)
-        this.$router.push('/userhome')
-    }
+        console.log('email', this.email, ', password', this.password);
+        this.SendLoginRequest();
+        this.$router.push('/userhome');
+
+    },
+    SendLoginRequest(){
+      const body = {username: this.email,
+        password:this.password,
+      }
+     fetch(this.url,SendRequestComponent.method.Request(body));
+    }// send request to back end
   }
 };
 </script>

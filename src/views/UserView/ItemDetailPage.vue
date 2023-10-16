@@ -24,8 +24,8 @@
                         {{ this.itemData.price }}$
                     </div>
                     <div style="display: flex; justify-content: space-around;">
-                        <RoundCornerButton style="width: 200px;" :text="$t('BuyNow')"></RoundCornerButton>
-                        <RoundCornerButton style="width: 200px;" :text="$t('AddToCart')"></RoundCornerButton>
+                        <RoundCornerButton style="width: 200px;" :text="$t('BuyNow')" @click="redirect()" ></RoundCornerButton>
+                        <RoundCornerButton style="width: 200px;" :text="$t('AddToCart')" ></RoundCornerButton>
                     </div>
                 </div>
             </div>
@@ -41,13 +41,19 @@
 <script>
 import RoundCornerButton from '@/components/Common/RoundCornerButton.vue';
 import ItemCommentComponent from '@/components/Item/ItemCommentComponent.vue';
+import routes from '@/router/index';
 export default {
     name: "ItemDetailPage",
     components: {
         RoundCornerButton,
-        ItemCommentComponent
+        ItemCommentComponent,
     },
-
+  methods:{
+      redirect()
+      {
+        this.$router.push('/userhome/transactionpage')
+      }
+  },
     data() {
         return {
             itemData: {
