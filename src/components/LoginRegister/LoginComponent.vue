@@ -49,6 +49,7 @@ import ClickableText from "../Common/ClickableText.vue";
 import LabelTextField from "../Common/LabelTextField.vue";
 import RoundCornerButton from "../Common/RoundCornerButton.vue";
 import SendRequestComponent from "@/components/Common/SendRequestComponent";
+import axios from 'axios';
 export default {
   name: "LoginComponent",
   components: {
@@ -74,10 +75,27 @@ export default {
 
     },
     SendLoginRequest(){
-      const body = {username: this.email,
-        password:this.password,
-      }
-     fetch(this.url,SendRequestComponent.method.Request(body));
+
+      var data = {
+        "username": this.email,
+        "password": this.password
+      };
+      var config = {
+        method: 'post',
+        url: 'http://localhost:28888/user/login',
+        headers: { 
+            'Content-Type': 'application/json'
+        },
+        data : data,
+      };
+
+      axios(config)
+      .then(function (response) {
+        console.log(JSON.stringify(response.data));
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
     }// send request to back end
   }
 };
