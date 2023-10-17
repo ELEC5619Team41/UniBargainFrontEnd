@@ -37,6 +37,8 @@ export default {
         if(url == '/userhome/userprofilepage')
         {
             this.selectedButton = -1
+        }else if(url == '/userhome/transactionendpage'){
+            this.selectedButton = 5
         }
         for (let index = 0; index < this.itemNames.length; index++) {
             if(this.itemNames[index].link == url)

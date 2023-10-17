@@ -12,6 +12,7 @@ import ItemDetailPage from '../views/UserView/ItemDetailPage.vue'
 import PublishIdlePage from "@/views/UserView/PublishIdlePage";
 import SeekTradeItem from "@/views/UserView/SeekTradeItem";
 import TransactionPage from "@/views/UserView/TransactionPage";
+import TransactionEndPage from "@/views/UserView/TransactionEndPage";
 
 const routes = [
   {
@@ -76,6 +77,10 @@ const routes = [
       {
         path: 'transactionpage',
         component: TransactionPage
+      },
+      {
+        path: 'transactionendpage',
+        component: TransactionEndPage
       }
     ]
   }
