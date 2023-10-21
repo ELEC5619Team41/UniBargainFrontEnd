@@ -15,7 +15,7 @@
 <!--        <div v-for="pic in this.post.PostPictureUrl">-->
 <!--          <img src="{{pic}}" alt="item_image">-->
 <!--        </div>-->
-        <PictureViewer :item-id = post.ItemId :Item-url = post.ItemUrl></PictureViewer>
+        <PictureViewer :ItemId = post.ItemId :ItemUrl = post.ItemUrl></PictureViewer>
       </div>
 
     </div>

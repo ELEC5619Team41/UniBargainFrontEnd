@@ -1,21 +1,22 @@
 <template>
 
-  <div class="row">
-    <div class="column" v-for="(imageItem,index) in ImageSet">
-      <img :src="imageItem.src" :alt=" 'photo'+index"  v-on:click="this.selectImage(index);">
+  <div style="display:flex; flex-direction: column">
+    <div style="display: flex; flex-direction: row">
+      <div class="column" v-for="(imageItem,index) in ImageSet" :key="index" style="margin-left: 10px">
+        <img :src="imageItem.src" :alt=" 'photo'+index"  v-on:click="this.selectImage(index)" width="40" height="40">
+      </div>
+    </div>
+
+    <div  v-if="CurrentImage!=='default'">
+      <!-- Close the image -->
+      <!-- Expanded image -->
+      <img :src="this.CurrentImage" style="width: 500px">
+      <!-- Image text -->
+      <div id="imgtext"></div>
     </div>
   </div>
 
-  <div class="container">
-    <!-- Close the image -->
-    <span onclick="this.parentElement.style.display='none'" class="closebtn">&times;</span>
 
-    <!-- Expanded image -->
-    <img :src="this.CurrentImage" style="width:100%">
-
-    <!-- Image text -->
-    <div id="imgtext"></div>
-  </div>
 
 </template>
 
@@ -42,9 +43,10 @@ export default {
     selectImage(index)
     {
       const num = index;
+      this.CurrentImage = this.ImageSet[num].src;
       console.log(num);
       // this.CurrentImage=this.image[index].src;
-      console.log(this.image[index].src)
+      console.log(this.ImageSet[index].src)
     },
     SendRequest() {
 
@@ -53,8 +55,15 @@ export default {
   },
   data(){
     return {
-      CurrentImage: '',
-      ImageSet:[],
+      CurrentImage: 'default',
+      ImageSet:[
+        {
+          src:'../favicon.ico',
+        },
+        {
+          src: '../1.webp',
+        }
+      ],
       body:[],
       // Property:this.props
     }
@@ -96,7 +105,6 @@ export default {
 /* The expanding image container (positioning is needed to position the close button and the text) */
 .container {
   position: relative;
-  display: none;
 }
 
 /* Expanding image text */

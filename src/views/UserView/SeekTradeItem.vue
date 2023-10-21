@@ -40,10 +40,10 @@ export default {
       PostData: [{
           UserName:"DJ",
           ItemId:'1',
-          UserImageUrl: "./assets/logo.png",
+          UserImageUrl: "../assets/logo.png",
           PostName: "Relx5",
           PostMsg: "idle relx5,good price and quality",
-          ItemUrl:'',
+          ItemUrl:'../assets/logo.png',
           Comment:
       [
         {
