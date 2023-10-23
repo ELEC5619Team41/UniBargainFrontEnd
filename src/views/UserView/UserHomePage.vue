@@ -167,9 +167,34 @@ export default {
 
         }
     },
+    mounted(){
+        // this.getRecommend(12);
+    },
     methods: {
         search() {
             console.log(this.searchbar.input);
+        },
+        getRecommend(count){
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+
+            var data = '';
+
+            var requestOptions = {
+            method: 'GET',
+            headers: myHeaders,
+            redirect: 'follow'
+            };
+
+            fetch("http://localhost:28888/product/getRecommendList", requestOptions)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+
+            })
+            .catch(error => console.log('error', error));
         }
     }
 }

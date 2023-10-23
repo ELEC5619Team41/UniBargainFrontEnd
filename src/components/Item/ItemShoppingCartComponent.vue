@@ -7,13 +7,12 @@
 
         <div class="commentField">
             <div style="margin-top: 10px; display: flex; height: 95%; width: 100%;">
-                <div style="width: 175px; height: 175px; aspect-ratio: 1/1; background-color: aqua;"></div>
+                <div style="width: 175px; height: 175px; aspect-ratio: 1/1; background-image: `url(${this.item.itemImage})`;"></div>
                 <div class="textField" style="max-width: 70%; width: 80%; min-width: 20%">
                     <div style="width: 80%; overflow-wrap: break-word; overflow: hidden; max-height: 70%;">{{
                         this.item.itemName }}</div>
-                    <div style="width: 80%;">{{ this.item.orderDate }}</div>
                     <div style="position: absolute;bottom: 0; display: flex; width: 60%;">
-                        <div>{{ this.item.itemPrice }} $</div>
+                        <div>$ {{ this.item.itemPrice }} </div>
                     </div>
                 </div>
 
@@ -23,12 +22,12 @@
 
         <div style=" margin-top: 10px; width: 15%; height: 95%; position: absolute; right: 0;">
             <div style="display: flex;  align-items: center;">
-                <div style="width: 48px; height: 48px; background-color: green;"></div>
-                <div style="margin-left: 10px;">{{this.item.username}}</div>
+                <div style="width: 48px; height: 48px; background-image: `url(${this.item.sellerAvater})`;"></div>
+                <div style="margin-left: 10px;">{{this.item.sellerName}}</div>
             </div>
             <div style="display: flex; position: absolute; bottom: 0; align-items: center;">
                 <div style="width: 48px; height: 48px;"></div>
-                <ClickableText :text="$t('Delete')" @text-trigger="$emit('delete-cart-item', this.item.orderNumber)"></ClickableText>
+                <ClickableText :text="$t('Delete')" @text-trigger="$emit('delete-cart-item', this.item.productId)"></ClickableText>
             </div>
         </div>
 
@@ -77,7 +76,7 @@ export default {
                 console.log('set value', value)
                 this.selectItemComputePrice.checked = value
                 this.$emit('update:selectItemComputePrice', {
-                    id: this.item.orderNumber,
+                    id: this.item.productId,
                     checked: value
                 })
             }
