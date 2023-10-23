@@ -49,7 +49,6 @@ import ClickableText from "../Common/ClickableText.vue";
 import LabelTextField from "../Common/LabelTextField.vue";
 import RoundCornerButton from "../Common/RoundCornerButton.vue";
 import SendRequestComponent from "@/components/Common/SendRequestComponent";
-import axios from 'axios';
 export default {
   name: "LoginComponent",
   components: {
@@ -71,31 +70,30 @@ export default {
     requestLogin(){
         console.log('email', this.email, ', password', this.password);
         this.SendLoginRequest();
-        this.$router.push('/userhome');
+        
 
     },
     SendLoginRequest(){
 
-      var data = {
-        "username": this.email,
-        "password": this.password
-      };
-      var config = {
-        method: 'post',
-        url: 'http://localhost:28888/user/login',
-        headers: { 
-            'Content-Type': 'application/json'
-        },
-        data : data,
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+
+      var data = {"username": this.email,"password": this.password};
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: JSON.stringify(data),
+        redirect: 'follow'
       };
 
-      axios(config)
-      .then(function (response) {
-        console.log(JSON.stringify(response.data));
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+      fetch("http://localhost:28888/user/login", requestOptions)
+        .then(response => response.json())
+        .then(data => {
+          this.$store.commit('update',{"username":this.email, "token":data.data['token']});
+          this.$router.push('/userhome/userhomepage');
+        })
+        .catch(error => console.log('error', error));
     }// send request to back end
   }
 };

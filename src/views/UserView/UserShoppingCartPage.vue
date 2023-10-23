@@ -98,6 +98,7 @@ export default {
 
             this.itemsData = this.itemsData.filter(item => item.orderNumber != orderNumber)
             delete this.checkStatus[orderNumber]
+            this.removeFromCart(0);
 
             if(this.selectedCount === this.itemsData.length && this.selectedCount != 0){
                 this.allItemSelect = true
@@ -111,7 +112,88 @@ export default {
                     this.deleteOneItem(key)
                 }
             }
+        },
+        getSellername(){
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+
+            var data = {};
+
+            var requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: JSON.stringify(data),
+            redirect: 'follow'
+            };
+
+            fetch("http://localhost:28888/", requestOptions)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+
+            })
+            .catch(error => console.log('error', error));
+        },
+        getList(){
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+
+            var data = {};
+
+            var requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: JSON.stringify(data),
+            redirect: 'follow'
+            };
+
+            fetch("http://localhost:28888/shoppingCart/getList", requestOptions)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                var ls =[]
+                for(let i = 0; i<data.data.length;i++){
+
+                    var content = { "productId": data.data[i]['productId'],
+                                    "username": "",
+                                    "itemName": data.data[i]['productInfo']['name'],
+                                    "orderDate": "",
+                                    "itemPrice": 0,
+                                    "selected": false};
+                    ls.push(content);  
+                }
+                this.itemsData = ls;
+            })
+            .catch(error => console.log('error', error));
+        },
+        removeFromCart(productId){
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+
+            var data = {"productId": productId};
+
+            var requestOptions = {
+            method: 'DELETE',
+            headers: myHeaders,
+            body: JSON.stringify(data),
+            redirect: 'follow'
+            };
+
+            fetch("http://localhost:28888/shoppingCart/remove", requestOptions)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                this.itemData['addedCart'] = false;
+    ;        })
+            .catch(error => console.log('error', error));
         }
+        
     },
     mounted: function () {
         this.totalPrice = 0

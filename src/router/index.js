@@ -64,7 +64,8 @@ const routes = [
       },
       {
         path: 'itemdetailpage/:id',
-        component: ItemDetailPage
+        component: ItemDetailPage,
+        props: true
       },
       {
         path: 'publishidlepage',

@@ -1,10 +1,10 @@
 <template>
     <div class="searchbar">
         <input class="inputBar" v-model="this.searchbar.input">
-        <div class="clearButton" @click="clear()"></div>
+        <div class="clearButton" @click="clear()"><div class="buttonText">Clear</div></div>
         <div style="width: 1px; height: 50%; background: black; margin-left: 15px;"></div>
-        <h3 style="margin-left: 15px;">Goods</h3>
-        <div class="searchButton"></div>
+        <h5 style="margin-left: 5px; margin-top:5px;">Goods</h5>
+        <div class="searchButton"><div class="buttonText">Search</div></div>
     </div>
 </template>
 
@@ -54,15 +54,21 @@ export default {
 }
 
 .clearButton {
-    height: 20px;
-    width: 20px;
+    height: 30px;
     border-radius: 20px;
     background-color: black;
 }
 
+.buttonText {
+    color: white;
+    font-size:17px;
+    padding:1px;
+    margin-left:5px;
+    margin-right:5px;
+}
+
 .searchButton {
     height: 30px;
-    width: 30px;
     border-radius: 30px;
     background-color: black;
     right: 20px;

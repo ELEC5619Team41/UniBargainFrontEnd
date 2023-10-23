@@ -24,8 +24,11 @@
                         {{ this.itemData.price }}$
                     </div>
                     <div style="display: flex; justify-content: space-around;">
-                        <RoundCornerButton style="width: 200px;" :text="$t('BuyNow')" @click="redirect()" ></RoundCornerButton>
-                        <RoundCornerButton style="width: 200px;" :text="$t('AddToCart')" ></RoundCornerButton>
+                        <RoundCornerButton style="width: 150px;" :text="$t('BuyNow')" @click="redirect()" ></RoundCornerButton>
+                        <RoundCornerButton v-if="this.itemData['addedCart'] == true" style="width: 200px;" :text="$t('Remove From Cart')" @click="removeFromCart()" ></RoundCornerButton>
+                        <RoundCornerButton v-else style="width: 150px;" :text="$t('AddToCart')" @click="addToCart()" ></RoundCornerButton>
+                        <RoundCornerButton v-if="this.itemData['collected'] == true" style="width: 200px;" :text="$t('Remove From Collection')" @click="removeFromCollection()" ></RoundCornerButton>
+                        <RoundCornerButton v-else style="width: 150px;" :text="$t('Add To Collection')" @click="addToCollection()" ></RoundCornerButton>
                     </div>
                 </div>
             </div>
@@ -52,7 +55,175 @@ export default {
       redirect()
       {
         this.$router.push('/userhome/transactionpage')
-      }
+      },
+      Iteminfo(){
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("username", this.$store.state.username);
+        myHeaders.append("token", this.$store.state.token);
+
+        var data = {"id": this.$route.params.id};
+
+        var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: JSON.stringify(data),
+        redirect: 'follow'
+        };
+
+        fetch("http://localhost:28888/product/get", requestOptions)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            this.itemData['name'] = data.data['info']["name"];
+            this.itemData['description'] = data.data['info']["description"];
+            this.itemData['price'] = data.data['info']["price"];
+            this.itemData['collected'] = false;
+            this.itemData['addedCart'] = false;
+            this.sellerName(data.data['userId']);
+        })
+        .catch(error => console.log('error', error));
+      },
+      sellerName(userid){
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("username", this.$store.state.username);
+        myHeaders.append("token", this.$store.state.token);
+
+        var data = {"userId": userid};
+
+        var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: JSON.stringify(data),
+        redirect: 'follow'
+        };
+
+        fetch("http://localhost:28888/user/getByUserId", requestOptions)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            this.itemData['seller']['username'] = data.data['username'];
+        })
+        .catch(error => console.log('error', error));
+      },
+      itemScore(){
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("username", this.$store.state.username);
+        myHeaders.append("token", this.$store.state.token);
+
+        var data = {"id": this.$route.params.id};
+
+        var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: JSON.stringify(data),
+        redirect: 'follow'
+        };
+
+        fetch("http://localhost:28888/user/getAvgScore", requestOptions)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+        })
+        .catch(error => console.log('error', error));
+      },
+      addToCollection(){
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("username", this.$store.state.username);
+        myHeaders.append("token", this.$store.state.token);
+
+        var data = {"productId": this.$route.params.id};
+
+        var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: JSON.stringify(data),
+        redirect: 'follow'
+        };
+
+        fetch("http://localhost:28888/collect/add", requestOptions)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            this.itemData['collected'] = true;
+;        })
+        .catch(error => console.log('error', error));
+      },      
+      removeFromCollection(){
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("username", this.$store.state.username);
+        myHeaders.append("token", this.$store.state.token);
+
+        var data = {"productId": this.$route.params.id};
+
+        var requestOptions = {
+        method: 'DELETE',
+        headers: myHeaders,
+        body: JSON.stringify(data),
+        redirect: 'follow'
+        };
+
+        fetch("http://localhost:28888/collect/remove", requestOptions)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            this.itemData['collected'] = false;
+;        })
+        .catch(error => console.log('error', error));
+      },
+      addToCart(){
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("username", this.$store.state.username);
+        myHeaders.append("token", this.$store.state.token);
+
+        var data = {"productId": this.$route.params.id};
+
+        var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: JSON.stringify(data),
+        redirect: 'follow'
+        };
+
+        fetch("http://localhost:28888/shoppingCart/add", requestOptions)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            this.itemData['addedCart'] = true;
+;        })
+        .catch(error => console.log('error', error));
+      },      
+      removeFromCart(){
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("username", this.$store.state.username);
+        myHeaders.append("token", this.$store.state.token);
+
+        var data = {"productId": this.$route.params.id};
+
+        var requestOptions = {
+        method: 'DELETE',
+        headers: myHeaders,
+        body: JSON.stringify(data),
+        redirect: 'follow'
+        };
+
+        fetch("http://localhost:28888/shoppingCart/remove", requestOptions)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            this.itemData['addedCart'] = false;
+;        })
+        .catch(error => console.log('error', error));
+      },
+  },
+  mounted(){
+    this.Iteminfo();
   },
     data() {
         return {
@@ -74,6 +245,8 @@ Elevate your style with this leather bag, a testament to craftsmanship and quali
                     username: "Username is long",
                     rating: 5.0
                 },
+                collected: false,
+                addedCart: false,
                 labels: [
                     "Hello",
                     "Hello",

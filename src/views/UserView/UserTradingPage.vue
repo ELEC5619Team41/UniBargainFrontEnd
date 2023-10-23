@@ -268,10 +268,47 @@ export default {
             } else {
                 this.displayItems = this.items.filter(item => (item.status == this.statusKeyPairs[e] && item.tag == this.tagKeyPairs[this.categorySelectedButton]))
             }
+        },
+        findBoughts(){
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+
+            var data = {};
+
+            var requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: JSON.stringify(data),
+            redirect: 'follow'
+            };
+
+            fetch("http://localhost:28888/buyProduct/getList", requestOptions)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                var ls = [];
+                for (let i = 0; i < data.data.length; i++){
+                    var content= {
+                        "productId": data.data[i]['productId'],
+                        "username": data.data[i]['productUserId'],
+                        "itemName": data.data[i]['productInfo']['name'],
+                        "orderDate": "",
+                        "itemPrice": data.data[i]['productInfo']['price'],
+                        "tag": "bought",
+                        "status": "unrated"
+                    }
+                    ls.push(content);
+                }
+
+            })
+            .catch(error => console.log('error', error));
         }
     },
     mounted() {
-        this.displayItems = this.items.filter(item => (item.tag == this.tagKeyPairs[this.categorySelectedButton]))
+        this.displayItems = this.items.filter(item => (item.tag == this.tagKeyPairs[this.categorySelectedButton]));
+        this.findBoughts();
     }
 }
 </script>
