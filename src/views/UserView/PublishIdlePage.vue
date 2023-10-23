@@ -1,90 +1,74 @@
 <template>
 
-  <div class="commentField" style="padding-bottom: 5rem; display: flex; flex-direction: column">
-    <div class="division">
-      <div class="item-basic-info">
-        <div class="item-basic-info-element">
-          <h3>basic information</h3>
-          <input class="info-input" type="text">
-        </div>
+  <div  class="commentField">
+    <el-row justify="space-between">
+      <el-col :span="4" ><div>Item Name</div><el-input ></el-input></el-col>
+      <el-col :span="4"><div>Price</div> <el-input ></el-input></el-col>
+      <el-col :span="4"><div>Mailing method</div><el-cascader :options="option" v-model="mailMethod"></el-cascader> </el-col>
+    </el-row>
 
-        <div class="item-basic-info-element">
-          <h3>basic information</h3>
-          <input class="info-input" type="text">
-        </div>
+    <el-row justify="space-between">
+      <el-col :span="24"><div>Item Description</div>
+      <el-input ></el-input></el-col>
+    </el-row>
 
-        <div class="item-basic-info-element">
-          <h3>basic information</h3>
-          <input class="info-input" type="text">
-        </div>
-      </div>
-      <b-alert v-model="showDismissibleAlert" variant="danger" dismissible>
-        Dismissible Alert!
-      </b-alert>
+    <el-row justify="space-between">
+      <el-col :span="24"><div>Item Image</div>
+      <file-upload-component></file-upload-component></el-col>
+    </el-row>
 
+    <el-row justify="space-between">
+      <el-col :span="4"><div>Brand</div><el-input ></el-input></el-col>
+      <el-col :span="4"><div>Quality</div><el-input ></el-input></el-col>
+      <el-col :span="4"><div>Sale Status</div><el-cascader :options="status" v-model="statusValue"></el-cascader></el-col>
+    </el-row>
+    <el-row>
+      <el-col :span="24" ><address-block-component :input-data="[]"></address-block-component></el-col>
+    </el-row>
 
-    </div>
-
-
-    <div class="division">
-      <h3>item description</h3>
-      <input style="width: 80%; align-items: center; height: 100px; margin-bottom: 50px; border-radius: 10px; border: gray solid" type="text">
-    </div>
-
-    <div class="division" >
-      <h3 style="left: ">item image</h3>
-      <div >
-        add image
-      </div>
-    </div>
-
-    <div class="division">
-      <div style="display: flex; flex-direction: row">
-
-        <div class="item-basic-info-element">
-          <h3>basic information</h3>
-          <input class="info-input" type="text">
-        </div>
-
-        <div class="item-basic-info-element">
-          <h3>basic information</h3>
-          <input class="info-input" type="text">
-        </div>
-
-        <div class="item-basic-info-element">
-          <h3>basic information</h3>
-          <input class="info-input" type="text">
-        </div>
-      </div>
-
-    </div>
-
-    <div class="division">
-      <div>
-        <h3>address</h3>
-      </div>
-      <input style="width: 80%; align-items: center; height: 100px; margin-bottom: 50px; border-radius: 10px; border: gray solid" type="text">
-    </div>
-
-    <div class="division" style="float: bottom ; display: flex">
-      <round-corner-button text="submit" style="margin-left: 20%"></round-corner-button>
-      <round-corner-button text="cancel" style="margin-left: 40%; margin-right: 20%"></round-corner-button>
-
-    </div>
-
-
-
-
+    <el-row justify="center">
+      <el-col :span="4"><el-button>Cancel</el-button></el-col>
+      <el-col :span="4"><el-button>Submit</el-button></el-col>
+    </el-row>
   </div>
 </template>
 <script>
 import RoundCornerButton from "@/components/Common/RoundCornerButton";
+import AddressBlockComponent from "@/components/UserProfile/AddressBlockComponent";
+import FileUploadComponent from "@/components/Common/FileUploadComponent";
 export default {
   name: "PublishIdlePage",
-  components: {RoundCornerButton},
+  components: {FileUploadComponent, AddressBlockComponent, RoundCornerButton},
   methods:{
     Submit(){
 
+    }
+  },
+  data()
+  {
+    return{
+      option:[
+        {value:'mail',
+          label:'mail'
+        },
+        {
+          value: 'pickup',
+          label: 'pick up'
+        }
+      ],
+      status:[
+        {value:'new',
+          label:'new'
+        },
+        {value:'few flaw',
+          label:'few flaw'
+        },
+        {value:'used',
+          label:'used'
+        },
+      ],
+      mailMethod:'mail',
+      statusValue:'new'
     }
   }
 }
@@ -130,5 +114,9 @@ export default {
 .division{
   /*border: gray solid;*/
   margin-top: 15px;
+}
+
+.el-row{
+  margin-bottom: 20px;
 }
 </style>

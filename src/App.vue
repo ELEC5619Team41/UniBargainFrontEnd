@@ -3,7 +3,12 @@
 </template>
 
 <script>
+import  SocketIoService from './service/socketio.service';
+export default {
+  name:'App',
+  components:{},
 
+}
 </script>
 <style>
 #app {

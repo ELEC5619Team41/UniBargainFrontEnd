@@ -10,7 +10,7 @@
         <div class="rightSection">
             <div class="chatHeader">
                 <div style="width: 48px; height: 48px; background-color: white;"></div>
-                <div>{{ this.ChatInfo.contact_name }}</div>
+                <div onclick="">{{ this.ChatInfo.contact_name }}</div>
             </div>
 
 
@@ -38,6 +38,8 @@
 import MessageSearchBar from '@/components/Message/MessageSearchBar.vue'
 import ContactItem from '@/components/Message/ContactItem.vue'
 import { formatDate } from '@fullcalendar/core';
+import {io} from"socket.io-client"
+import SocketIoService from "@/service/socketio.service";
 export default {
     name: "UserMessagePage",
     components: {
@@ -420,12 +422,14 @@ export default {
             myUserID: 1, // should be store in vuex, get when login
             restHeight: 0,
             timer: null,
+            service: new SocketIoService(),
+            chatRoom:0
 
         }
     },
-    mounted() {
-        this.windowsHeight = window.innerHeight;
-    },
+  // mounted() {
+    //     this.windowsHeight = window.innerHeight;
+    // },
     methods: {
         userTextAreaInput(e) {
             console.log("userTextAreaInput" + e.which);
@@ -438,6 +442,7 @@ export default {
                 this.chatInput = "";
             }
             console.log(this.chatInput);
+            this.submitChatMessage();
         },
         onScroll({ target: { scrollTop, offsetHeight, scrollHeight } }) {
             if (scrollTop == 0) {
@@ -455,6 +460,29 @@ export default {
 
             }
         },
+      submitChatMessage()
+      {
+        this.service.socket.emit("sendMessage",this.chatInput,this.chatRoom)
+      },
+      JoinRoom()
+      {
+        this.service.socket.emit("joinRoom",this.chatRoom)
+      },
+      StartChat()
+      {
+        this.service.socket.emit("startChat",this.myUserID)
+      },
+      findChat(userid)
+      {
+        this.service.socket.emit("findChat",this.service.socket.id,userid)
+      },
+      backToOwnRoom()
+      {
+        this.service.socket.emit("findChat",this.service.socket.id,this.myUserID)
+      }
+
+
+
     },
     updated() {
         // if (!this.needUpdate) {
@@ -467,7 +495,29 @@ export default {
     mounted() {
         const div = document.getElementById("chatWindow");
         div.scrollTop = div.scrollHeight;
+      this.windowsHeight = window.innerHeight;
+    },
+    created() {
+      const service =this.service;
+      service.setupSocketConnection();
+      service.socket.on("connect", () => {
+        console.log(service.socket.id); // true
+      });
+      service.socket.on("disconnect", () => {
+        console.log(service.socket.id); // undefined
+      });
+      service.socket.on("receiveMessage", (message) => {
+        console.log(message);
+      })
+      service.socket.on("RoomFound",(id)=>{
+        this.chatRoom=id;
+      })
+    },
+    setUpChat()
+    {
+
     }
+
 }
 </script>
 
