@@ -7,15 +7,14 @@ import store from './store'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'element-plus/dist/index.css'
 import ElementPlus from 'element-plus';
-
+import { createStore } from 'vuex'
 
 
 
 const app = createApp(App);
-app
 
-
-app.use(ElementPlus)
+app.use(store);
+app.use(ElementPlus);
 app.use(router);
 app.use(i18n);
 app.use(store);

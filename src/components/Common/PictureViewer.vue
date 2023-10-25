@@ -69,6 +69,7 @@ export default {
     }
   },
   created() {
+    this.CurrentImage = this.ImageSet[0].src;
    this.SendRequest()
   }
 

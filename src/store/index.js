@@ -5,13 +5,15 @@ export default  createStore({
     state () {
       return {
         username: '',
-        token: ''
+        token: '',
+          id:'',
       }
     },
     mutations: {
       update (state,input) {
         state.username = input.username;
         state.token = input.token;
+        state.id= input.id
       }
     },
     plugins: [createPersistedState()]

@@ -1,26 +1,33 @@
 <template>
     <div class="interfaceFrame">
         <div class="leftSection">
-            <MessageSearchBar></MessageSearchBar>
+          <div class="searchbar">
+            <input class="inputBar" v-model="searchInput">
+            <div class="searchButton" v-on:click="SearchList"></div>
+          </div>
             <div class="contactField">
-                <ContactItem v-for="item in this.Contacts" :contactDetail="item"></ContactItem>
+              <div v-for="(item,num) in this.Contacts" v-on:click="ChangeChatRoom(num)" >
+                <ContactItem  :contactDetail="item" ></ContactItem>
+              </div>
             </div>
 
         </div>
         <div class="rightSection">
             <div class="chatHeader">
                 <div style="width: 48px; height: 48px; background-color: white;"></div>
-                <div onclick="">{{ this.ChatInfo.contact_name }}</div>
+                <div onclick="" v-if="this.Show">{{ this.Contacts[CurrentRoom].user.name}}</div>
             </div>
 
 
-            <div id="chatWindow" class="chatWindow" @scroll="onScroll">
-                <div :class="[message.userid == this.myUserID ? 'self' : '', 'messageOutLine']" class="messageOutLine"
-                    v-for="message in this.ChatInfo.messages">
-                    <div class="bubble">
-                        {{ message.message }}
-                    </div>
+            <div id="chatWindow" class="chatWindow" @scroll="onScroll" >
+              <div v-if="this.Show">
+                <div :class="[message.sendUserId == this.myUserID ? 'self' : '', 'messageOutLine']" class="messageOutLine"
+                     v-for="message in this.ChatInfo">
+                  <div class="bubble" >
+                    {{ message.message.text }}
                 </div>
+              </div>
+              </div>
             </div>
 
 
@@ -32,6 +39,7 @@
             </div>
         </div>
     </div>
+
 </template>
 
 <script>
@@ -40,6 +48,9 @@ import ContactItem from '@/components/Message/ContactItem.vue'
 import { formatDate } from '@fullcalendar/core';
 import {io} from"socket.io-client"
 import SocketIoService from "@/service/socketio.service";
+import UserPost from "@/components/Message/UserPost";
+import { useRoute } from 'vue-router';
+
 export default {
     name: "UserMessagePage",
     components: {
@@ -49,217 +60,9 @@ export default {
     data() {
         return {
             windowsHeight: 0,
+            CurrentRoom:0,
             Contacts: [
-                {
-                    "contact_name": "Alice",
-                    "last_message": "Hello!",
-                    "timestamp": "2023-09-21T08:15:00Z"
-                },
-                {
-                    "contact_name": "Bob",
-                    "last_message": "Hi there!",
-                    "timestamp": "2023-09-21T07:30:00Z"
-                },
-                {
-                    "contact_name": "Charlie",
-                    "last_message": "Good morning!",
-                    "timestamp": "2023-09-20T09:45:00Z"
-                },
-                {
-                    "contact_name": "David",
-                    "last_message": "How are you?",
-                    "timestamp": "2023-09-20T12:20:00Z"
-                },
-                {
-                    "contact_name": "Eva",
-                    "last_message": "Hey!",
-                    "timestamp": "2023-09-19T15:40:00Z"
-                },
-                {
-                    "contact_name": "Frank",
-                    "last_message": "What's up?",
-                    "timestamp": "2023-09-19T17:10:00Z"
-                },
-                {
-                    "contact_name": "Grace",
-                    "last_message": "Hi!",
-                    "timestamp": "2023-09-18T18:25:00Z"
-                },
-                {
-                    "contact_name": "Hannah",
-                    "last_message": "Good evening!",
-                    "timestamp": "2023-09-18T20:55:00Z"
-                },
-                {
-                    "contact_name": "Ian",
-                    "last_message": "Hello!",
-                    "timestamp": "2023-09-17T22:00:00Z"
-                },
-                {
-                    "contact_name": "Julia",
-                    "last_message": "Hi there!",
-                    "timestamp": "2023-09-17T23:30:00Z"
-                },
-                {
-                    "contact_name": "Kurt",
-                    "last_message": "Good morning!",
-                    "timestamp": "2023-09-16T09:10:00Z"
-                },
-                {
-                    "contact_name": "Linda",
-                    "last_message": "How are you?",
-                    "timestamp": "2023-09-16T11:45:00Z"
-                },
-                {
-                    "contact_name": "Mike",
-                    "last_message": "Hey!",
-                    "timestamp": "2023-09-15T14:20:00Z"
-                },
-                {
-                    "contact_name": "Nina",
-                    "last_message": "What's up?",
-                    "timestamp": "2023-09-15T16:35:00Z"
-                },
-                {
-                    "contact_name": "Oliver",
-                    "last_message": "Hi!",
-                    "timestamp": "2023-09-14T17:50:00Z"
-                },
-                {
-                    "contact_name": "Alice",
-                    "last_message": "Hello!",
-                    "timestamp": "2023-09-21T08:15:00Z"
-                },
-                {
-                    "contact_name": "Bob",
-                    "last_message": "Hi there!",
-                    "timestamp": "2023-09-21T07:30:00Z"
-                },
-                {
-                    "contact_name": "Charlie",
-                    "last_message": "Good morning!",
-                    "timestamp": "2023-09-20T09:45:00Z"
-                },
-                {
-                    "contact_name": "David",
-                    "last_message": "How are you?",
-                    "timestamp": "2023-09-20T12:20:00Z"
-                },
-                {
-                    "contact_name": "Eva",
-                    "last_message": "Hey!",
-                    "timestamp": "2023-09-19T15:40:00Z"
-                },
-                {
-                    "contact_name": "Frank",
-                    "last_message": "What's up?",
-                    "timestamp": "2023-09-19T17:10:00Z"
-                },
-                {
-                    "contact_name": "Grace",
-                    "last_message": "Hi!",
-                    "timestamp": "2023-09-18T18:25:00Z"
-                },
-                {
-                    "contact_name": "Hannah",
-                    "last_message": "Good evening!",
-                    "timestamp": "2023-09-18T20:55:00Z"
-                },
-                {
-                    "contact_name": "Ian",
-                    "last_message": "Hello!",
-                    "timestamp": "2023-09-17T22:00:00Z"
-                },
-                {
-                    "contact_name": "Julia",
-                    "last_message": "Hi there!",
-                    "timestamp": "2023-09-17T23:30:00Z"
-                },
-                {
-                    "contact_name": "Kurt",
-                    "last_message": "Good morning!",
-                    "timestamp": "2023-09-16T09:10:00Z"
-                },
-                {
-                    "contact_name": "Linda",
-                    "last_message": "How are you?",
-                    "timestamp": "2023-09-16T11:45:00Z"
-                },
-                {
-                    "contact_name": "Mike",
-                    "last_message": "Hey!",
-                    "timestamp": "2023-09-15T14:20:00Z"
-                },
-                {
-                    "contact_name": "Nina",
-                    "last_message": "What's up?",
-                    "timestamp": "2023-09-15T16:35:00Z"
-                },
-                {
-                    "contact_name": "Oliver",
-                    "last_message": "Hi!",
-                    "timestamp": "2023-09-14T17:50:00Z"
-                },
-                {
-                    "contact_name": "Alice",
-                    "last_message": "Hello!",
-                    "timestamp": "2023-09-21T08:15:00Z"
-                },
-                {
-                    "contact_name": "Bob",
-                    "last_message": "Hi there!",
-                    "timestamp": "2023-09-21T07:30:00Z"
-                },
-                {
-                    "contact_name": "Charlie",
-                    "last_message": "Good morning!",
-                    "timestamp": "2023-09-20T09:45:00Z"
-                },
-                {
-                    "contact_name": "David",
-                    "last_message": "How are you?",
-                    "timestamp": "2023-09-20T12:20:00Z"
-                },
-                {
-                    "contact_name": "Eva",
-                    "last_message": "Hey!",
-                    "timestamp": "2023-09-19T15:40:00Z"
-                },
-                {
-                    "contact_name": "Frank",
-                    "last_message": "What's up?",
-                    "timestamp": "2023-09-19T17:10:00Z"
-                },
-                {
-                    "contact_name": "Grace",
-                    "last_message": "Hi!",
-                    "timestamp": "2023-09-18T18:25:00Z"
-                },
-                {
-                    "contact_name": "Hannah",
-                    "last_message": "Good evening!",
-                    "timestamp": "2023-09-18T20:55:00Z"
-                },
-                {
-                    "contact_name": "Ian",
-                    "last_message": "Hello!",
-                    "timestamp": "2023-09-17T22:00:00Z"
-                },
-                {
-                    "contact_name": "Julia",
-                    "last_message": "Hi there!",
-                    "timestamp": "2023-09-17T23:30:00Z"
-                },
-                {
-                    "contact_name": "Kurt",
-                    "last_message": "Good morning!",
-                    "timestamp": "2023-09-16T09:10:00Z"
-                },
-                {
-                    "contact_name": "Linda",
-                    "last_message": "How are you?",
-                    "timestamp": "2023-09-16T11:45:00Z"
-                }
+
             ],
             ChatInfo: {
                 "contact_name": "Alice",
@@ -423,7 +226,10 @@ export default {
             restHeight: 0,
             timer: null,
             service: new SocketIoService(),
-            chatRoom:0
+            chatRoom:false,
+            Show:false,
+            searchInput:'',
+            defaultMessage:'talk about the trade',
 
         }
     },
@@ -439,10 +245,60 @@ export default {
             } else if (e.which == 13) {
                 e.preventDefault();
                 console.log("send message");
+                var myHeaders = new Headers();
+                myHeaders.append("Content-Type", "application/json");
+                myHeaders.append("username", this.$store.state.username);
+                myHeaders.append("token", this.$store.state.token);
+                const raw = {
+                opposingUserId: this.Contacts[this.CurrentRoom].user.id,
+                  message:
+                      {
+                        text:this.chatInput
+                      }
+                };
+                var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(raw),
+                redirect: 'follow'
+                };
+                console.log(requestOptions);
+
+                fetch("http://localhost:28888/chat/sendMessage", requestOptions)
+                  .then(response=>{response.json();console.log(response)})
+                  .then(result => this.ChangeChatRoom(this.CurrentRoom))
+                  .catch(error => console.log('error', error));
                 this.chatInput = "";
             }
             console.log(this.chatInput);
-            this.submitChatMessage();
+
+        },
+        ChangeChatRoom(num)
+        {
+          this.CurrentRoom=num;
+          let id = this.Contacts[this.CurrentRoom].user.id;
+          console.log(id);
+          this.chatRoom=true;
+          var myHeaders = new Headers();
+          myHeaders.append("Content-Type", "application/json");
+          myHeaders.append("username", this.$store.state.username);
+          myHeaders.append("token", this.$store.state.token);
+
+          const raw = {
+            "opposingUserId": id
+          };
+
+          var requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: JSON.stringify(raw),
+            redirect: 'follow'
+          };
+
+          fetch("http://localhost:28888/chat/getListByOpposingUserId", requestOptions)
+              .then(response=>response.json())
+              .then(result => {this.ChatInfo= result.data; console.log(result);this.Show=true; this.ChatInfo=this.ChatInfo.reverse()})
+              .catch(error => console.log('error', error));
         },
         onScroll({ target: { scrollTop, offsetHeight, scrollHeight } }) {
             if (scrollTop == 0) {
@@ -460,31 +316,141 @@ export default {
 
             }
         },
-      submitChatMessage()
-      {
-        this.service.socket.emit("sendMessage",this.chatInput,this.chatRoom)
-      },
-      JoinRoom()
-      {
-        this.service.socket.emit("joinRoom",this.chatRoom)
-      },
-      StartChat()
-      {
-        this.service.socket.emit("startChat",this.myUserID)
-      },
-      findChat(userid)
-      {
-        this.service.socket.emit("findChat",this.service.socket.id,userid)
-      },
-      backToOwnRoom()
-      {
-        this.service.socket.emit("findChat",this.service.socket.id,this.myUserID)
-      }
+        SearchList()
+        {
+          var myHeaders = new Headers();
+          myHeaders.append("Content-Type", "application/json");
+          myHeaders.append("username", this.$store.state.username);
+          myHeaders.append("token", this.$store.state.token);
+          var raw = {"searchName":this.searchInput};
+
+          var requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: JSON.stringify(raw),
+            redirect: 'follow'
+          };
+
+          fetch("http://localhost:28888/chat/getPreviewList", requestOptions)
+              .then(response => response.json())
+              .then(result => {
+
+                this.Contacts=result.data;
+                if(this.Contacts.length!==0)
+                {
+                  this.ChangeChatRoom(0);
+                  this.searchInput='';
+                }
+                else {
+
+                }
+
+
+              })
+              .catch(error => console.log('error', error));
+        }
+
+
 
 
 
     },
-    updated() {
+  activated() {
+
+
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("username", this.$store.state.username);
+    myHeaders.append("token", this.$store.state.token);
+    var raw = {"searchname":"null"};
+
+    var requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: JSON.stringify(raw),
+      redirect: 'follow'
+    };
+
+    fetch("http://localhost:28888/chat/getPreviewList", requestOptions)
+        .then(response => response.json())
+        .then(result => {this.Contacts=result.data})
+        .catch(error => console.log('error', error));
+
+
+  },
+  created() {
+      const route = useRoute();
+      this.myUserID= this.$store.state.id;
+      console.log(this.myUserID+"id")
+      if(route.query.UserID!=null) {
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("username", this.$store.state.username);
+        myHeaders.append("token", this.$store.state.token);
+
+        const raw = {
+          opposingUserId: route.query.UserID,
+          message:
+              {
+                text:'Hello, I want to talk about trade'
+              }
+        };
+
+        var requestOptions = {
+          method: 'POST',
+          headers: myHeaders,
+          body: JSON.stringify(raw),
+          redirect: 'follow'
+        };
+
+        fetch("http://localhost:28888/chat/sendMessage", requestOptions)
+            .then(response=>response.json())
+            .then(result => console.log(result['user']))
+            .catch(error => console.log('error', error));
+      }
+      else {
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("username", this.$store.state.username);
+        myHeaders.append("token", this.$store.state.token);
+        var raw = {"searchname":"null"};
+
+        var requestOptions = {
+          method: 'POST',
+          headers: myHeaders,
+          body: JSON.stringify(raw),
+          redirect: 'follow'
+        };
+
+        fetch("http://localhost:28888/chat/getPreviewList", requestOptions)
+            .then(response => response.json())
+            .then(result => {this.Contacts=result.data;this.ChangeChatRoom(0)})
+            .catch(error => console.log('error', error));
+      }
+
+      setInterval(()=>{
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("username", this.$store.state.username);
+        myHeaders.append("token", this.$store.state.token);
+        var raw = {"searchname":"null"};
+
+        var requestOptions = {
+          method: 'POST',
+          headers: myHeaders,
+          body: JSON.stringify(raw),
+          redirect: 'follow'
+        };
+
+        fetch("http://localhost:28888/chat/getPreviewList", requestOptions)
+            .then(response => response.json())
+            .then(result => {this.Contacts=result.data})
+            .catch(error => console.log('error', error));
+      },1000)
+
+  },
+
+  updated() {
         // if (!this.needUpdate) {
         //     return
         // }
@@ -497,27 +463,52 @@ export default {
         div.scrollTop = div.scrollHeight;
       this.windowsHeight = window.innerHeight;
     },
-    created() {
-      const service =this.service;
-      service.setupSocketConnection();
-      service.socket.on("connect", () => {
-        console.log(service.socket.id); // true
-      });
-      service.socket.on("disconnect", () => {
-        console.log(service.socket.id); // undefined
-      });
-      service.socket.on("receiveMessage", (message) => {
-        console.log(message);
-      })
-      service.socket.on("RoomFound",(id)=>{
-        this.chatRoom=id;
-      })
-    },
-    setUpChat()
-    {
 
-    }
 
+
+
+  // created() {
+  //   // const service =this.service;
+  //   // service.setupSocketConnection();
+  //   // service.socket.on("connect", () => {
+  //   //   console.log(service.socket.id); // true
+  //   // });
+  //   // service.socket.on("disconnect", () => {
+  //   //   console.log(service.socket.id); // undefined
+  //   // });
+  //   // service.socket.on("receiveMessage", (message) => {
+  //   //   console.log(message);
+  //   // })
+  //   // service.socket.on("RoomFound",(id)=>{
+  //   //   this.chatRoom=id;
+  //   // })
+  // },
+  // setUpChat()
+  // {
+  //
+  // }
+  // submitChatMessage()
+  // {
+  //   this.service.socket.emit("sendMessage",this.chatInput,this.chatRoom)
+  //   // server push message
+  //
+  // },
+  // JoinRoom()
+  // {
+  //   this.service.socket.emit("joinRoom",this.chatRoom)
+  // },
+  // StartChat()
+  // {
+  //   this.service.socket.emit("startChat",this.myUserID)
+  // },
+  // findChat(userid)
+  // {
+  //   this.service.socket.emit("findChat",this.service.socket.id,userid)
+  // },
+  // backToOwnRoom()
+  // {
+  //   this.service.socket.emit("findChat",this.service.socket.id,this.myUserID)
+  // }
 }
 </script>
 
@@ -631,4 +622,49 @@ export default {
     width: fit-content;
     max-width: 60%;
 }
+
+
+
+ .searchbar {
+   display: flex;
+   align-items: center;
+   overflow: hidden;
+   height: 40px;
+   width: 100%;
+   border-radius: 80px;
+   border: 1px solid black;
+   max-width: 1124px;
+   background-color: white;
+   position: relative;
+ }
+
+.inputBar {
+  width: 80%;
+  height: 100%;
+  border: none;
+  padding-left: 10px;
+}
+
+.inputBar:focus {
+  outline: none;
+}
+
+.clearButton {
+  height: 20px;
+  width: 20px;
+  border-radius: 20px;
+  background-color: black;
+}
+
+.searchButton {
+  height: 30px;
+  width: 30px;
+  border-radius: 30px;
+  background-color: black;
+  right: 20px;
+  position: absolute
+}
 </style>
+
+
+

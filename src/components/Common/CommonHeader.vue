@@ -41,7 +41,17 @@ export default {
             this.selectedButton = 5
         }
         for (let index = 0; index < this.itemNames.length; index++) {
-            if(this.itemNames[index].link == url)
+          let questionmark = url.indexOf('?');
+          let Url;
+          if(questionmark!==0)
+          {
+            Url = url.substring(0,questionmark)
+          }
+          else
+          {
+            Url=url;
+          }
+            if(this.itemNames[index].link == Url)
             {
                 this.selectedButton = index
             }

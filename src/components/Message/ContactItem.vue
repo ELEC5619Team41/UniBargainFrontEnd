@@ -5,13 +5,13 @@
             <!-- {{ this.contactDetail }} -->
             <div style="margin-left: 10px; width: calc(100%-48px); overflow: hidden;">
                 <p class="contactName">
-                    {{ this.contactDetail.contact_name }}</p>
+                    {{ this.contactDetail.user.name }}</p>
                 <p class="contactMessage">
-                    {{ this.contactDetail.last_message }}</p>
+                    {{ this.contactDetail.message.text }}</p>
             </div>
         </div>
-        <p class="contactTime">
-            {{ this.humanTimeFromISO }}</p>
+<!--        <p class="contactTime">-->
+<!--&lt;!&ndash;            {{ this.humanTimeFromISO }}</p>&ndash;&gt; need to add timestamp-->
     </div>
 </template>
 
@@ -31,11 +31,12 @@ export default {
         }
     },
     props: {
-        contactDetail: {
-            contact_name: "",
-            last_message: "",
-            timestamp: ""
-        }
+        contactDetail:Object
+        //     {
+        //     contact_name: "",
+        //     last_message: "",
+        //     timestamp: ""
+        // }
     },
     methods: {
     }

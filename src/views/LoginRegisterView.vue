@@ -26,6 +26,7 @@ export default {
     setLoginRegister(){
       this.isLoginInterface = !this.isLoginInterface
     },
+
   }
 };
 </script>

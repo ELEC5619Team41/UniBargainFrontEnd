@@ -1,42 +1,33 @@
 <template>
 
-<div class="commentField">
-  <el-container>
-    <el-header>
-      <top-search-bar></top-search-bar>
-    </el-header>
-    <el-container>
-      <el-aside>
-          <el-button-group >
-            <el-button autofocus @click="SetDetail">Detailed</el-button>
-            <el-button @click="SetExplore">Explore</el-button>
-            <el-button @click="SetMyPost">My Post</el-button>
-          </el-button-group>
-      </el-aside>
-      <el-main>
-
+  <div>
+    <top-search-bar></top-search-bar>
+    <div style="display: flex">
+      <el-button-group style="width: 30%">
+        <el-button autofocus @click="SetDetail">Detailed</el-button>
+        <el-button @click="SetExplore">Explore</el-button>
+        <el-button @click="SetMyPost">My Post</el-button>
+      </el-button-group>
+      <div style="width: 70%">
         <div v-if="Detail">
-          <div v-for = "post in PostData">
+          <div v-for="post in PostData">
             <UserPost :post="post"></UserPost>
           </div>
         </div>
 
-        <div v-if="Explore" style="display: flex; max-width: 1124px; flex-wrap: wrap; justify-content:space-around;width: 100%"  >
-          <div v-for="item in GalleryItem" >
-            <GalleryItemcomponent  :ItemData="item"></GalleryItemcomponent>
+        <div v-if="Explore"
+             style="display: flex; max-width: 1124px; flex-wrap: wrap; justify-content:space-around;width: 100%">
+          <div v-for="item in GalleryItem">
+            <GalleryItemcomponent :ItemData="item"></GalleryItemcomponent>
           </div>
         </div>
 
-        <div v-if="MyPost" style="display: flex; max-width: 1124px; flex-wrap: wrap; justify-content:space-around;width: 100%" >
-
+        <div v-if="MyPost"
+             style="display: flex; max-width: 1124px; flex-wrap: wrap; justify-content:space-around;width: 100%">
         </div>
-      </el-main>
-    </el-container>
-
-  </el-container>
-
-</div>
-
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -47,60 +38,59 @@ import GalleryItemcomponent from "@/components/HomePage/GalleryItemcomponent";
 export default {
   name: "SeekTradeItem",
 
-  components:{
+  components: {
     GalleryItemcomponent,
-    TopSearchBar,UserPost
+    TopSearchBar, UserPost
 
   },
   methods: {
-    SetExplore()
-    {
-      this.Explore=true;
-      this.MyPost=false;
-      this.Detail=false;
+    SetExplore() {
+      this.Explore = true;
+      this.MyPost = false;
+      this.Detail = false;
     },
-    SetDetail()
-    {
-      this.Explore=false;
-      this.MyPost=false;
-      this.Detail=true;
+    SetDetail() {
+      this.Explore = false;
+      this.MyPost = false;
+      this.Detail = true;
     },
-    SetMyPost()
-    {
-      this.Explore=false;
-      this.MyPost=true;
-      this.Detail=false;
+    SetMyPost() {
+      this.Explore = false;
+      this.MyPost = true;
+      this.Detail = false;
     }
 
-      },
+  },
   data() {
     return {
       PostData: [{
-          UserName:"DJ",
-          ItemId:'1',
-          UserImageUrl: "../assets/logo.png",
-          PostName: "Relx5",
-          PostMsg: "idle relx5,good price and quality",
-          ItemUrl:'../assets/logo.png',
-          Comment:
-      [
-        {
-          name: "wang ape",
-          content: "traditional cigar is better.",
-          time:"2023-9-10"
-        },
-        {
-          name: "love0",
-          content: "need this in usa",
-          time:"2023-9-12"
+        UserName: "DJ",
+        UserID:"13",
+        ItemId: '1',
+        UserImageUrl: "../1.webp",
+        PostName: "Relx5",
+        PostMsg: "idle relx5,good price and quality",
+        ItemUrl: '../assets/logo.png',
+        Comment:
+            [
+              {
+                name: "wang ape",
+                content: "traditional cigar is better.",
+                time: "2023-9-10"
+              },
+              {
+                name: "love0",
+                content: "need this in usa",
+                time: "2023-9-12"
 
-        }
+              }
 
-      ]
-    },
+            ]
+      },
         {
-          UserName:"DJ",
-          ItemId:'2',
+          UserName: "DJ",
+          ItemId: '2',
+          UserID: "12",
           UserImageUrl: "./assets/logo.png",
           PostName: "Relx5",
           PostMsg: "idle relx5,good price and quality",
@@ -109,18 +99,18 @@ export default {
                 {
                   name: "wang ape",
                   content: "traditional cigar is better.",
-                  time:"2023-9-10"
+                  time: "2023-9-10"
                 },
                 {
                   name: "love0",
                   content: "need this in usa",
-                  time:"2023-9-12"
+                  time: "2023-9-12"
 
                 }
 
               ]
         }],
-      GalleryItem:[ {
+      GalleryItem: [{
         id: "1a2b3c4d",
         description: "A breathtaking view of a colorful and serene sunset over the calm ocean waves, creating a mesmerizing blend of orange, pink, and purple hues that stretch across the horizon. Captured by JohnDoe123.",
         uploader: "JohnDoe123",
@@ -192,11 +182,10 @@ export default {
           uploader: "AstroPhotographer",
           rating: 9.7
         }],
-      MyItems:[],
-      Explore:false,
-      Detail:true,
-      MyPost:false,
-
+      MyItems: [],
+      Explore: false,
+      Detail: true,
+      MyPost: false,
 
 
     }
@@ -212,19 +201,24 @@ export default {
   height: 180px;
   margin-top: 5px;
 }
-.right-section{
+
+.right-section {
   width: 73%;
   display: flex;
   flex-direction: column;
 
 }
-.left-section{
-  width: 27%; background-color: rgb(244,244,244);
+
+.left-section {
+  width: 27%;
+  background-color: rgb(244, 244, 244);
 }
-.left-section-item{
-  background-color: rgb(244,244,244);
+
+.left-section-item {
+  background-color: rgb(244, 244, 244);
   height: 30px;
 }
+
 .centerButton {
   padding: 15px;
   width: 100%;

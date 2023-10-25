@@ -55,8 +55,9 @@ const routes = [
         component: UserRequestPage
       },
       {
+        name: 'messages',
         path: 'usermessagepage',
-        component: UserMessagePage
+        component: UserMessagePage,
       },
       {
         path: 'userprofilepage',

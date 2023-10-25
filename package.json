@@ -31,6 +31,7 @@
     "vue-socket.io": "^3.0.10",
     "vuex": "^4.0.2",
     "vuex-persistedstate": "^4.1.0"
+
   },
   "devDependencies": {
     "@intlify/vue-i18n-loader": "^3.0.0",
