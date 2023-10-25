@@ -1,10 +1,12 @@
 <template>
     <div class="itemFrame" @click="clickItem()">
-        <div class="itemImg" style="background-image: `url(${this.ItemData.image})` "></div>
+        <!-- <div class="itemImg" style:{background-image="url(`${this.ItemData.image}`)" }></div> -->
+        <img v-bind:src="`${this.ItemData.image}`" class="itemImg">
         <div class="itemName">
             {{this.ItemData.name}}
         </div>
         <div style="display: flex; align-items: center;">
+            
             <div style="margin-left: 15px; width: 30px; height: 30px; background-image: `url(${this.ItemData.uploaderAvatar})`; border-radius: 10px;"></div>
             <div style="margin-left: 25px; width: 100px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; text-align: left;">{{this.ItemData.uploader}}</div>
             <div style="margin-left: 25px; "> {{this.ItemData.rating}}</div>

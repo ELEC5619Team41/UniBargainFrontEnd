@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="userProfile">
-            <div style="width: 50px; height: 50px; `background-image:url(${this.comment.userAvatar})`;"></div>
+            <img style="width: 50px; height: 50px;" v-bind:src="`${this.comment.userAvatar}`"/>
             <div>{{ this.comment.username }}</div>
             <div style="width: 30px; height: 30px; background-color: blue" v-for="index in this.comment.commentRating"></div>
             <div>{{ this.comment.rating }}</div>
@@ -28,6 +28,12 @@ export default {
             type: Object,
         }
     }
+    ,
+    // updated(){
+    //     var commAva = document.getElementById("comment-ava");
+    //     commAva.style.backgroundImage = "url(" + this.comment.userAvatar + ")";
+    //     commAva.style.backgroundSize = "cover";
+    // }
 }
 </script>
 

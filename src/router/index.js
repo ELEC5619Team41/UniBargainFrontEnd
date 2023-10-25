@@ -13,6 +13,7 @@ import PublishIdlePage from "@/views/UserView/PublishIdlePage";
 import SeekTradeItem from "@/views/UserView/SeekTradeItem";
 import TransactionPage from "@/views/UserView/TransactionPage";
 import TransactionEndPage from "@/views/UserView/TransactionEndPage";
+import SearchResultPage from "@/views/UserView/SearchResultPage";
 
 const routes = [
   {
@@ -66,6 +67,11 @@ const routes = [
       {
         path: 'itemdetailpage/:id',
         component: ItemDetailPage,
+        props: true
+      },
+      {
+        path: "search/:search",
+        component: SearchResultPage,
         props: true
       },
       {

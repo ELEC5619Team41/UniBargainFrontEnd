@@ -98,7 +98,7 @@ export default {
 
             this.itemsData = this.itemsData.filter(item => item.productId != productId)
             delete this.checkStatus[productId]
-            this.removeFromCart(0);
+            this.removeFromCart(productId);
 
             if(this.selectedCount === this.itemsData.length && this.selectedCount != 0){
                 this.allItemSelect = true
@@ -241,7 +241,6 @@ export default {
             .then(response => response.json())
             .then(data => {
                 console.log(data);
-                this.itemData['addedCart'] = false;
     ;        })
             .catch(error => console.log('error', error));
         }
