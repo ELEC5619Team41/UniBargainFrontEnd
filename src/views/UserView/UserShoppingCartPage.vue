@@ -23,7 +23,7 @@
         <div class="itemField">
             <div v-for="(itemData, index) in this.itemsData"
                 style="width: 100%; align-items: center; justify-content: center; display: flex; flex-direction: column; background-color: rgb(241, 241, 241);">
-                <ItemShoppingCartComponent :selectItemComputePrice.sync="checkStatus[itemData.orderNumber]" @update:selectItemComputePrice="selectOneItem"
+                <ItemShoppingCartComponent :selectItemComputePrice.sync="checkStatus[itemData.productId]" @update:selectItemComputePrice="selectOneItem"
                 @delete-cart-item="deleteOneItem"
                     :item="itemData">
                 </ItemShoppingCartComponent>
@@ -60,10 +60,10 @@ export default {
             for (var key in this.checkStatus) {
 
                 this.checkStatus[key].checked = this.allItemSelect
-                this.itemsData.find(item => item.orderNumber == key).selected = this.allItemSelect
+                this.itemsData.find(item => item.productId == key).selected = this.allItemSelect
 
                 if (this.allItemSelect) {
-                    this.totalPrice += this.itemsData.find(item => item.orderNumber == key).itemPrice
+                    this.totalPrice += this.itemsData.find(item => item.productId == key).itemPrice
                 }
             }
             this.totalPrice = parseFloat(this.totalPrice).toFixed(2)
@@ -71,14 +71,14 @@ export default {
         selectOneItem(itemStatusData){
 
             this.checkStatus[itemStatusData.id].checked = itemStatusData.checked
-            this.itemsData.find(item => item.orderNumber == itemStatusData.id).selected = itemStatusData.checked
+            this.itemsData.find(item => item.productId == itemStatusData.id).selected = itemStatusData.checked
 
             if (itemStatusData.checked) {
-                this.totalPrice += this.itemsData.find(item => item.orderNumber == itemStatusData.id).itemPrice
+                this.totalPrice += this.itemsData.find(item => item.productId == itemStatusData.id).itemPrice
                 this.totalPrice = parseFloat(this.totalPrice).toFixed(2)
                 this.selectedCount += 1
             } else {
-                this.totalPrice -= this.itemsData.find(item => item.orderNumber == itemStatusData.id).itemPrice
+                this.totalPrice -= this.itemsData.find(item => item.productId == itemStatusData.id).itemPrice
                 this.totalPrice = parseFloat(this.totalPrice).toFixed(2)
                 this.selectedCount -= 1
             }
@@ -88,16 +88,16 @@ export default {
                 this.allItemSelect = false
             }
         },
-        deleteOneItem(orderNumber){
+        deleteOneItem(productId){
 
-            let itemDetail = this.itemsData.find(item => item.orderNumber == orderNumber)
+            let itemDetail = this.itemsData.find(item => item.productId == productId)
             if(itemDetail.selected){
                 this.totalPrice = parseFloat(this.totalPrice - itemDetail.itemPrice).toFixed(2)
                 this.selectedCount -= 1
             }
 
-            this.itemsData = this.itemsData.filter(item => item.orderNumber != orderNumber)
-            delete this.checkStatus[orderNumber]
+            this.itemsData = this.itemsData.filter(item => item.productId != productId)
+            delete this.checkStatus[productId]
             this.removeFromCart(0);
 
             if(this.selectedCount === this.itemsData.length && this.selectedCount != 0){
@@ -107,19 +107,22 @@ export default {
             }
         },
         DeleteAllSelected(){
+            
             for (var key in this.checkStatus) {
                 if(this.checkStatus[key].checked){
-                    this.deleteOneItem(key)
+                    this.buy(this.checkStatus[key].productId,"");
+                    this.deleteOneItem(key);
                 }
             }
         },
-        getSellername(){
+        getSellerInfo(id,input){
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("username", this.$store.state.username);
             myHeaders.append("token", this.$store.state.token);
 
-            var data = {};
+            var data = {userId : id};
+            console.log(id);
 
             var requestOptions = {
             method: 'POST',
@@ -128,15 +131,63 @@ export default {
             redirect: 'follow'
             };
 
-            fetch("http://localhost:28888/", requestOptions)
+
+            return fetch("http://localhost:28888/user/getByUserId", requestOptions)
             .then(response => response.json())
             .then(data => {
                 console.log(data);
+                this.itemsData[input]['sellerName'] = data.data['username'];
+                this.itemsData[input]['sellerAvatar'] = data.data['avatar'];
 
             })
             .catch(error => console.log('error', error));
         },
-        getList(){
+        getProductInfo(id,input){
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+
+            var data = {"id": id};
+
+            var requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: JSON.stringify(data),
+            redirect: 'follow'
+            };
+
+            return fetch("http://localhost:28888/product/get", requestOptions)
+            .then(response => response.json())
+            .then(data => {
+                this.itemsData[input]['itemPrice'] = parseInt(data.data['info']["price"]);
+                this.itemsData[input]['itemImage'] = data.data['info']["image"];
+            })
+            .catch(error => console.log('error', error));
+        },
+        buy(id, address){
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+
+            var data = {"productId": id, "info": {"address": address}};
+
+            var requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: JSON.stringify(data),
+            redirect: 'follow'
+            };
+
+            fetch("http://localhost:28888//buyProduct/add", requestOptions)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+            })
+            .catch(error => console.log('error', error));
+        },
+        async getList(){
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("username", this.$store.state.username);
@@ -151,18 +202,19 @@ export default {
             redirect: 'follow'
             };
 
-            fetch("http://localhost:28888/shoppingCart/getList", requestOptions)
+            await fetch("http://localhost:28888/shoppingCart/getList", requestOptions)
             .then(response => response.json())
             .then(data => {
                 console.log(data);
                 var ls =[]
                 for(let i = 0; i<data.data.length;i++){
-
                     var content = { "productId": data.data[i]['productId'],
-                                    "username": "",
+                                    "sellerId": data.data[i]['productUserId'],
+                                    "sellerName": '',
                                     "itemName": data.data[i]['productInfo']['name'],
-                                    "orderDate": "",
                                     "itemPrice": 0,
+                                    "itemImage": '',
+                                    "sellerAvatar": '',
                                     "selected": false};
                     ls.push(content);  
                 }
@@ -195,11 +247,17 @@ export default {
         }
         
     },
-    mounted: function () {
+    async mounted() {
+        await this.getList();
+        for(let i = 0; i< this.itemsData.length; i++){
+            await this.getSellerInfo(this.itemsData[i]["sellerId"],i);
+            await this.getProductInfo(this.itemsData[i]["productId"],i);
+        }
+        console.log(this.itemsData);
         this.totalPrice = 0
         this.itemsData.forEach(item => {
-            this.checkStatus[item.orderNumber] = {
-                id: item.orderNumber,
+            this.checkStatus[item.productId] = {
+                id: item.productId,
                 checked: item.selected
             }
             if (item.selected) {
@@ -217,54 +275,54 @@ export default {
             selectedCount: 0,
             itemsData: [
                 {
-                    "orderNumber": "12345",
-                    "username": "john_doe",
-                    "itemName": "Product AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-                    "orderDate": "2023-09-18",
-                    "itemPrice": 19.99,
-                    "tag": "posted",
-                    "status": "unshipped",
-                    "selected": true
-                },
-                {
-                    "orderNumber": "67890",
-                    "username": "jane_smith",
-                    "itemName": "Product B",
-                    "orderDate": "2023-09-19",
-                    "itemPrice": 24.99,
-                    "tag": "bought",
-                    "status": "unreceived",
-                    "selected": false
-                },
-                {
-                    "orderNumber": "54321",
-                    "username": "bob_jones",
-                    "itemName": "Product C",
-                    "orderDate": "2023-09-20",
-                    "itemPrice": 14.99,
-                    "tag": "sold",
-                    "status": "unrated",
-                    "selected": true
-                },
-                {
-                    "orderNumber": "98765",
-                    "username": "alice_smith",
-                    "itemName": "Product D",
-                    "orderDate": "2023-09-21",
-                    "itemPrice": 29.99,
-                    "tag": "collection",
-                    "status": "refund",
-                    "selected": false
-                },
-                {
-                    "orderNumber": "24680",
-                    "username": "sam_jackson",
-                    "itemName": "Product E",
-                    "orderDate": "2023-09-22",
-                    "itemPrice": 39.99,
-                    "tag": "posted",
-                    "status": "unshipped",
-                    "selected": true
+                //     "orderNumber": "12345",
+                //     "username": "john_doe",
+                //     "itemName": "Product AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                //     "orderDate": "2023-09-18",
+                //     "itemPrice": 19.99,
+                //     "tag": "posted",
+                //     "status": "unshipped",
+                //     "selected": true
+                // },
+                // {
+                //     "orderNumber": "67890",
+                //     "username": "jane_smith",
+                //     "itemName": "Product B",
+                //     "orderDate": "2023-09-19",
+                //     "itemPrice": 24.99,
+                //     "tag": "bought",
+                //     "status": "unreceived",
+                //     "selected": false
+                // },
+                // {
+                //     "orderNumber": "54321",
+                //     "username": "bob_jones",
+                //     "itemName": "Product C",
+                //     "orderDate": "2023-09-20",
+                //     "itemPrice": 14.99,
+                //     "tag": "sold",
+                //     "status": "unrated",
+                //     "selected": true
+                // },
+                // {
+                //     "orderNumber": "98765",
+                //     "username": "alice_smith",
+                //     "itemName": "Product D",
+                //     "orderDate": "2023-09-21",
+                //     "itemPrice": 29.99,
+                //     "tag": "collection",
+                //     "status": "refund",
+                //     "selected": false
+                // },
+                // {
+                //     "orderNumber": "24680",
+                //     "username": "sam_jackson",
+                //     "itemName": "Product E",
+                //     "orderDate": "2023-09-22",
+                //     "itemPrice": 39.99,
+                //     "tag": "posted",
+                //     "status": "unshipped",
+                //     "selected": true
                 }
             ]
         }

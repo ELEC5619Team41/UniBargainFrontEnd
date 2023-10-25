@@ -79,7 +79,7 @@ export default {
             
         },
 
-        submitData() {
+        async submitData() {
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("username", this.$store.state.username);
@@ -94,7 +94,7 @@ export default {
             redirect: 'follow'
             };
 
-            fetch("http://localhost:28888/user/setName", requestOptions)
+            await fetch("http://localhost:28888/user/setName", requestOptions)
             .then(response => response.json())
             .then(data => {
                 console.log(data);
@@ -115,7 +115,7 @@ export default {
             redirect: 'follow'
             };
 
-            fetch("http://localhost:28888/user/setExtend", requestOptions)
+            await fetch("http://localhost:28888/user/setExtend", requestOptions)
             .then(response => response.json())
             .then(data => {
                 console.log(data);
@@ -136,7 +136,7 @@ export default {
             redirect: 'follow'
             };
 
-            fetch("http://localhost:28888/user/setAvatar", requestOptions)
+            await fetch("http://localhost:28888/user/setAvatar", requestOptions)
             .then(response => response.json())
             .then(data => {
                 console.log(data);
