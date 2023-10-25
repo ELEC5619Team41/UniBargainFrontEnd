@@ -9,6 +9,7 @@
       :on-preview="OnPreview"
       :on-remove="OnRemove"
       :auto-upload="false"
+      :on-change = "AddImage"
   >
   </el-upload>
   <el-dialog v-model="dialogVisible">
@@ -19,6 +20,7 @@
 <script>
 
 import SendRequestComponent from "@/components/Common/SendRequestComponent";
+import { read } from "@popperjs/core";
 
 export default {
   name: "FileUploadComponent",
@@ -36,10 +38,17 @@ export default {
       SendRequestComponent.method.Request(url,'delete',body,header);
     },
     AddImage(e)
-    {
-       const file = e.target.files||e.dataTransfer.files;
-       Image.push(file);
-       console.log(file);
+    { 
+       console.log(e);
+       if(e){
+        this.Image.push(e.url);
+        var reader = new FileReader();
+        reader.readAsDataURL(e.raw);
+        reader.onload= (event)=>{
+          this.img.push(event.target.result);
+        }
+       }
+       this.$emit('show-image', this.img);
     },
     OnPreview(uploadFile)
     {
@@ -50,25 +59,24 @@ export default {
     OnRemove(uploadFile,uploadFiles)
     {
       console.log(uploadFile,uploadFiles);
+      console.log(this.img);
 
     },
+    get(){
+      return this.img;
+    }
   }
   ,
   data()
   {
     return{
       Image:[
-        {
-          name:'2',
-          src:'../favicon.ico',
-        },
-        {
-          name:'1',
-          src: '../1.webp',
-        }
       ],
       ImageUrl:'',
-      dialogVisible:false
+      dialogVisible:false,
+      img:[
+
+      ]
 
 
     }

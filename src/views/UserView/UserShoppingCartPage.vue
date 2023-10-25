@@ -115,13 +115,14 @@ export default {
                 }
             }
         },
-        getSellerInfo(input){
+        getSellerInfo(id,input){
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("username", this.$store.state.username);
             myHeaders.append("token", this.$store.state.token);
 
-            var data = {userId : input};
+            var data = {userId : id};
+            console.log(id);
 
             var requestOptions = {
             method: 'POST',
@@ -130,21 +131,18 @@ export default {
             redirect: 'follow'
             };
 
-            var name = '';
-            var img = '';
 
-            fetch("http://localhost:28888/user/getByUserId", requestOptions)
+            return fetch("http://localhost:28888/user/getByUserId", requestOptions)
             .then(response => response.json())
             .then(data => {
                 console.log(data);
-                name = data.data['username'];
-                img = data.data['avatar'];
+                this.itemsData[input]['sellerName'] = data.data['username'];
+                this.itemsData[input]['sellerAvatar'] = data.data['avatar'];
 
             })
             .catch(error => console.log('error', error));
-            return [name,img];
         },
-        getProductInfo(id){
+        getProductInfo(id,input){
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("username", this.$store.state.username);
@@ -159,19 +157,13 @@ export default {
             redirect: 'follow'
             };
 
-            var price = 0;
-            var image = '';
-
-            fetch("http://localhost:28888/product/get", requestOptions)
+            return fetch("http://localhost:28888/product/get", requestOptions)
             .then(response => response.json())
             .then(data => {
-                console.log(data);
-                price = data.data['info']["price"];
-                image = data.data['info']["image"];
+                this.itemsData[input]['itemPrice'] = parseInt(data.data['info']["price"]);
+                this.itemsData[input]['itemImage'] = data.data['info']["image"];
             })
             .catch(error => console.log('error', error));
-
-            return [price,image];
         },
         buy(id, address){
             var myHeaders = new Headers();
@@ -195,7 +187,7 @@ export default {
             })
             .catch(error => console.log('error', error));
         },
-        getList(){
+        async getList(){
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("username", this.$store.state.username);
@@ -210,22 +202,19 @@ export default {
             redirect: 'follow'
             };
 
-            fetch("http://localhost:28888/shoppingCart/getList", requestOptions)
+            await fetch("http://localhost:28888/shoppingCart/getList", requestOptions)
             .then(response => response.json())
             .then(data => {
                 console.log(data);
                 var ls =[]
                 for(let i = 0; i<data.data.length;i++){
-                    var ls1 = [];
-                    ls1 = this.getSellerInfo(data.data[i]['productUserId']);
-                    var ls2 = [];
-                    ls2 = this.getProductInfo(data.data[i]['productId']);
                     var content = { "productId": data.data[i]['productId'],
-                                    "sellerName": ls1[0],
+                                    "sellerId": data.data[i]['productUserId'],
+                                    "sellerName": '',
                                     "itemName": data.data[i]['productInfo']['name'],
-                                    "itemPrice": parseInt(ls2[0]),
-                                    "itemImage": ls2[1],
-                                    "sellerAvatar": ls1[1],
+                                    "itemPrice": 0,
+                                    "itemImage": '',
+                                    "sellerAvatar": '',
                                     "selected": false};
                     ls.push(content);  
                 }
@@ -258,8 +247,13 @@ export default {
         }
         
     },
-    mounted: function () {
-        this.getList();
+    async mounted() {
+        await this.getList();
+        for(let i = 0; i< this.itemsData.length; i++){
+            await this.getSellerInfo(this.itemsData[i]["sellerId"],i);
+            await this.getProductInfo(this.itemsData[i]["productId"],i);
+        }
+        console.log(this.itemsData);
         this.totalPrice = 0
         this.itemsData.forEach(item => {
             this.checkStatus[item.productId] = {

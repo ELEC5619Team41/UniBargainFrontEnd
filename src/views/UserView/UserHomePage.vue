@@ -167,32 +167,119 @@ export default {
 
         }
     },
-    mounted(){
-        // this.getRecommend(12);
+    async created(){
+        await this.getRecommend(12);
+        await this.getProductInfo();
+        console.log(this.galleryItemData);
     },
     methods: {
         search() {
             console.log(this.searchbar.input);
         },
-        getRecommend(count){
+        getProductInfo(){
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("username", this.$store.state.username);
             myHeaders.append("token", this.$store.state.token);
 
-            var data = '';
+
+            for(let i = 0; i<this.galleryItemData.length; i++){
+                
+                var data = {"productId": this.galleryItemData[i]["id"]};
+
+                var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
+                };
+
+                fetch("http://localhost:28888/product/getAvgScore", requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    if (data.data['score']!= null){
+                        this.galleryItemData[i]["rating"] = parseInt(data.data['score']).toFixed();
+                    }else{
+                        this.galleryItemData[i]["rating"] = "No ratings";
+                    }
+                })
+                .catch(error => console.log('error', error));
+
+                var data = {"userId": this.galleryItemData[i]["uploaderId"]};
+
+                var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
+                };
+
+                fetch("http://localhost:28888/user/getByUserId", requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    this.galleryItemData[i]["uploader"] = data.data['username'];
+                    this.galleryItemData[i]["uploaderAvatar"] = data.data["avatar"];
+                })
+                .catch(error => console.log('error', error));
+
+                var data = {"id": this.galleryItemData[i]["id"]};
+
+                var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
+                };
+
+                fetch("http://localhost:28888/product/get", requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    if(data.data['info']['images'] == undefined){
+                        this.galleryItemData[i]["image"] = '';
+                    }else{
+                        this.galleryItemData[i]["image"] = data.data['info']['images'][0];
+                    }
+                })
+                .catch(error => console.log('error', error));
+            }
+        },
+        async getRecommend(count){
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+
+            var data = {"count" : count};
 
             var requestOptions = {
-            method: 'GET',
+            method: 'POST',
             headers: myHeaders,
+            body: JSON.stringify(data),
             redirect: 'follow'
             };
-
-            fetch("http://localhost:28888/product/getRecommendList", requestOptions)
+            
+            await fetch("http://localhost:28888/product/getRecommendList", requestOptions)
             .then(response => response.json())
-            .then(data => {
+            .then( data => {
                 console.log(data);
-
+                
+                var ls =[]
+                for(let i = 0; i<data.data.length; i++){
+                    var content = {
+                        id: data.data[i]["id"],
+                        name : data.data[i]["info"]["name"],
+                        uploader: "",
+                        uploaderId: data.data[i]["userId"],
+                        rating: 0,
+                        image: "",
+                        uploaderAvatar: "",
+                    }
+                    ls.push(content);
+                } 
+                this.galleryItemData = ls;
             })
             .catch(error => console.log('error', error));
         }

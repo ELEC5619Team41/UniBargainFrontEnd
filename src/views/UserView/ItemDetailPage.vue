@@ -21,7 +21,7 @@
                         <div v-for="(item) in this.itemData.labels" style="padding: 5px;">{{ item }}</div>
                     </div> -->
                     <div style="text-align: left; font-size: 50px;">
-                        {{ this.itemData.price }}$
+                        ${{ this.itemData.price }}
                     </div>
                     <div style="display: flex; justify-content: space-around;">
                         <RoundCornerButton style="width: 150px;" :text="$t('BuyNow')" @click="redirect()" ></RoundCornerButton>
@@ -56,7 +56,7 @@ export default {
       {
         this.$router.push('/userhome/transactionpage')
       },
-      Iteminfo(){
+      async Iteminfo(){
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
         myHeaders.append("username", this.$store.state.username);
@@ -71,7 +71,7 @@ export default {
         redirect: 'follow'
         };
 
-        fetch("http://localhost:28888/product/get", requestOptions)
+        await fetch("http://localhost:28888/product/get", requestOptions)
         .then(response => response.json())
         .then(data => {
             console.log(data);
@@ -80,21 +80,18 @@ export default {
             this.itemData['price'] = data.data['info']["price"];
             this.itemData['collected'] = false;
             this.itemData['addedCart'] = false;
-            this.getSellerInfo(data.data['userId'],"seller");
             this.itemData['images'] = data.data['info']['images'];
+            this.itemData['sellerId'] = data.data['userId'];
         })
         .catch(error => console.log('error', error));
       },
-      getSellerInfo(input, mode){
+      getSellerInfo(input, i){
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("username", this.$store.state.username);
             myHeaders.append("token", this.$store.state.token);
 
             var data = {userId : input};
-
-            var name = '';
-            var avt = '';
 
             var requestOptions = {
             method: 'POST',
@@ -104,23 +101,19 @@ export default {
             };
 
 
-            fetch("http://localhost:28888/user/getByUserId", requestOptions)
+            return fetch("http://localhost:28888/user/getByUserId", requestOptions)
             .then(response => response.json())
             .then(data => {
                 console.log(data);
-                if( mode == "seller"){
+                if( i == "seller"){
                     this.itemData['seller']['username'] = data.data['username'];
                     this.itemData['seller']['avatar'] = data.data['avatar'];
-                }else if (mdoe == "comment"){
-                    this.itemData['tempComment']['username'] = data.data['username'];
-                    this.itemData['tempComment']['avatar'] = data.data['avatar']
+                }else{
+                    this.itemData["comments"][i]['username'] = data.data['username'];
+                    this.itemData["comments"][i]['userAvatar'] = data.data['avatar'];
                 }
-
-
             })
             .catch(error => console.log('error', error));
-
-            return [name,avt]
       },
       itemScore(){
         var myHeaders = new Headers();
@@ -237,7 +230,7 @@ export default {
 ;        })
         .catch(error => console.log('error', error));
       },
-      getComments(){
+      async getComments(){
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
         myHeaders.append("username", this.$store.state.username);
@@ -252,27 +245,30 @@ export default {
         redirect: 'follow'
         };
 
-        fetch("http://localhost:28888/product/getScoreList", requestOptions)
+        await fetch("http://localhost:28888/product/getScoreList", requestOptions)
         .then(response => response.json())
         .then(data => {
             console.log(data);
             var ls =[]
             for(let i = 0; i<data.data.length; i++){
-                var ls1 = [];
-                ls1 = this.getSellerInfo(data.data[i]['buyUserId'],"comment");
-                console.log(ls1);
                 var content = {
-                    "username": ls1[0],
+                    "username": '',
                     "rating": parseInt(data.data[i]['score']).toFixed(),
                     "comment": data.data[i]['evaluate'],
                     "commentRating": data.data[i]['score'].toFixed(),
-                    "userAvatar" : ls1[1]
+                    "userAvatar" : '',
+                    "userId": data.data[i]['buyUserId'],
                 }
                 ls.push(content);
             } 
             this.itemData["comments"] = ls;
         })
         .catch(error => console.log('error', error));
+
+        for(let i = 0; i<this.itemData["comments"].length; i++){
+            this.getSellerInfo(this.itemData["comments"][i]['userId'],i);
+        }
+
       },
       getUsername(input){
             var myHeaders = new Headers();
@@ -304,10 +300,11 @@ export default {
             return [name,img];
         }
   },
-  mounted(){
-    this.Iteminfo();
-    this.itemScore();
-    this.getComments();
+  async mounted(){
+    await this.Iteminfo();
+    await this.getSellerInfo(this.itemData['sellerId'],"seller");
+    await this.itemScore();
+    await this.getComments();
   },
     data() {
         return {
@@ -335,6 +332,7 @@ Elevate your style with this leather bag, a testament to craftsmanship and quali
                     username:"",
                     avatar:""
                 },
+                sellerId: '',
                 collected: false,
                 addedCart: false,
                 labels: [

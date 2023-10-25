@@ -26,8 +26,8 @@ export default {
         return {
             selectedButton: 0,
             itemNames: [
-                { title: this.$t('Home'), link: '/userhome/userhomepage' }, { title: this.$t('Trading'), link: '/userhome/usertradingpage' }, { title: this.$t('ShoppingCart'), link: '/userhome/usershoppingcartpage' }, { title: this.$t('Request'), link: '/userhome/userrequestpage' }, { title: this.$t('Message'), link: '/userhome/usermessagepage' },
-              { title: this.$t('Transaction'), link: '/userhome/transactionpage' },{ title: this.$t('PublishIdleItem'), link: '/userhome/publishidlepage' },{ title: this.$t('SeekTrade'), link: '/userhome/seektradepage' }
+                { title: this.$t('Home'), link: '/userhome/userhomepage' }, { title: this.$t('Trading'), link: '/userhome/usertradingpage' }, { title: this.$t('Shopping Cart'), link: '/userhome/usershoppingcartpage' }, { title: this.$t('Message'), link: '/userhome/usermessagepage' },
+              { title: this.$t('Transaction'), link: '/userhome/transactionpage' },{ title: this.$t('Publish Item'), link: '/userhome/publishidlepage' },{ title: this.$t('Seek Trade'), link: '/userhome/seektradepage' }
             ]
         }
     //        add more links

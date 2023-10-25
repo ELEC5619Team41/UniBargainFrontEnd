@@ -1,52 +1,98 @@
 <template>
 
   <div  class="commentField">
-    <el-row justify="space-between">
-      <el-col :span="4" ><div>Item Name</div><el-input ></el-input></el-col>
-      <el-col :span="4"><div>Price</div> <el-input ></el-input></el-col>
-      <el-col :span="4"><div>Mailing method</div><el-cascader :options="option" v-model="mailMethod"></el-cascader> </el-col>
-    </el-row>
+    <el-form :model="form" label-width="120px">
+        <el-form-item label="Item Name">
+          <el-input v-model="this.form.name" />
+        </el-form-item>
+        <el-form-item label="Item Price">
+          <el-input v-model="this.form.price" />
+        </el-form-item>
+        <!-- <el-col :span="4"><div>Mailing method</div><el-cascader :options="option" v-model="mailMethod"></el-cascader> </el-col> -->
+
+        <el-form-item label="Item Description">    
+          <el-input
+            v-model="this.form.description"
+            type="textarea"
+            />
+        </el-form-item>
+
+
 
     <el-row justify="space-between">
-      <el-col :span="24"><div>Item Description</div>
-      <el-input ></el-input></el-col>
+      <el-col :span="24"><div>Upload item images</div>
+      <file-upload-component @show-image="receiveEmit"></file-upload-component></el-col>
     </el-row>
 
-    <el-row justify="space-between">
-      <el-col :span="24"><div>Item Image</div>
-      <file-upload-component></file-upload-component></el-col>
-    </el-row>
-
-    <el-row justify="space-between">
+    <!-- <el-row justify="space-between">
       <el-col :span="4"><div>Brand</div><el-input ></el-input></el-col>
       <el-col :span="4"><div>Quality</div><el-input ></el-input></el-col>
       <el-col :span="4"><div>Sale Status</div><el-cascader :options="status" v-model="statusValue"></el-cascader></el-col>
-    </el-row>
-    <el-row>
+    </el-row> -->
+    <!-- <el-row>
       <el-col :span="24" ><address-block-component :input-data="[]"></address-block-component></el-col>
-    </el-row>
+    </el-row> -->
 
-    <el-row justify="center">
+    <el-form-item>
       <el-col :span="4"><el-button>Cancel</el-button></el-col>
-      <el-col :span="4"><el-button>Submit</el-button></el-col>
-    </el-row>
+      <el-col :span="4"><el-button @click="Submit">Submit</el-button></el-col>
+    </el-form-item>
+  </el-form>
   </div>
 </template>
 <script>
 import RoundCornerButton from "@/components/Common/RoundCornerButton";
 import AddressBlockComponent from "@/components/UserProfile/AddressBlockComponent";
 import FileUploadComponent from "@/components/Common/FileUploadComponent";
+
 export default {
   name: "PublishIdlePage",
   components: {FileUploadComponent, AddressBlockComponent, RoundCornerButton},
   methods:{
+    receiveEmit(input){
+      this.form.images = input;
+    },
     Submit(){
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      myHeaders.append("username", this.$store.state.username);
+      myHeaders.append("token", this.$store.state.token);
 
+      var data = {"info": {
+        "name" : this.form.name,
+        "price" : this.form.price,
+        "description" : this.form.description,
+        "images" : this.form.images,
+      }};
+
+
+      var requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: JSON.stringify(data),
+      redirect: 'follow'
+      };
+
+      fetch("http://localhost:28888/product/add", requestOptions)
+      .then(response => response.json())
+      .then(data => {
+          console.log(data);
+          var url = '/userhome/itemdetailpage/'+data.data["id"];
+          console.log(url);
+          this.$router.push(url);
+      })
+      .catch(error => console.log('error', error));
     }
   },
   data()
   {
     return{
+      form: {
+        name: '',
+        price: 0,
+        description: '',
+        images: [],
+      },
       option:[
         {value:'mail',
           label:'mail'
