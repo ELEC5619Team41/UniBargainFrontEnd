@@ -1,10 +1,10 @@
 <template>
     <div class="searchbar">
-        <input class="inputBar" v-model="this.searchbar.input">
+        <input class="inputBar" v-model="this.searchbar.input" @input="$emit('update:inputText', $event.target.value);">
         <div class="clearButton" @click="clear()"><div class="buttonText">Clear</div></div>
         <div style="width: 1px; height: 50%; background: black; margin-left: 15px;"></div>
         <h5 style="margin-left: 5px; margin-top:5px;">Goods</h5>
-        <div class="searchButton"><div class="buttonText">Search</div></div>
+        <div class="searchButton" @click="$emit('searchFunction')"><div class="buttonText">Search</div></div>
     </div>
 </template>
 

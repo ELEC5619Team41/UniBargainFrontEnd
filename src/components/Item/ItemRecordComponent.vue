@@ -10,13 +10,17 @@
                     {{ this.item.username }}
                 </div>
             </div>
+            <div v-if="this.item.tag=='collection'" style="width: 35px; height: 35px; background-color: blue; margin-left: 5px;">
+            
+            </div>
         </div>
 
         <div style="margin-top: 10px; display: flex;">
             <div style="width: 15%; aspect-ratio: 1/1; background-color: aqua;"></div>
             <div class="textField" style="width: 85%;">
-                <div>{{ this.item.itemName }}</div>
+                <ClickableText :text="this.item.itemName" :size="'20px'" @text-trigger="jumpToItem"></ClickableText>
                 <div>{{ this.item.orderDate }}</div>
+                
                 <div style="position: absolute;bottom: 0; display: flex; width: 100%;">
                     <div>{{ this.item.itemPrice }}</div>
                     <!-- <div style="right: 0; position: absolute;">Hello</div> -->
@@ -35,11 +39,12 @@
 
 <script>
 import RoundCornerButton from '../Common/RoundCornerButton.vue';
+import ClickableText from '../Common/ClickableText.vue';
 export default {
     name: "ItemRecordComponent",
     components: {
         RoundCornerButton,
-        RoundCornerButton
+        ClickableText
     },
     props: {
         item: {
@@ -52,12 +57,15 @@ export default {
             tagKeyPairs: {
                 "unshipped": this.$t('Unshipped'),
                 "unreceived": this.$t('Unreceived'),
-                "unrated":  this.$t('Unrated'),
-                "refund":  this.$t('Refund')
+                "unrated": this.$t('Unrated'),
+                "refund": this.$t('Refund')
             },
         }
     },
     methods: {
+        jumpToItem() {
+            this.$router.push('/userhome/itemdetailpage/' + this.item.productId)
+        }
     }
 }
 </script>
