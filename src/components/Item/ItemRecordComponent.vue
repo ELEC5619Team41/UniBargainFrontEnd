@@ -10,8 +10,8 @@
                     {{ this.item.username }}
                 </div>
             </div>
-            <div v-if="this.item.tag=='collection'" style="width: 35px; height: 35px; background-color: blue; margin-left: 5px;">
-            
+            <div v-if="this.item.tag=='collection'" style="width: 65px; height: 35px; background-color: white; margin-left: 5px; align-items: center; text-align: center; display: flex; border-radius: 5px;" @click="$emit('remove-collection')">
+                Remove
             </div>
         </div>
 

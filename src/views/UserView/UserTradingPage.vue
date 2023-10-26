@@ -25,7 +25,8 @@
                 <div class="itemField">
                     <div v-for="(itemData, index) in this.displayItems"
                         style="width: 100%; align-items: center; justify-content: center; display: flex; flex-direction: column; background-color: rgb(241, 241, 241);">
-                        <ItemRecordComponent :item="itemData"></ItemRecordComponent>
+                        <ItemRecordComponent :item="itemData" @remove-collection="removeFromCollection(itemData)">
+                        </ItemRecordComponent>
                         <div v-if="index !== this.displayItems.length - 1"
                             style=" display: flex; width: 100%; height: 1px; background: rgb(241, 241, 241); justify-content: center; align-items: center;">
                             <div style="width: 95%; height: 1px; background: black;"></div>
@@ -293,6 +294,38 @@ export default {
 
             }
             this.categoryOnClick(4)
+        },
+        async removeFromCollection(deleteItem) {
+            console.log(deleteItem);
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+
+            var raw = { productId: deleteItem.productId };
+            var requestOptions = {
+                method: 'DELETE',
+                headers: myHeaders,
+                body: JSON.stringify(raw),
+                redirect: 'follow'
+            };
+
+            fetch("http://localhost:28888/collect/remove", requestOptions)
+                .then(response => {
+                    return response.text();
+                })
+                .then(result => {
+                    var resultJson = JSON.parse(result);
+                    if (resultJson.code == 200) {
+                        this.items = this.items.filter(item => (item.productId != deleteItem.productId || item.tag != "collection"));
+                        this.displayItems = this.displayItems.filter(item => (item.productId != deleteItem.productId || item.tag != "collection"));
+                    } else {
+                        console.log(result)
+                    }
+
+                })
+                .catch(error => console.log('error', error));
+
         }
     },
 
