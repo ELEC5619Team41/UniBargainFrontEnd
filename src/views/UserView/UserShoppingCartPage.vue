@@ -56,7 +56,8 @@ export default {
             this.totalPrice = 0
             if(this.allItemSelect)
                 this.selectedCount = this.itemsData.length
-            console.log('select all')
+            else
+                this.selectedCount = 0
             for (var key in this.checkStatus) {
 
                 this.checkStatus[key].checked = this.allItemSelect
@@ -73,6 +74,8 @@ export default {
             this.checkStatus[itemStatusData.id].checked = itemStatusData.checked
             this.itemsData.find(item => item.productId == itemStatusData.id).selected = itemStatusData.checked
 
+            this.totalPrice = Number(this.totalPrice)
+
             if (itemStatusData.checked) {
                 this.totalPrice += this.itemsData.find(item => item.productId == itemStatusData.id).itemPrice
                 this.totalPrice = parseFloat(this.totalPrice).toFixed(2)
@@ -82,6 +85,7 @@ export default {
                 this.totalPrice = parseFloat(this.totalPrice).toFixed(2)
                 this.selectedCount -= 1
             }
+        
             if(this.selectedCount === this.itemsData.length && this.selectedCount != 0){
                 this.allItemSelect = true
             } else {
@@ -122,7 +126,6 @@ export default {
             myHeaders.append("token", this.$store.state.token);
 
             var data = {userId : id};
-            console.log(id);
 
             var requestOptions = {
             method: 'POST',
@@ -135,7 +138,6 @@ export default {
             return fetch("http://localhost:28888/user/getByUserId", requestOptions)
             .then(response => response.json())
             .then(data => {
-                console.log(data);
                 this.itemsData[input]['sellerName'] = data.data['username'];
                 this.itemsData[input]['sellerAvatar'] = data.data['avatar'];
 
@@ -205,7 +207,6 @@ export default {
             await fetch("http://localhost:28888/shoppingCart/getList", requestOptions)
             .then(response => response.json())
             .then(data => {
-                console.log(data);
                 var ls =[]
                 for(let i = 0; i<data.data.length;i++){
                     var content = { "productId": data.data[i]['productId'],
@@ -240,7 +241,6 @@ export default {
             fetch("http://localhost:28888/shoppingCart/remove", requestOptions)
             .then(response => response.json())
             .then(data => {
-                console.log(data);
                 this.itemData['addedCart'] = false;
     ;        })
             .catch(error => console.log('error', error));
@@ -253,7 +253,6 @@ export default {
             await this.getSellerInfo(this.itemsData[i]["sellerId"],i);
             await this.getProductInfo(this.itemsData[i]["productId"],i);
         }
-        console.log(this.itemsData);
         this.totalPrice = 0
         this.itemsData.forEach(item => {
             this.checkStatus[item.productId] = {
@@ -269,7 +268,10 @@ export default {
     },
     data() {
         return {
-            totalPrice: 0,
+            totalPrice: {
+                type: Number,
+                default: 0
+            },
             checkStatus: {},
             allItemSelect: false,
             selectedCount: 0,
