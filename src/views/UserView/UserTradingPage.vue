@@ -123,11 +123,9 @@ export default {
                 redirect: 'follow'
             };
 
-            fetch("http://localhost:28888/buyProduct/getList", requestOptions)
+            await fetch("http://localhost:28888/buyProduct/getList", requestOptions)
                 .then(response => response.json())
                 .then(async (data) => {
-                    console.log('boughts:')
-                    console.log(data);
                     var ls = [];
                     for (let i = 0; i < data.data.length; i++) {
                         var username = await this.getUsername(data.data[i]['productUserId']);
@@ -161,11 +159,9 @@ export default {
                 redirect: 'follow'
             };
 
-            fetch("http://localhost:28888/buyProduct/getListByProductUser", requestOptions)
+            await fetch("http://localhost:28888/buyProduct/getListByProductUser", requestOptions)
                 .then(response => response.json())
                 .then(async (data) => {
-                    console.log('sold:')
-                    console.log(data);
                     var ls = [];
                     for (let i = 0; i < data.data.length; i++) {
                         var username = await this.getUsername(data.data[i]['productUserId']);
@@ -199,11 +195,9 @@ export default {
                 redirect: 'follow'
             };
 
-            fetch("http://localhost:28888/collect/getList", requestOptions)
+            await fetch("http://localhost:28888/collect/getList", requestOptions)
                 .then(response => response.json())
                 .then(async (data) => {
-                    console.log('collection:')
-                    console.log(data);
                     var ls = [];
                     for (let i = 0; i < data.data.length; i++) {
                         var username = await this.getUsername(data.data[i]['productUserId']);
@@ -247,45 +241,70 @@ export default {
                 })
                 .catch(error => console.log('error', error));
             return name;
-        }
-        // async findPosted() {
-        //     var myHeaders = new Headers();
-        //     myHeaders.append("Content-Type", "application/json");
-        //     myHeaders.append("username", this.$store.state.username);
-        //     myHeaders.append("token", this.$store.state.token);
+        },
+        async getProductInfo(productId){
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
 
-        //     var data = {};
+            var data = { id: productId };
 
-        //     var requestOptions = {
-        //         method: 'POST',
-        //         headers: myHeaders,
-        //         body: JSON.stringify(data),
-        //         redirect: 'follow'
-        //     };
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
+            };
 
-        //     fetch("http://localhost:28888/product/getMyList", requestOptions)
-        //         .then(response => response.json())
-        //         .then(data => {
-        //             console.log('posted:')
-        //             console.log(data);
-        //             var ls = [];
-        //             for (let i = 0; i < data.data.length; i++) {
-        //                 var content = {
-        //                     "productId": data.data[i]['productId'],
-        //                     "username": data.data[i]['productUserId'],
-        //                     "itemName": data.data[i]['name'],
-        //                     "orderDate": "",
-        //                     "itemPrice": data.data[i]['price'],
-        //                     "tag": "posted",
-        //                     "status": "unshipped"
-        //                 }
-        //                 ls.push(content);
-        //             }
-        //             this.items = this.items.concat(ls);
-        //         })
-        //         .catch(error => console.log('error', error));
-        // },
-        ,
+            var output;
+
+            await fetch("http://localhost:28888/product/get", requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    output = data;
+
+                })
+                .catch(error => console.log('error', error));
+            return output;
+        },
+        async findPosted() {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+
+            var data = {};
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
+            };
+
+            await fetch("http://localhost:28888/product/getMyList", requestOptions)
+                .then(response => response.json())
+                .then(async(data) => {
+                    var ls = [];
+                    for (let i = 0; i < data.data.length; i++) {
+                        var username = await this.getUsername(data.data[i]['userId']);
+                        var productDetail = await this.getProductInfo(data.data[i]['id']);
+                        var content = {
+                            "productId": data.data[i]['id'],
+                            "username": username,
+                            "itemName": productDetail.data.info["name"],
+                            "orderDate": "",
+                            "itemPrice": productDetail.data.info["price"],
+                            "tag": "posted",
+                            "status": "unshipped"
+                        }
+                        ls.push(content);
+                    }
+                    this.items = this.items.concat(ls);
+                })
+                .catch(error => console.log('error', error));
+        },
         searchByItemNameAndUserName() {
             this.searchItems = [];
             for (let i = 0; i < this.items.length; i++) {
@@ -330,12 +349,16 @@ export default {
     },
 
     async mounted() {
-        this.displayItems = this.items.filter(item => (item.tag == this.tagKeyPairs[this.categorySelectedButton]));
+        
         await this.findBoughts();
         await this.findSold();
         await this.findCollection();
-        // await this.findPosted();
-    }
+        await this.findPosted();
+        
+        this.displayItems = this.items.filter(item => (item.tag == this.tagKeyPairs[this.categorySelectedButton]));
+
+        this.categoryOnClick(0);
+    },
 }
 </script>
 
