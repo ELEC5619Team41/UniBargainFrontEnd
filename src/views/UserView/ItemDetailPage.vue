@@ -329,7 +329,7 @@ export default {
         }
 
       },
-      getUsername(input){
+      async getUsername(input){
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("username", this.$store.state.username);
@@ -347,7 +347,7 @@ export default {
             var name = '';
             var img = '';
 
-            fetch("http://localhost:28888/user/getByUserId", requestOptions)
+            await fetch("http://localhost:28888/user/getByUserId", requestOptions)
             .then(response => response.json())
             .then(data => {
                 console.log(data);

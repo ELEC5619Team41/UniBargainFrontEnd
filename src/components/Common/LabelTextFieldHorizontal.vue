@@ -2,8 +2,7 @@
   <div class="item">
     <div class="label">{{ text }}</div>
     <div style="display: flex;">
-      <input :type="isPassword ? 'password' : ''" class="content"
-        @input="$emit('update:inputText', $event.target.value);" :value="defaultValue" />
+      <input :type="isPassword ? 'password' : ''" class="content" @input="$emit('update:inputText', $event.target.value);" :value="defaultValue" />
     </div>
 
   </div>

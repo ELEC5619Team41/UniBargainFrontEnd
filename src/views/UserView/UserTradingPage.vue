@@ -1,6 +1,7 @@
 <template>
     <div style="padding-bottom: 5rem;">
-        <TopSearchBar style="margin-top: 10px;"></TopSearchBar>
+        <TopSearchBar style="margin-top: 10px;" v-model:inputText="this.searchText"
+            @searchFunction="searchByItemNameAndUserName"></TopSearchBar>
         <div style="min-height: 200px; display: flex; justify-content: space-between;">
             <div style="width: 15%; height: fit-content; border-radius: 15px; overflow: hidden; margin-top: 20px;">
                 <button v-for="(item, index) in this.itemCategoryTags" @click="categoryOnClick(index)"
@@ -24,7 +25,8 @@
                 <div class="itemField">
                     <div v-for="(itemData, index) in this.displayItems"
                         style="width: 100%; align-items: center; justify-content: center; display: flex; flex-direction: column; background-color: rgb(241, 241, 241);">
-                        <ItemRecordComponent :item="itemData"></ItemRecordComponent>
+                        <ItemRecordComponent :item="itemData" @remove-collection="removeFromCollection(itemData)">
+                        </ItemRecordComponent>
                         <div v-if="index !== this.displayItems.length - 1"
                             style=" display: flex; width: 100%; height: 1px; background: rgb(241, 241, 241); justify-content: center; align-items: center;">
                             <div style="width: 95%; height: 1px; background: black;"></div>
@@ -52,7 +54,7 @@ export default {
             categorySelectedButton: 0,
             statusSelectedButton: 0,
             itemCategoryTags: [
-                this.$t('Posted'), this.$t('Bought'), this.$t('Sold'), this.$t('Collection'),
+                this.$t('Posted'), this.$t('Bought'), this.$t('Sold'), this.$t('Collection'), this.$t('Search'),
             ],
             itemStatusTags: [
                 this.$t('All'), this.$t('Unshipped'), this.$t('Unreceived'), this.$t('Unrated'), this.$t('Refund')
@@ -62,196 +64,29 @@ export default {
                 2: "unreceived",
                 3: "unrated",
                 4: "refund",
+                5: "search",
                 "unshipped": 1,
                 "unreceived": 2,
                 "unrated": 3,
                 "refund": 4,
+                "search": 5
             },
             tagKeyPairs: {
                 0: "posted",
                 1: "bought",
                 2: "sold",
                 3: "collection",
+                4: "search",
                 "posted": 0,
                 "bought": 1,
                 "sold": 2,
-                "collection": 3
+                "collection": 3,
+                "search": 4
             },
-            items: [
-                {
-                    "orderNumber": "12345",
-                    "username": "john_doe",
-                    "itemName": "Product A",
-                    "orderDate": "2023-09-18",
-                    "itemPrice": 19.99,
-                    "tag": "posted",
-                    "status": "unshipped"
-                },
-                {
-                    "orderNumber": "67890",
-                    "username": "jane_smith",
-                    "itemName": "Product B",
-                    "orderDate": "2023-09-19",
-                    "itemPrice": 24.99,
-                    "tag": "bought",
-                    "status": "unreceived"
-                },
-                {
-                    "orderNumber": "54321",
-                    "username": "bob_jones",
-                    "itemName": "Product C",
-                    "orderDate": "2023-09-20",
-                    "itemPrice": 14.99,
-                    "tag": "sold",
-                    "status": "unrated"
-                },
-                {
-                    "orderNumber": "98765",
-                    "username": "alice_smith",
-                    "itemName": "Product D",
-                    "orderDate": "2023-09-21",
-                    "itemPrice": 29.99,
-                    "tag": "collection",
-                    "status": "refund"
-                },
-                {
-                    "orderNumber": "24680",
-                    "username": "sam_jackson",
-                    "itemName": "Product E",
-                    "orderDate": "2023-09-22",
-                    "itemPrice": 39.99,
-                    "tag": "posted",
-                    "status": "unshipped"
-                },
-                {
-                    "orderNumber": "13579",
-                    "username": "emily_wilson",
-                    "itemName": "Product F",
-                    "orderDate": "2023-09-23",
-                    "itemPrice": 49.99,
-                    "tag": "bought",
-                    "status": "refund"
-                },
-                {
-                    "orderNumber": "11223",
-                    "username": "david_smith",
-                    "itemName": "Product G",
-                    "orderDate": "2023-09-24",
-                    "itemPrice": 9.99,
-                    "tag": "collection",
-                    "status": "unrated"
-                },
-                {
-                    "orderNumber": "45678",
-                    "username": "susan_davis",
-                    "itemName": "Product H",
-                    "orderDate": "2023-09-25",
-                    "itemPrice": 54.99,
-                    "tag": "posted",
-                    "status": "unshipped"
-                },
-                {
-                    "orderNumber": "98765",
-                    "username": "alice_smith",
-                    "itemName": "Product I",
-                    "orderDate": "2023-09-26",
-                    "itemPrice": 34.99,
-                    "tag": "bought",
-                    "status": "unreceived"
-                },
-                {
-                    "orderNumber": "24680",
-                    "username": "sam_jackson",
-                    "itemName": "Product J",
-                    "orderDate": "2023-09-27",
-                    "itemPrice": 29.99,
-                    "tag": "sold",
-                    "status": "unrated"
-                },
-                {
-                    "orderNumber": "13579",
-                    "username": "emily_wilson",
-                    "itemName": "Product K",
-                    "orderDate": "2023-09-28",
-                    "itemPrice": 19.99,
-                    "tag": "collection",
-                    "status": "unshipped"
-                },
-                {
-                    "orderNumber": "11223",
-                    "username": "david_smith",
-                    "itemName": "Product L",
-                    "orderDate": "2023-09-29",
-                    "itemPrice": 9.99,
-                    "tag": "posted",
-                    "status": "refund"
-                },
-                {
-                    "orderNumber": "45678",
-                    "username": "susan_davis",
-                    "itemName": "Product M",
-                    "orderDate": "2023-09-30",
-                    "itemPrice": 34.99,
-                    "tag": "bought",
-                    "status": "unreceived"
-                },
-                {
-                    "orderNumber": "98765",
-                    "username": "alice_smith",
-                    "itemName": "Product N",
-                    "orderDate": "2023-10-01",
-                    "itemPrice": 54.99,
-                    "tag": "sold",
-                    "status": "unrated"
-                },
-                {
-                    "orderNumber": "54321",
-                    "username": "bob_jones",
-                    "itemName": "Product O",
-                    "orderDate": "2023-10-02",
-                    "itemPrice": 14.99,
-                    "tag": "collection",
-                    "status": "refund"
-                },
-                {
-                    "orderNumber": "12345",
-                    "username": "john_doe",
-                    "itemName": "Product P",
-                    "orderDate": "2023-10-03",
-                    "itemPrice": 19.99,
-                    "tag": "posted",
-                    "status": "unshipped"
-                },
-                {
-                    "orderNumber": "24680",
-                    "username": "sam_jackson",
-                    "itemName": "Product Q",
-                    "orderDate": "2023-10-04",
-                    "itemPrice": 39.99,
-                    "tag": "bought",
-                    "status": "unreceived"
-                },
-                {
-                    "orderNumber": "13579",
-                    "username": "emily_wilson",
-                    "itemName": "Product R",
-                    "orderDate": "2023-10-05",
-                    "itemPrice": 29.99,
-                    "tag": "sold",
-                    "status": "refund"
-                },
-                {
-                    "orderNumber": "11223",
-                    "username": "david_smith",
-                    "itemName": "Product S",
-                    "orderDate": "2023-10-06",
-                    "itemPrice": 9.99,
-                    "tag": "collection",
-                    "status": "unrated"
-                }
-            ]
-            ,
-            displayItems: []
+            searchText: "",
+            items: [],
+            displayItems: [],
+            searchItems: []
 
         }
     },
@@ -259,6 +94,10 @@ export default {
         categoryOnClick(e) {
             this.categorySelectedButton = e
             this.statusSelectedButton = 0
+            if (e == 4) {
+                this.displayItems = this.searchItems;
+                return;
+            }
             this.displayItems = this.items.filter(item => item.tag == this.tagKeyPairs[e])
         },
         stuatusOnClick(e) {
@@ -269,7 +108,7 @@ export default {
                 this.displayItems = this.items.filter(item => (item.status == this.statusKeyPairs[e] && item.tag == this.tagKeyPairs[this.categorySelectedButton]))
             }
         },
-        findBoughts(){
+        async findBoughts() {
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("username", this.$store.state.username);
@@ -278,37 +117,224 @@ export default {
             var data = {};
 
             var requestOptions = {
-            method: 'POST',
-            headers: myHeaders,
-            body: JSON.stringify(data),
-            redirect: 'follow'
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
             };
 
             fetch("http://localhost:28888/buyProduct/getList", requestOptions)
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                var ls = [];
-                for (let i = 0; i < data.data.length; i++){
-                    var content= {
-                        "productId": data.data[i]['productId'],
-                        "username": data.data[i]['productUserId'],
-                        "itemName": data.data[i]['productInfo']['name'],
-                        "orderDate": "",
-                        "itemPrice": data.data[i]['productInfo']['price'],
-                        "tag": "bought",
-                        "status": "unrated"
+                .then(response => response.json())
+                .then(async (data) => {
+                    console.log('boughts:')
+                    console.log(data);
+                    var ls = [];
+                    for (let i = 0; i < data.data.length; i++) {
+                        var username = await this.getUsername(data.data[i]['productUserId']);
+                        var content = {
+                            "productId": data.data[i]['productId'],
+                            "username": username,
+                            "itemName": data.data[i]['productInfo']['name'],
+                            "orderDate": "",
+                            "itemPrice": data.data[i]['productInfo']['price'],
+                            "tag": "bought",
+                            "status": "unrated"
+                        }
+                        ls.push(content);
                     }
-                    ls.push(content);
-                }
+                    this.items = this.items.concat(ls);
+                })
+                .catch(error => console.log('error', error));
+        },
+        async findSold() {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
 
-            })
-            .catch(error => console.log('error', error));
+            var data = {};
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
+            };
+
+            fetch("http://localhost:28888/buyProduct/getListByProductUser", requestOptions)
+                .then(response => response.json())
+                .then(async (data) => {
+                    console.log('sold:')
+                    console.log(data);
+                    var ls = [];
+                    for (let i = 0; i < data.data.length; i++) {
+                        var username = await this.getUsername(data.data[i]['productUserId']);
+                        var content = {
+                            "productId": data.data[i]['productId'],
+                            "username": username,
+                            "itemName": data.data[i]['productInfo']['name'],
+                            "orderDate": "",
+                            "itemPrice": data.data[i]['productInfo']['price'],
+                            "tag": "sold",
+                            "status": "unrated"
+                        }
+                        ls.push(content);
+                    }
+                    this.items = this.items.concat(ls);
+                })
+                .catch(error => console.log('error', error));
+        },
+        async findCollection() {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+
+            var data = {};
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
+            };
+
+            fetch("http://localhost:28888/collect/getList", requestOptions)
+                .then(response => response.json())
+                .then(async (data) => {
+                    console.log('collection:')
+                    console.log(data);
+                    var ls = [];
+                    for (let i = 0; i < data.data.length; i++) {
+                        var username = await this.getUsername(data.data[i]['productUserId']);
+                        var content = {
+                            "productId": data.data[i]['productId'],
+                            "username": username,
+                            "itemName": String(data.data[i]['productInfo']['name']),
+                            "orderDate": "",
+                            "itemPrice": data.data[i]['productInfo']['price'],
+                            "tag": "collection",
+                            "status": "unrated"
+                        }
+                        ls.push(content);
+                    }
+                    this.items = this.items.concat(ls);
+                })
+                .catch(error => console.log('error', error));
+        },
+        async getUsername(input) {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+
+            var data = { userId: input };
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
+            };
+
+            var name = '';
+
+            await fetch("http://localhost:28888/user/getByUserId", requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    name = data.data['username'];
+
+                })
+                .catch(error => console.log('error', error));
+            return name;
+        }
+        // async findPosted() {
+        //     var myHeaders = new Headers();
+        //     myHeaders.append("Content-Type", "application/json");
+        //     myHeaders.append("username", this.$store.state.username);
+        //     myHeaders.append("token", this.$store.state.token);
+
+        //     var data = {};
+
+        //     var requestOptions = {
+        //         method: 'POST',
+        //         headers: myHeaders,
+        //         body: JSON.stringify(data),
+        //         redirect: 'follow'
+        //     };
+
+        //     fetch("http://localhost:28888/product/getMyList", requestOptions)
+        //         .then(response => response.json())
+        //         .then(data => {
+        //             console.log('posted:')
+        //             console.log(data);
+        //             var ls = [];
+        //             for (let i = 0; i < data.data.length; i++) {
+        //                 var content = {
+        //                     "productId": data.data[i]['productId'],
+        //                     "username": data.data[i]['productUserId'],
+        //                     "itemName": data.data[i]['name'],
+        //                     "orderDate": "",
+        //                     "itemPrice": data.data[i]['price'],
+        //                     "tag": "posted",
+        //                     "status": "unshipped"
+        //                 }
+        //                 ls.push(content);
+        //             }
+        //             this.items = this.items.concat(ls);
+        //         })
+        //         .catch(error => console.log('error', error));
+        // },
+        ,
+        searchByItemNameAndUserName() {
+            this.searchItems = [];
+            for (let i = 0; i < this.items.length; i++) {
+                // console.log(this.items[i].itemName.includes(this.searchText));
+                if (this.items[i].username.includes(this.searchText) || this.items[i].itemName.includes(this.searchText)) { this.searchItems.push(this.items[i]); console.log("add") }
+
+            }
+            this.categoryOnClick(4)
+        },
+        async removeFromCollection(deleteItem) {
+            console.log(deleteItem);
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+
+            var raw = { productId: deleteItem.productId };
+            var requestOptions = {
+                method: 'DELETE',
+                headers: myHeaders,
+                body: JSON.stringify(raw),
+                redirect: 'follow'
+            };
+
+            fetch("http://localhost:28888/collect/remove", requestOptions)
+                .then(response => {
+                    return response.text();
+                })
+                .then(result => {
+                    var resultJson = JSON.parse(result);
+                    if (resultJson.code == 200) {
+                        this.items = this.items.filter(item => (item.productId != deleteItem.productId || item.tag != "collection"));
+                        this.displayItems = this.displayItems.filter(item => (item.productId != deleteItem.productId || item.tag != "collection"));
+                    } else {
+                        console.log(result)
+                    }
+
+                })
+                .catch(error => console.log('error', error));
+
         }
     },
-    mounted() {
+
+    async mounted() {
         this.displayItems = this.items.filter(item => (item.tag == this.tagKeyPairs[this.categorySelectedButton]));
-        this.findBoughts();
+        await this.findBoughts();
+        await this.findSold();
+        await this.findCollection();
+        // await this.findPosted();
     }
 }
 </script>
