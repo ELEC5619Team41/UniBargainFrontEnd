@@ -1,14 +1,18 @@
 <template>
     <div class="itemFrame" @click="clickItem()">
-        <div id="firstImg" class="itemImg"></div>
+        <div ref="firstImg" class="itemImg"></div>
         <div class="itemName">
-            {{this.ItemData.name}}
+            {{ this.ItemData.name }}
         </div>
         <div style="display: flex; align-items: center;">
-            
-            <div style="margin-left: 15px; width: 30px; height: 30px; background-image: `url(${this.ItemData.uploaderAvatar})`; border-radius: 10px;"></div>
-            <div style="margin-left: 25px; width: 100px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; text-align: left;">{{this.ItemData.uploader}}</div>
-            <div style="margin-left: 25px; "> {{this.ItemData.rating}}</div>
+
+            <div ref="uploaderAvatar"
+                style="margin-left: 15px; width: 30px; height: 30px; border-radius: 10px; background-color: red;">
+            </div>
+            <div
+                style="margin-left: 25px; width: 100px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; text-align: left;">
+                {{ this.ItemData.uploader }}</div>
+            <div style="margin-left: 25px; "> {{ this.ItemData.rating }}</div>
         </div>
     </div>
 </template>
@@ -22,14 +26,26 @@ export default {
         ItemData: Object
     },
     methods: {
-        clickItem(){
-            this.$router.push('/userhome/itemdetailpage/'+this.ItemData.id)
+        clickItem() {
+            this.$router.push('/userhome/itemdetailpage/' + this.ItemData.id)
         }
     },
-    mounted(){
-        var firstImg = document.getElementById("firstImg");
-        firstImg.style.backgroundImage = `url(${this.ItemData.image})`;
-        firstImg.style.backgroundSize = "cover";
+    mounted() {
+        
+        if (('image' in this.ItemData) && this.ItemData.image != '') {
+            console.log('this.ItemData', this.ItemData)
+            var firstImg = this.$refs.firstImg
+            this.text='load'
+            firstImg.style.backgroundImage = "url(" + this.ItemData.image + ")";
+            firstImg.style.backgroundSize = "cover";
+        }
+
+        if(('uploaderAvatar' in this.ItemData) &&this.ItemData.uploaderAvatar != ''){
+            console.log('this.ItemData', this.ItemData)
+            var uploaderAvatar = this.$refs.uploaderAvatar
+            uploaderAvatar.style.backgroundImage = "url(" + this.ItemData.uploaderAvatar + ")";
+            uploaderAvatar.style.backgroundSize = "cover";
+        }
     }
 }
 </script>
@@ -45,11 +61,14 @@ export default {
 }
 
 .itemImg {
+    position: relative;
     width: 280px;
     height: 240px;
     margin-left: 10px;
-    margin-top: 10px;
+    top: 10px;
     border-radius: 10px;
+
+    background-color: gray;
 }
 
 .itemName {
@@ -59,12 +78,12 @@ export default {
     word-wrap: break-word;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin-top: 10px;
 
-    font-size:30px;
+    font-size: 30px;
     display: -webkit-box;
     -webkit-line-clamp: 6;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-</style>
+}</style>

@@ -1,9 +1,14 @@
 <template>
-  <div style="margin-bottom: 50px;">
-      <top-search-bar></top-search-bar>
+  <div>
+    <div style="margin-bottom: 50px; margin-top: 15px;">
+      <top-search-bar v-model:inputText="this.searchText" @searchFunction="search"></top-search-bar>
+
       <div style="display: flex; max-width: 1124px; flex-wrap: wrap; justify-content:space-around;width: 100%">
-      <GalleryItemcomponent v-for="(item, num) in this.GalleryItem" :ItemData="item"></GalleryItemcomponent>
+        <div v-for="item in this.GalleryItem">
+          <GalleryItemcomponent :ItemData="item"></GalleryItemcomponent>
+        </div>
       </div>
+    </div>
   </div>
 </template>
 
@@ -17,128 +22,144 @@ export default {
     GalleryItemcomponent,
     TopSearchBar
   },
-  async mounted(){
+  async mounted() {
     await this.getlist(this.$route.params.search);
     await this.getProductInfo();
-    console.log(this.GalleryItem);
+    this.GalleryItem = this.PreGalleryItem;
   },
   methods: {
-    async getlist(input){
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        myHeaders.append("username", this.$store.state.username);
-        myHeaders.append("token", this.$store.state.token);
+    search() {
 
-        var data = {'search' : input};
+      var url = '/userhome/search/' + this.searchText;
+      console.log(url)
+      this.$router.push(url).then(() => {
+        window.location.reload();
+      });
+    },
+    async getlist(input) {
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      myHeaders.append("username", this.$store.state.username);
+      myHeaders.append("token", this.$store.state.token);
 
-        var requestOptions = {
+      var data = { 'search': input };
+
+      var requestOptions = {
         method: 'POST',
         headers: myHeaders,
         body: JSON.stringify(data),
         redirect: 'follow'
-        };
+      };
 
-        await fetch("http://localhost:28888/product/getList", requestOptions)
+      await fetch("http://localhost:28888/product/getList", requestOptions)
         .then(response => response.json())
         .then(data => {
-            console.log(data);
-            var ls =[]
-            for(let i = 0; i<data.data.length; i++){
-                var content = {
-                    id: data.data[i]["id"],
-                    name : data.data[i]["info"]["name"],
-                    uploader: "",
-                    uploaderId: data.data[i]["userId"],
-                    rating: 0,
-                    image: "",
-                    uploaderAvatar: "",
-                }
-                ls.push(content);
-            } 
-            this.GalleryItem = ls;
+          // console.log(data);
+          var ls = []
+          for (let i = 0; i < data.data.length; i++) {
+            var content = {
+              id: data.data[i]["id"],
+              name: data.data[i]["info"]["name"],
+              uploader: "",
+              uploaderId: data.data[i]["userId"],
+              rating: 0,
+              image: "",
+              uploaderAvatar: "",
+            }
+            ls.push(content);
+          }
+          this.PreGalleryItem = ls;
         })
         .catch(error => console.log('error', error));
     },
-    getProductInfo(){
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        myHeaders.append("username", this.$store.state.username);
-        myHeaders.append("token", this.$store.state.token);
+    async getProductInfo() {
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      myHeaders.append("username", this.$store.state.username);
+      myHeaders.append("token", this.$store.state.token);
 
 
-        for(let i = 0; i<this.GalleryItem.length; i++){
-            
-            var data = {"productId": this.GalleryItem[i]["id"]};
+      for (let i = 0; i < this.PreGalleryItem.length; i++) {
 
-            var requestOptions = {
-            method: 'POST',
-            headers: myHeaders,
-            body: JSON.stringify(data),
-            redirect: 'follow'
-            };
+        var data = { "productId": this.PreGalleryItem[i]["id"] };
 
-            fetch("http://localhost:28888/product/getAvgScore", requestOptions)
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                if (data.data['score']!= null){
-                    this.GalleryItem[i]["rating"] = parseInt(data.data['score']).toFixed();
-                }else{
-                    this.GalleryItem[i]["rating"] = "No ratings";
-                }
-            })
-            .catch(error => console.log('error', error));
+        var requestOptions = {
+          method: 'POST',
+          headers: myHeaders,
+          body: JSON.stringify(data),
+          redirect: 'follow'
+        };
 
-            var data = {"userId": this.GalleryItem[i]["uploaderId"]};
+        await fetch("http://localhost:28888/product/getAvgScore", requestOptions)
+          .then(response => response.json())
+          .then(data => {
+            // console.log(data);
+            if (data.data['score'] != null) {
+              this.PreGalleryItem[i]["rating"] = parseInt(data.data['score']).toFixed();
+            } else {
+              this.PreGalleryItem[i]["rating"] = "No ratings";
+            }
+          })
+          .catch(error => console.log('error', error));
 
-            var requestOptions = {
-            method: 'POST',
-            headers: myHeaders,
-            body: JSON.stringify(data),
-            redirect: 'follow'
-            };
+        var data = { "userId": this.PreGalleryItem[i]["uploaderId"] };
 
-            fetch("http://localhost:28888/user/getByUserId", requestOptions)
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                this.GalleryItem[i]["uploader"] = data.data['username'];
-                this.GalleryItem[i]["uploaderAvatar"] = data.data["avatar"];
-            })
-            .catch(error => console.log('error', error));
+        var requestOptions = {
+          method: 'POST',
+          headers: myHeaders,
+          body: JSON.stringify(data),
+          redirect: 'follow'
+        };
 
-            var data = {"id": this.GalleryItem[i]["id"]};
+        await fetch("http://localhost:28888/user/getByUserId", requestOptions)
+          .then(response => response.json())
+          .then(data => {
+            console.log(data);
+            this.PreGalleryItem[i]["uploader"] = data.data['username'];
 
-            var requestOptions = {
-            method: 'POST',
-            headers: myHeaders,
-            body: JSON.stringify(data),
-            redirect: 'follow'
-            };
+            if (!('avatar' in data.data) || data.data['avatar'] == null) {
+              this.PreGalleryItem[i]["uploaderAvatar"] = '';
+            } else {
+              this.PreGalleryItem[i]["uploaderAvatar"] = data.data["avatar"];
+              console.log('save')
+            }
+          })
+          .catch(error => console.log('error', error));
 
-            fetch("http://localhost:28888/product/get", requestOptions)
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                if(data.data['info']['images'] == undefined){
-                    this.GalleryItem[i]["image"] = '';
-                }else{
-                    this.GalleryItem[i]["image"] = data.data['info']['images'][0];  
-                }
-            })
-            .catch(error => console.log('error', error));
-        }
+        var data = { "id": this.PreGalleryItem[i]["id"] };
+
+        var requestOptions = {
+          method: 'POST',
+          headers: myHeaders,
+          body: JSON.stringify(data),
+          redirect: 'follow'
+        };
+
+        await fetch("http://localhost:28888/product/get", requestOptions)
+          .then(response => response.json())
+          .then(data => {
+            // console.log(data);
+            if (!('images' in data.data['info']) || data.data['info']['images'].length == 0) {
+              this.PreGalleryItem[i]["image"] = '';
+            } else {
+              this.PreGalleryItem[i]["image"] = data.data['info']['images'][0];
+            }
+          })
+          .catch(error => console.log('error', error));
+      }
     }
 
   },
   data() {
     return {
-      GalleryItem: [{
-                    id: "1a2b3c4d",
-                    description: "A breathtaking view of a colorful and serene sunset over the calm ocean waves, creating a mesmerizing blend of orange, pink, and purple hues that stretch across the horizon. Captured by JohnDoe123.",
-                    uploader: "JohnDoe123",
-                    rating: 9.5
-                },],
+      searchText: '',
+      PreGalleryItem: [{
+        id: "1a2b3c4d",
+        description: "A breathtaking view of a colorful and serene sunset over the calm ocean waves, creating a mesmerizing blend of orange, pink, and purple hues that stretch across the horizon. Captured by JohnDoe123.",
+        uploader: "JohnDoe123",
+        rating: 9.5
+      },],
+      GalleryItem: []
     }
   }
 }

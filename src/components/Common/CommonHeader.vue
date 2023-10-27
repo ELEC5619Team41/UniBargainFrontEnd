@@ -8,7 +8,7 @@
                 :class="'centerButton ' + (selectedButton == index ? 'selected' : '')">{{ item.title }}</button>
         </div>
         <div style="width: 20%; height: 100%; justify-content: center; display: flex; align-items: center;">
-            <div id="uploadImageField" style="height: 30px; width: 30px; "
+            <div ref="uploadImageField" style="height: 30px; width: 30px; "
                 @click="buttonOnClick(-1, { title: this.$t('UserProfile'), link: '/userhome/userprofilepage' })"></div>
         </div>
     </div>
@@ -40,7 +40,7 @@ export default {
             fetch("http://localhost:28888/user/get", requestOptions)
                 .then(response => response.json())
                 .then(data => {
-                    var imageBG = document.getElementById("uploadImageField");
+                    var imageBG = this.$refs.uploadImageField;
                     imageBG.style.backgroundImage = "url(" + data.data['avatar'] + ")";
                     imageBG.style.backgroundSize = "cover";
                 })

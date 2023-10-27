@@ -114,7 +114,7 @@ export default {
         <FullCalendar ref="calendar" :options="calendarOptions" />
 
         <div style="width: 100%; display: flex; align-items: center; justify-content: center;">
-            <div id="uploadImageField"
+            <div 
                 style="display: flex; background-color: gray; width: 200px; height: 50px; align-items: center; justify-content: center; margin-top: 10px; border-radius: 10px;">
                 <div>{{$t('UploadNewTimetable')}}</div>
                 <input type="file" accept="text\calendar" @change="previewImage" style="opacity: 0; position: absolute;" />

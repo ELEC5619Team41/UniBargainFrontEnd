@@ -128,16 +128,29 @@ export default {
                 .then(async (data) => {
                     var ls = [];
                     for (let i = 0; i < data.data.length; i++) {
-                        var username = await this.getUsername(data.data[i]['productUserId']);
+                        var user = await this.getUser(data.data[i]['productUserId']);
+                        var product = await this.getProductInfo(data.data[i]['productId']);
                         var content = {
                             "productId": data.data[i]['productId'],
-                            "username": username,
+                            "username": user['username'],
                             "itemName": data.data[i]['productInfo']['name'],
                             "orderDate": "",
                             "itemPrice": data.data[i]['productInfo']['price'],
                             "tag": "bought",
                             "status": "unrated"
                         }
+
+
+                        if('images' in product.data['info']){
+                            if(product.data['info']['images'].length > 0){
+                                content['image'] = product.data['info']['images'][0];
+                            }
+                        }
+
+                        if('avatar' in user){
+                            content['avatar'] = user['avatar'];
+                        }
+
                         ls.push(content);
                     }
                     this.items = this.items.concat(ls);
@@ -163,17 +176,32 @@ export default {
                 .then(response => response.json())
                 .then(async (data) => {
                     var ls = [];
+                    console.log(data)
                     for (let i = 0; i < data.data.length; i++) {
-                        var username = await this.getUsername(data.data[i]['productUserId']);
+                        var user = await this.getUser(data.data[i]['productUserId']);
+                        var product = await this.getProductInfo(data.data[i]['productId']);
+
                         var content = {
                             "productId": data.data[i]['productId'],
-                            "username": username,
+                            "username": user['username'],
                             "itemName": data.data[i]['productInfo']['name'],
                             "orderDate": "",
                             "itemPrice": data.data[i]['productInfo']['price'],
                             "tag": "sold",
                             "status": "unrated"
                         }
+
+                        if ('images' in product.data['info']) {
+                            if (product.data['info']['images'].length > 0) {
+                                content['image'] = product.data['info']['images'][0];
+                            }
+                        }
+
+
+                        if('avatar' in user){
+                            content['avatar'] = user['avatar'];
+                        }
+
                         ls.push(content);
                     }
                     this.items = this.items.concat(ls);
@@ -200,23 +228,35 @@ export default {
                 .then(async (data) => {
                     var ls = [];
                     for (let i = 0; i < data.data.length; i++) {
-                        var username = await this.getUsername(data.data[i]['productUserId']);
+                        var user = await this.getUser(data.data[i]['productUserId']);
+                        var product = await this.getProductInfo(data.data[i]['productId']);
                         var content = {
                             "productId": data.data[i]['productId'],
-                            "username": username,
+                            "username": user['username'],
                             "itemName": String(data.data[i]['productInfo']['name']),
                             "orderDate": "",
                             "itemPrice": data.data[i]['productInfo']['price'],
                             "tag": "collection",
                             "status": "unrated"
                         }
+                        if ('images' in product.data['info']) {
+                            if (product.data['info']['images'].length > 0) {
+                                content['image'] = product.data['info']['images'][0];
+                            }
+                        }
+
+
+                        if('avatar' in user){
+                            content['avatar'] = user['avatar'];
+                        }
+
                         ls.push(content);
                     }
                     this.items = this.items.concat(ls);
                 })
                 .catch(error => console.log('error', error));
         },
-        async getUsername(input) {
+        async getUser(input) {
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("username", this.$store.state.username);
@@ -230,19 +270,18 @@ export default {
                 body: JSON.stringify(data),
                 redirect: 'follow'
             };
-
-            var name = '';
+            
+            var user = '';
 
             await fetch("http://localhost:28888/user/getByUserId", requestOptions)
                 .then(response => response.json())
                 .then(data => {
-                    name = data.data['username'];
-
+                    user = data.data;
                 })
                 .catch(error => console.log('error', error));
-            return name;
+            return user;
         },
-        async getProductInfo(productId){
+        async getProductInfo(productId) {
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("username", this.$store.state.username);
@@ -263,7 +302,6 @@ export default {
                 .then(response => response.json())
                 .then(data => {
                     output = data;
-
                 })
                 .catch(error => console.log('error', error));
             return output;
@@ -285,20 +323,31 @@ export default {
 
             await fetch("http://localhost:28888/product/getMyList", requestOptions)
                 .then(response => response.json())
-                .then(async(data) => {
+                .then(async (data) => {
                     var ls = [];
                     for (let i = 0; i < data.data.length; i++) {
-                        var username = await this.getUsername(data.data[i]['userId']);
+                        var user = await this.getUser(data.data[i]['userId']);
                         var productDetail = await this.getProductInfo(data.data[i]['id']);
                         var content = {
                             "productId": data.data[i]['id'],
-                            "username": username,
+                            "username": user['name'],
                             "itemName": productDetail.data.info["name"],
                             "orderDate": "",
                             "itemPrice": productDetail.data.info["price"],
                             "tag": "posted",
                             "status": "unshipped"
                         }
+                        if('images' in productDetail.data['info']){
+                            if(productDetail.data['info']['images'].length > 0){
+                                content['image'] = productDetail.data['info']['images'][0];
+                            }
+                        }
+
+
+                        if('avatar' in user){
+                            content['avatar'] = user['avatar'];
+                        }
+
                         ls.push(content);
                     }
                     this.items = this.items.concat(ls);
@@ -349,12 +398,12 @@ export default {
     },
 
     async mounted() {
-        
+
         await this.findBoughts();
         await this.findSold();
         await this.findCollection();
         await this.findPosted();
-        
+
         this.displayItems = this.items.filter(item => (item.tag == this.tagKeyPairs[this.categorySelectedButton]));
 
         this.categoryOnClick(0);

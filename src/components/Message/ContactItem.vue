@@ -1,7 +1,7 @@
 <template>
     <div class="background">
         <div style="margin: 10px; display: flex; align-items: center;">
-            <div id="avatar" style="width: 48px; height: 48px; background-color: gray;"></div>
+            <div ref="avatar" style="width: 48px; height: 48px; background-color: gray;"></div>
             <!-- {{ this.contactDetail }} -->
             <div style="margin-left: 10px; width: calc(100%-48px); overflow: hidden;">
                 <p class="contactName">
@@ -10,8 +10,8 @@
                     {{ this.contactDetail.message.text }}</p>
             </div>
         </div>
-<!--        <p class="contactTime">-->
-<!--&lt;!&ndash;            {{ this.humanTimeFromISO }}</p>&ndash;&gt; need to add timestamp-->
+        <!--        <p class="contactTime">-->
+        <!--&lt;!&ndash;            {{ this.humanTimeFromISO }}</p>&ndash;&gt; need to add timestamp-->
     </div>
 </template>
 
@@ -31,15 +31,16 @@ export default {
         }
     },
     props: {
-        contactDetail:Object
+        contactDetail: Object
     },
     methods: {
     },
-    mounted(){
-        var avatar = document.getElementById("avatar");
-        avatar.style.backgroundImage = `url(${this.contactDetail.user.avatar})`;
-        avatar.style.backgroundSize = "cover";
-    
+    mounted() {
+        if (!(this.contactDetail.user.avatar == null || this.contactDetail.user.avatar == '')) {
+            var avatar = this.$refs.avatar;
+            avatar.style.backgroundImage = `url(${this.contactDetail.user.avatar})`;
+            avatar.style.backgroundSize = "cover";
+        }
     }
 }
 </script>
@@ -74,7 +75,7 @@ export default {
     text-wrap: nowrap;
 }
 
-.contactTime{
+.contactTime {
     margin: 0px;
     width: 100%;
     font-size: 15px;

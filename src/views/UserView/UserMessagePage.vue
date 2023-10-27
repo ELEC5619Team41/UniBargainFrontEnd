@@ -2,12 +2,13 @@
     <div class="interfaceFrame">
         <div class="leftSection">
             <div class="searchbar">
-                <input class="inputBar" v-model="searchInput">
-                <div class="searchButton" v-on:click="SearchList"></div>
+                <input class="inputBar" v-model="this.searchInput">
+                <div class="searchButton" @click="SearchList"></div>
             </div>
             <div class="contactField">
-                <div v-for="(item, num) in this.Contacts" v-on:click="ChangeChatRoom(num)">
-                    <ContactItem :contactDetail="item"></ContactItem>
+                <div v-for="(item, num) in this.Contacts" v-on:click="ChangeChatRoom(num, true)">
+                    <ContactItem :contactDetail="item" :class="item.user.id == this.CurrentTalkTo ? 'selected' : ''">
+                    </ContactItem>
                 </div>
             </div>
 
@@ -25,13 +26,13 @@
                     <div :class="[message.sendUserId == this.myUserID ? 'self' : '', 'messageOutLine']"
                         class="messageOutLine" v-for="message in this.ChatInfo">
                         <div class="bubble">
-
-
-                            <div v-if="message.message.text.startsWith('data:text/calendar;')">
-                                In Text Calendar
-                                <InTextCalendar :url="message.message.text"></InTextCalendar>
+                            <div v-if="typeof (message.message.text) == 'string'">
+                                <div v-if="message.message.text.startsWith('data:text/calendar;')">
+                                    In Text Calendar
+                                    <InTextCalendar :url="message.message.text"></InTextCalendar>
+                                </div>
+                                <div v-else>{{ message.message.text }}</div>
                             </div>
-                            <div v-else>{{ message.message.text }}</div>
 
                         </div>
                     </div>
@@ -45,15 +46,25 @@
                 <!-- todo: Four buttoms functionality -->
                 <!-- <div style="height: 30px; background-color: gray; width: 100%;"></div> -->
                 <div style="display: flex; background-color: rgb(222, 222, 222);">
-                    <div style="height: 30px; width: 30px; background-color: blue; margin-left: 10px;"
-                        @click="emojiPickerDisplay"></div>
+                    <el-icon size="30px" style="margin-left: 10px;" @click="emojiPickerDisplay">
+                        <ChatRound />
+                    </el-icon>
+
+
                     <EmojiPicker v-if="this.showEmoji" :native="true" @select="onSelectEmoji"
                         style="position: absolute; margin-top: -200px; margin-left: 50px;" />
-                    <div style="height: 30px; width: 30px; background-color: blue; margin-left: 30px;"
-                        @click="dateSelect"></div>
+
+                    <el-icon :size="'30px'" style="margin-left: 30px;" @click="dateSelect">
+                        <Calendar />
+                    </el-icon>
                     <!-- get location -->
-                    <div style="height: 30px; width: 30px; background-color: blue; margin-left: 30px;"
-                        @click="datePickerDisplay"></div>
+
+                    <el-icon size="30px" style="margin-left: 30px;" @click="this.chatInput += this.deliveryAddress">
+                        <Location />
+                    </el-icon>
+
+
+
                 </div>
 
 
@@ -88,12 +99,13 @@ export default {
         ContactItem,
         EmojiPicker,
         FullCalendar,
-        InTextCalendar
+        InTextCalendar,
     },
     data() {
         return {
             windowsHeight: 0,
             CurrentRoom: 0,
+            CurrentTalkTo: -1,
             Contacts: [
 
             ],
@@ -103,12 +115,14 @@ export default {
             myUserID: 1, // should be store in vuex, get when login
             restHeight: 0,
             timer: null,
+            searchRaw: {},
             chatRoom: false,
             Show: false,
             searchInput: '',
-            defaultMessage: 'talk about the trade',
             showEmoji: false,
             showCalendar: false,
+            currentScroll: 0,
+            deliveryAddress: '',
             calendarOptions: {
                 plugins: [interactionPlugin, dayGridPlugin],
                 initialView: 'dayGridMonth',
@@ -170,21 +184,47 @@ export default {
                 if (result['message'] == 'success') {
 
                     this.calendarOptions.events.url = result['data']['file']
-                    let calendarApi = this.$refs.calendar.getApi()
-                    calendarApi.render()
                 }
             }).catch(error => console.log('error', error));
         },
+        async getAddress() {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+
+            var data = '';
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
+            };
+
+            await fetch("http://localhost:28888/user/get", requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    if (!('address' in data.data['extend']) || data.data['extend']['address'].length == 0) {
+                        alert('Please add your address first');
+                        return;
+                    }
+                    var addressList = data.data['extend']['address'];
+                    for (let i = 0; i < addressList.length; i++) {
+                        if (addressList[i].isDefault) {
+                            this.deliveryAddress = addressList[i].address + ", " + addressList[i].city
+                                + ", " + addressList[i].state + ", " + addressList[i].zip + ", " + addressList[i].country;
+                            break;
+                        }
+                    }
+                })
+                .catch(error => console.log('error', error));
+        },
         async userTextAreaInput(e) {
-            console.log("userTextAreaInput" + e);
             if (e.which == 13 && e.shiftKey) {
-                console.log("new line");
             } else if (e.which == 13) {
-                e.preventDefault();
-                console.log("send message");
                 await this.SendMessage(this.chatInput);
             }
-            console.log(this.chatInput);
 
 
         },
@@ -206,21 +246,33 @@ export default {
                 body: JSON.stringify(raw),
                 redirect: 'follow'
             };
-            console.log(requestOptions);
 
             await fetch("http://localhost:28888/chat/sendMessage", requestOptions)
-                .then(response => { response.json(); console.log(response) })
-                .then(result => this.ChangeChatRoom(this.CurrentRoom))
+                .then(response => { response.json() })
+                .then(result => this.ChangeChatRoom(this.FindChatRoom(this.CurrentTalkTo), true))
                 .catch(error => console.log('error', error));
             this.chatInput = "";
             this.showEmoji = false;
 
         },
-        ChangeChatRoom(num) {
+        FindChatRoom(id) {
+            if (id == -1) {
+                return 0;
+            }
+            for (let i = 0; i < this.Contacts.length; i++) {
+                if (this.Contacts[i].user.id == id) {
+                    return i;
+                }
+            }
+            return -1;
+
+        },
+        async ChangeChatRoom(num, manual) {
             this.CurrentRoom = num;
             let id = this.Contacts[this.CurrentRoom].user.id;
-            console.log(id);
+            this.CurrentTalkTo = id;
             this.chatRoom = true;
+
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("username", this.$store.state.username);
@@ -237,15 +289,20 @@ export default {
                 redirect: 'follow'
             };
 
-            fetch("http://localhost:28888/chat/getListByOpposingUserId", requestOptions)
+            await fetch("http://localhost:28888/chat/getListByOpposingUserId", requestOptions)
                 .then(response => response.json())
-                .then(result => { this.needUpdate = true; this.ChatInfo = result.data; console.log(result); this.Show = true; this.ChatInfo = this.ChatInfo.reverse() })
+                .then(result => { this.needUpdate = true; this.ChatInfo = result.data; this.Show = true; this.ChatInfo = this.ChatInfo.reverse() })
                 .catch(error => console.log('error', error));
+
+            if (manual) {
+                const div = document.getElementById("chatWindow");
+                this.currentScroll = 10000;
+                div.scrollTop = this.currentScroll;
+            }
         },
         onScroll({ target: { scrollTop, offsetHeight, scrollHeight } }) {
-            console.log(scrollTop)
+            this.currentScroll = scrollTop
             if (scrollTop == 0) {
-                console.log("Top!");
                 const div = document.getElementById("scrollBar");
                 this.restHeight = scrollHeight;
                 this.$emit("scrollview-hit-top");
@@ -253,37 +310,46 @@ export default {
             if (scrollTop >= scrollHeight - offsetHeight) {
                 clearTimeout(this.timer)
                 this.timer = setTimeout(() => {
-                    console.log("Bottom!");
                     this.$emit("scrollview-hit-bottom");
                 }, 100)
 
             }
         },
-        SearchList() {
+        async SearchList() {
+
+            //todo: problem here
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("username", this.$store.state.username);
             myHeaders.append("token", this.$store.state.token);
-            var raw = { "searchName": this.searchInput };
+
+            if (this.searchInput == '') {
+                this.searchRaw = {};
+            }
+            else {
+                this.searchRaw = { "searchname": this.searchInput };
+            }
+
+
 
             var requestOptions = {
                 method: 'POST',
                 headers: myHeaders,
-                body: JSON.stringify(raw),
+                body: JSON.stringify(this.searchRaw),
                 redirect: 'follow'
             };
 
-            fetch("http://localhost:28888/chat/getPreviewList", requestOptions)
+            await fetch("http://localhost:28888/chat/getPreviewList", requestOptions)
                 .then(response => response.json())
                 .then(result => {
-
-                    this.Contacts = result.data;
-                    if (this.Contacts.length !== 0) {
-                        this.ChangeChatRoom(0);
-                        this.searchInput = '';
-                    }
-                    else {
-
+                    console.log('preveiw: ', result)
+                    if (result.data.length != 0) {
+                        this.Contacts = result.data;
+                        console.log(this.Contacts)
+                        if (this.Contacts.length !== 0) {
+                            this.ChangeChatRoom(0, false);
+                            this.searchInput = '';
+                        }
                     }
 
 
@@ -296,33 +362,11 @@ export default {
 
 
     },
-    activated() {
 
-
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        myHeaders.append("username", this.$store.state.username);
-        myHeaders.append("token", this.$store.state.token);
-        var raw = { "searchname": "null" };
-
-        var requestOptions = {
-            method: 'POST',
-            headers: myHeaders,
-            body: JSON.stringify(raw),
-            redirect: 'follow'
-        };
-
-        fetch("http://localhost:28888/chat/getPreviewList", requestOptions)
-            .then(response => response.json())
-            .then(result => { this.Contacts = result.data })
-            .catch(error => console.log('error', error));
-
-
-    },
     created() {
         const route = useRoute();
         this.myUserID = this.$store.state.id;
-        console.log(this.myUserID + "id")
+        console.log('chat-id', this.$route.params.id == '')
         if (route.query.UserID != null) {
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
@@ -354,7 +398,7 @@ export default {
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("username", this.$store.state.username);
             myHeaders.append("token", this.$store.state.token);
-            var raw = { "searchname": "null" };
+            var raw = this.searchRaw
 
             var requestOptions = {
                 method: 'POST',
@@ -365,7 +409,46 @@ export default {
 
             fetch("http://localhost:28888/chat/getPreviewList", requestOptions)
                 .then(response => response.json())
-                .then(result => { this.Contacts = result.data; this.ChangeChatRoom(0) })
+                .then(async (result) => {
+                    this.Contacts = result.data;
+                    console.log(this.Contacts[0].user.username);
+
+                    if (this.$route.params.id != '') {
+                        var exist = false;
+                        for (let i = 0; i < this.Contacts.length; i++) {
+                            if (this.Contacts[i].user.id == this.$route.params.id) {
+                                exist = true;
+                                break;
+                            }
+                        }
+                        if (!exist) {
+                            var myHeaders = new Headers();
+                            myHeaders.append("Content-Type", "application/json");
+                            myHeaders.append("username", this.$store.state.username);
+                            myHeaders.append("token", this.$store.state.token);
+                            const raw = {
+                                opposingUserId: this.$route.params.id,
+                                message:
+                                {
+                                    text: 'Hello, I want to talk about trade'
+                                }
+                            };
+                            var requestOptions = {
+                                method: 'POST',
+                                headers: myHeaders,
+                                body: JSON.stringify(raw),
+                                redirect: 'follow'
+                            };
+
+                            await fetch("http://localhost:28888/chat/sendMessage", requestOptions)
+                                .then(response => { response.json() })
+                                .then(result => this.ChangeChatRoom(this.FindChatRoom(this.CurrentTalkTo), true))
+                                .catch(error => console.log('error', error));
+                        }
+                    }
+
+                    this.ChangeChatRoom(this.FindChatRoom(this.CurrentTalkTo), true)
+                })
                 .catch(error => console.log('error', error));
         }
 
@@ -374,8 +457,8 @@ export default {
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("username", this.$store.state.username);
             myHeaders.append("token", this.$store.state.token);
-            var raw = { "searchname": "null" };
 
+            var raw = this.searchRaw
             var requestOptions = {
                 method: 'POST',
                 headers: myHeaders,
@@ -385,9 +468,11 @@ export default {
 
             fetch("http://localhost:28888/chat/getPreviewList", requestOptions)
                 .then(response => response.json())
-                .then(result => { this.Contacts = result.data })
+                .then(result => { this.Contacts = result.data; this.ChangeChatRoom(this.FindChatRoom(this.CurrentTalkTo), false) })
                 .catch(error => console.log('error', error));
         }, 1000)
+
+
 
     },
 
@@ -396,16 +481,13 @@ export default {
         if (this.needUpdate) {
             this.needUpdate = false;
             const div = document.getElementById("chatWindow");
-            console.log("update")
-            div.scrollTop = div.scrollHeight - this.restHeight;
+            div.scrollTop = this.currentScroll
         }
-
-
     },
     async mounted() {
         await this.getTimetable()
-        const div = document.getElementById("chatWindow");
-        div.scrollTop = div.scrollHeight;
+        await this.getAddress()
+
         this.windowsHeight = window.innerHeight;
     }
 }
@@ -566,6 +648,10 @@ export default {
     background-color: black;
     right: 20px;
     position: absolute
+}
+
+.selected {
+    background-color: rgb(209, 209, 209);
 }
 </style>
 

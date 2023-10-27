@@ -5,22 +5,24 @@
                 {{ $t('OrderNumber') }} {{ this.item.orderNumber }}
             </div>
             <div style="text-align: right; margin-left: auto; display: flex;">
-                <div style="width: 35px; height: 35px; background-color: blue; margin-right: 5px;"></div>
+                <div ref="avatar" style="width: 35px; height: 35px; background-color: blue; margin-right: 5px;"></div>
                 <div style="height: 35px; display: flex; align-items: center;">
                     {{ this.item.username }}
                 </div>
             </div>
-            <div v-if="this.item.tag=='collection'" style="width: 65px; height: 35px; background-color: white; margin-left: 5px; align-items: center; text-align: center; display: flex; border-radius: 5px;" @click="$emit('remove-collection')">
+            <div v-if="this.item.tag == 'collection'"
+                style="width: 65px; height: 35px; background-color: white; margin-left: 5px; align-items: center; text-align: center; display: flex; border-radius: 5px;"
+                @click="$emit('remove-collection')">
                 Remove
             </div>
         </div>
 
         <div style="margin-top: 10px; display: flex;">
-            <div style="width: 15%; aspect-ratio: 1/1; background-color: aqua;"></div>
+            <div ref="previewImage" style="width: 15%; aspect-ratio: 1/1; background-color: aqua;"></div>
             <div class="textField" style="width: 85%;">
                 <ClickableText :text="this.item.itemName" :size="'20px'" @text-trigger="jumpToItem"></ClickableText>
                 <div>{{ this.item.orderDate }}</div>
-                
+
                 <div style="position: absolute;bottom: 0; display: flex; width: 100%;">
                     <div>{{ this.item.itemPrice }}</div>
                     <!-- <div style="right: 0; position: absolute;">Hello</div> -->
@@ -65,6 +67,44 @@ export default {
     methods: {
         jumpToItem() {
             this.$router.push('/userhome/itemdetailpage/' + this.item.productId)
+        }
+    },
+    mounted() {
+        if ('image' in this.item && this.item.image != '') {
+
+            var previewImage = this.$refs.previewImage;
+            previewImage.style.backgroundImage = `url(${this.item.image})`;
+            previewImage.style.backgroundSize = "cover";
+        } else {
+            console.log('no img')
+            var previewImage = this.$refs.previewImage;
+            previewImage.style.backgroundImage = 'none';
+        }
+
+        if('avatar' in this.item){
+            var avatar = this.$refs.avatar;
+            avatar.style.backgroundImage = `url(${this.item.avatar})`;
+            avatar.style.backgroundSize = "cover";
+        }
+
+
+    },
+    updated(){
+        if ('image' in this.item && this.item.image != '') {
+
+            var previewImage = this.$refs.previewImage;
+            previewImage.style.backgroundImage = `url(${this.item.image})`;
+            previewImage.style.backgroundSize = "cover";
+        } else {
+            console.log('no img')
+            var previewImage = this.$refs.previewImage;
+            previewImage.style.backgroundImage = 'none';
+        }
+
+        if('avatar' in this.item){
+            var avatar = this.$refs.avatar;
+            avatar.style.backgroundImage = `url(${this.item.avatar})`;
+            avatar.style.backgroundSize = "cover";
         }
     }
 }

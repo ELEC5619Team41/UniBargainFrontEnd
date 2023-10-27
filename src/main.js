@@ -8,9 +8,15 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'element-plus/dist/index.css'
 import ElementPlus from 'element-plus';
 
+import * as ElIconList from '@element-plus/icons-vue'
+
 
 
 const app = createApp(App);
+
+for (const name in ElIconList) {
+    app.component(name, ElIconList[name])
+  }
 
 app.use(store);
 app.use(ElementPlus);

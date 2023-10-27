@@ -3,7 +3,7 @@
         <div style="margin-top: 20px;">
             <div style="display: flex; height: 500px; width: 100%; justify-content: space-between;">
 
-                <div id="ProductImage" style="height: 500px; width: 500px; border-radius: 25px;"
+                <div ref="ProductImage" style="height: 500px; width: 500px; border-radius: 25px;"
                     @click="showNextImage"></div>
                 <div class="contentField">
                     <div style="display: flex; height: 80px; align-items: center;">
@@ -12,7 +12,7 @@
                         </h1>
                         <div style="width: 40%; display: flex; align-items: center; justify-content: space-around;">
 
-                            <div id="sellerAvatar" style="width: 50px; height: 50px;"></div>
+                            <div ref="sellerAvatar" style="width: 50px; height: 50px;"></div>
                             <div>{{ this.itemData.seller.username }}</div>
                             <div>{{ this.itemData.seller.rating }}</div>
                         </div>
@@ -97,7 +97,7 @@ export default {
                 .catch(error => console.log('error', error));
         },
         showImageByIndex() {
-            var imageBG = document.getElementById("ProductImage");
+            var imageBG = this.$refs.ProductImage;
             imageBG.style.backgroundImage = "url(" + this.itemData['images'][this.showImageIndex] + ")";
             imageBG.style.backgroundSize = "cover";
         },
@@ -131,7 +131,7 @@ export default {
                 if( i == "seller"){
                     this.itemData['seller']['username'] = data.data['username'];
                     this.itemData['seller']['avatar'] = data.data['avatar'];
-                    var sellerAvatar = document.getElementById("seller-ava");
+                    var sellerAvatar = this.$refs.sellerAvatar;
                     sellerAvatar.style.backgroundImage = "url(" + data.data['avatar'] + ")";
                     sellerAvatar.style.backgroundSize = "cover";
                 }else{

@@ -4,7 +4,7 @@
         <div class="clearButton" @click="clear()"><div class="buttonText">Clear</div></div>
         <div style="width: 1px; height: 50%; background: black; margin-left: 15px;"></div>
         <h5 style="margin-left: 5px; margin-top:5px;">Goods</h5>
-        <div class="searchButton"><div class="buttonText" @click="search()">Search</div></div>
+        <div class="searchButton" @click="$emit('searchFunction'); console.log('emit event')"><div class="buttonText">Search</div></div>
     </div>
 </template>
 
@@ -23,10 +23,6 @@ export default {
     methods: {
         clear() {
             this.searchbar.input = ""
-        },
-        search(){
-            const url = '/userhome/search/'+this.searchbar.input;
-            this.$router.push(url);
         }
     }
 }

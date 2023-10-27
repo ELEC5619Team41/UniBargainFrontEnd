@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="searchbarBackground">
-            <TopSearchBar></TopSearchBar>
+            <TopSearchBar v-model:inputText="this.searchText" @searchFunction="search"></TopSearchBar>
         </div>
 
         <!-- <div style="height: 350px; display: flex; align-items: center;">
@@ -16,7 +16,6 @@
             <div>
                 <h1>Homepage Gallery</h1>
                 <div class="galleryContentBlock">
-
                     <GalleryItemcomponent v-for="(item, num) in this.galleryItemData" :ItemData="item"></GalleryItemcomponent>
                 </div>
             </div>
@@ -38,6 +37,7 @@ export default {
     },
     data() {
         return {
+            searchText: '',
             CategoryList: [
                 {
                     label: "Women's Dresses",
@@ -172,8 +172,9 @@ export default {
         await this.getProductInfo();
     },
     methods: {
-        search() {
-            console.log(this.searchbar.input);
+        search(){
+            var url = '/userhome/search/'+this.searchText;
+            this.$router.push(url);
         },
         getProductInfo(){
             var myHeaders = new Headers();
@@ -196,7 +197,6 @@ export default {
                 fetch("http://localhost:28888/product/getAvgScore", requestOptions)
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
                     if (data.data['score']!= null){
                         this.galleryItemData[i]["rating"] = parseInt(data.data['score']).toFixed();
                     }else{
@@ -217,7 +217,6 @@ export default {
                 fetch("http://localhost:28888/user/getByUserId", requestOptions)
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
                     this.galleryItemData[i]["uploader"] = data.data['username'];
                     this.galleryItemData[i]["uploaderAvatar"] = data.data["avatar"];
                 })
@@ -235,7 +234,6 @@ export default {
                 fetch("http://localhost:28888/product/get", requestOptions)
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
                     if(data.data['info']['images'] == undefined){
                         this.galleryItemData[i]["image"] = '';
                     }else{
@@ -263,7 +261,6 @@ export default {
             await fetch("http://localhost:28888/product/getRecommendList", requestOptions)
             .then(response => response.json())
             .then( data => {
-                console.log(data);
                 
                 var ls =[]
                 for(let i = 0; i<data.data.length; i++){

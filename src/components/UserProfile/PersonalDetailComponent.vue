@@ -22,7 +22,7 @@
                 style="text-align: left; margin-top: 12px; font-weight: bolder; color: black; font-size: 25px;">{{
                     $t('Avatar') }}</div>
 
-            <div id="uploadImageField" style="display: flex; background-color: gray; width: 50%; aspect-ratio: 1/1;">
+            <div ref="uploadImageField" style="display: flex; background-color: gray; width: 50%; aspect-ratio: 1/1;">
                 <input type="file" accept="image/*" @change="previewImage" style="opacity: 0;" />
             </div>
         </div>
@@ -69,7 +69,7 @@ export default {
                 reader.onload = (e) => {
                     this.preview = e.target.result;
                     console.log(this.preview)
-                    var imageBG = document.getElementById("uploadImageField");
+                    var imageBG = this.$refs.uploadImageField;
                     imageBG.style.backgroundImage = "url(" + this.preview + ")";
                     imageBG.style.backgroundSize = "cover";
                 }
@@ -172,7 +172,7 @@ export default {
                 this.uploadData['gender'] = data.data['extend']['gender'];
                 this.uploadData['mobileNumber'] = data.data['extend']['mobile'];
                 this.uploadData['addressList'] = data.data['extend']['address'];
-                var imageBG = document.getElementById("uploadImageField");
+                var imageBG = this.$refs.uploadImageField
                 imageBG.style.backgroundImage = "url(" + data.data['avatar'] + ")";
                 imageBG.style.backgroundSize = "cover";
             })
