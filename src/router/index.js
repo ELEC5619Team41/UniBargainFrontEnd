@@ -56,7 +56,6 @@ const routes = [
         component: UserRequestPage
       },
       {
-        name: 'messages',
         path: 'usermessagepage',
         component: UserMessagePage,
       },
@@ -83,7 +82,7 @@ const routes = [
         component: SeekTradeItem
       },
       {
-        path: 'transactionpage',
+        path: 'transactionpage/:id?',
         component: TransactionPage
       },
       {

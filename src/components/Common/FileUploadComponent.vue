@@ -27,6 +27,7 @@ export default {
   components: {
     SendRequestComponent
   },
+  emits:['show-image'],
 
   methods:{
     uploadFile(url,header,body)
@@ -39,16 +40,19 @@ export default {
     },
     AddImage(e)
     { 
-       console.log(e);
        if(e){
         this.Image.push(e.url);
         var reader = new FileReader();
-        reader.readAsDataURL(e.raw);
+        
         reader.onload= (event)=>{
           this.img.push(event.target.result);
+
+          this.$emit('show-image', event.target.result);
         }
+
+        reader.readAsDataURL(e.raw);
        }
-       this.$emit('show-image', this.img);
+       
     },
     OnPreview(uploadFile)
     {

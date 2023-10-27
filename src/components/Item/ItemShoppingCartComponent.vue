@@ -1,7 +1,7 @@
 <template>
     <div style="display: flex; width: 100%; position: relative; margin-bottom: 10px;">
 
-        <div style="margin-top: 10px; width: 20px;">
+        <div style="margin-top: 10px; width: 20px;" v-if="this.showToggle">
             <input type="checkbox" v-model="outputData">
         </div>
 
@@ -48,13 +48,16 @@ export default {
         },
         selectItemComputePrice: {
             type: Object,
-            required: true,
             default: () => {
                 return {
                     id: '',
                     checked: false
                 }
             }
+        },
+        showToggle: {
+            type: Boolean,
+            default: true
         }
     },
     data() {

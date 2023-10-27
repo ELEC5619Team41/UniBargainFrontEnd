@@ -8,7 +8,8 @@
                 :class="'centerButton ' + (selectedButton == index ? 'selected' : '')">{{ item.title }}</button>
         </div>
         <div style="width: 20%; height: 100%; justify-content: center; display: flex; align-items: center;">
-            <div style="height: 30px; width: 30px; background-color: white; " @click="buttonOnClick(-1, { title: this.$t('UserProfile'), link: '/userhome/userprofilepage' })"></div>
+            <div id="uploadImageField" style="height: 30px; width: 30px; "
+                @click="buttonOnClick(-1, { title: this.$t('UserProfile'), link: '/userhome/userprofilepage' })"></div>
         </div>
     </div>
 </template>
@@ -20,6 +21,30 @@ export default {
         buttonOnClick(e, item) {
             this.selectedButton = e
             this.$router.push(item.link)
+        },
+        SendRequest() {
+
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+            var data = '';
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
+            };
+
+            fetch("http://localhost:28888/user/get", requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    var imageBG = document.getElementById("uploadImageField");
+                    imageBG.style.backgroundImage = "url(" + data.data['avatar'] + ")";
+                    imageBG.style.backgroundSize = "cover";
+                })
+                .catch(error => console.log('error', error));
         }
     },
     data() {
@@ -27,36 +52,34 @@ export default {
             selectedButton: 0,
             itemNames: [
                 { title: this.$t('Home'), link: '/userhome/userhomepage' }, { title: this.$t('Trading'), link: '/userhome/usertradingpage' }, { title: this.$t('Shopping Cart'), link: '/userhome/usershoppingcartpage' }, { title: this.$t('Message'), link: '/userhome/usermessagepage' },
-              { title: this.$t('Transaction'), link: '/userhome/transactionpage' },{ title: this.$t('Publish Item'), link: '/userhome/publishidlepage' },{ title: this.$t('Seek Trade'), link: '/userhome/seektradepage' }
+                { title: this.$t('Transaction'), link: '/userhome/transactionpage' }, { title: this.$t('Publish Item'), link: '/userhome/publishidlepage' }, { title: this.$t('Seek Trade'), link: '/userhome/seektradepage' }
             ]
         }
-    //        add more links
     },
-    created(){
+    created() {
         var url = this.$router.currentRoute.value.fullPath
-        if(url == '/userhome/userprofilepage')
-        {
+        if (url == '/userhome/userprofilepage') {
             this.selectedButton = -1
-        }else if(url == '/userhome/transactionendpage'){
+        } else if (url == '/userhome/transactionendpage') {
             this.selectedButton = 5
         }
         for (let index = 0; index < this.itemNames.length; index++) {
-          let questionmark = url.indexOf('?');
-          let Url;
-          if(questionmark!==0)
-          {
-            Url = url.substring(0,questionmark)
-          }
-          else
-          {
-            Url=url;
-          }
-            if(this.itemNames[index].link == Url)
-            {
+            let questionmark = url.indexOf('?');
+            let Url;
+            if (questionmark !== 0) {
+                Url = url.substring(0, questionmark)
+            }
+            else {
+                Url = url;
+            }
+            if (this.itemNames[index].link == Url) {
                 this.selectedButton = index
             }
         }
-    }
+    },
+    mounted() {
+        this.SendRequest();
+    },
 }
 </script>
 

@@ -1,37 +1,41 @@
 <template>
-
   <div style="display: flex; width: 100%; position: relative; flex-direction: column; padding-bottom: 5rem">
     <div style="display: flex; flex-direction: column; margin-bottom: 10px" class="address">
+      <div style="font-size: 35px;">{{ $t('ConfirmDeliveryAddress') }}</div>
 
-        <h2 style="position: relative; display: inline-flex; margin-left: 10px">confirm delivery address</h2>
-        <div  style = "position: relative; display: flex; margin-bottom: 10px" v-for="i in this.Address" >
-          <div>
-            <input type="checkbox">
-            {{i.address}}
-          </div>
-        </div>
-  </div>
+      <div v-for="(item, index) in this.addressList" style="width: 100%; display: flex;">
+        <button @click="changeAddress(index)"
+          :class="'centerButton ' + (this.deliveryAddress == index ? 'selected' : '')">{{ item.address + ", " + item.city
+            + ", " + item.state + ", " + item.zip + ", " + item.country }}</button>
+      </div>
+
+    </div>
     <div class="order" style="display: flex; flex-direction: column">
-      <h2 style="position: relative; display: inline-flex; margin-left: 10px" >confirm order information</h2>
-     <div v-for="items in this.itemsData">
-       <ItemInOrderComponent :item="items" >
-       </ItemInOrderComponent>
-     </div>
-      <div style="text-align: right">total price:{{this.totalPrice}}</div>
+      <div style="font-size: 35px;">{{ $t('ConfirmOrderInformation') }}</div>
+      <div class="itemField">
+        <div v-for="(itemData, index) in this.itemsData"
+          style="width: 100%; align-items: center; justify-content: center; display: flex; flex-direction: column; background-color: rgb(241, 241, 241);">
+          <ItemShoppingCartComponent :showToggle="false"
+            @delete-cart-item="deleteOneItem" :item="itemData">
+          </ItemShoppingCartComponent>
+        </div>
+      </div>
+      <div style="text-align: right; font-size: 25px; color: green;">{{ $t('TotalPrice')+  this.totalPrice }}</div>
     </div>
 
     <div class="payment" style="display: flex; flex-direction: column">
-      <h2 style="position: relative; display: inline-flex; margin-left: 10px" >confirm payment method</h2>
-      <div class="payment_method" >
-        <div class="method" v-for="method in this.PaymentMethods"><h3>{{method.name}}</h3></div>
+      <div style="font-size: 35px;">{{ $t('ConfirmPaymentMethod') }}</div>
+      <div class="payment_method">
+        <div class="method" v-for="method in this.PaymentMethods">
+          <h3>{{ method.name }}</h3>
+        </div>
       </div>
       <div style="display: flex; margin-top: 15px; margin-right: 15px; margin-bottom: 15px">
-        <round-corner-button style="margin-left: auto" text="proceed">proceed</round-corner-button>
+        <round-corner-button style="margin-left: auto" :text="$t('Proceed')" @button-click="this.$router.push('/userhome/transactionendpage/')"></round-corner-button>
       </div>
     </div>
 
   </div>
-
 </template>
 
 <script>
@@ -41,166 +45,304 @@ import ItemRecordComponent from "@/components/Item/ItemRecordComponent";
 import ItemShoppingCartComponent from "@/components/Item/ItemShoppingCartComponent";
 import ItemInOrderComponent from "@/components/Item/ItemInOrderComponent";
 
+
+
 export default {
   name: "TransactionPage",
-  components:{
+  components: {
     ItemShoppingCartComponent,
     TopSearchBar,
     RoundCornerButton,
     ItemRecordComponent,
     ItemInOrderComponent,
   },
-  properties:{
+  properties: {
 
   },
-  data(){
+  data() {
     return {
       totalPrice: 0,
-      Signal:false,
-      Address:[
+      Signal: false,
+      Address: [
         {
-          num:"01",
-          address:"123 Main Street Springfield, IL 62701 USA"
+          num: "01",
+          address: "123 Main Street Springfield, IL 62701 USA"
         },
         {
-          num:"02",
-          address:"123 Main Street Springfield, IL 62701 USA"
+          num: "02",
+          address: "123 Main Street Springfield, IL 62701 USA"
         }
       ],
-      itemsData: [
-        {
-          "orderNumber": "12345",
-          "username": "john_doe",
-          "itemName": "Product AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-          "orderDate": "2023-09-18",
-          "itemPrice": 19.99,
-          "tag": "posted",
-          "status": "unshipped",
-          "selected": true
-        },
-        {
-          "orderNumber": "67890",
-          "username": "jane_smith",
-          "itemName": "Product B",
-          "orderDate": "2023-09-19",
-          "itemPrice": 24.99,
-          "tag": "bought",
-          "status": "unreceived",
-          "selected": false
-        },
-        {
-          "orderNumber": "54321",
-          "username": "bob_jones",
-          "itemName": "Product C",
-          "orderDate": "2023-09-20",
-          "itemPrice": 14.99,
-          "tag": "sold",
-          "status": "unrated",
-          "selected": true
-        },
-        {
-          "orderNumber": "98765",
-          "username": "alice_smith",
-          "itemName": "Product D",
-          "orderDate": "2023-09-21",
-          "itemPrice": 29.99,
-          "tag": "collection",
-          "status": "refund",
-          "selected": false
-        },
-        {
-          "orderNumber": "24680",
-          "username": "sam_jackson",
-          "itemName": "Product E",
-          "orderDate": "2023-09-22",
-          "itemPrice": 39.99,
-          "tag": "posted",
-          "status": "unshipped",
-          "selected": true
-        }
-      ],
-      PaymentMethods:[
+      addressList: [],
+      itemsData: [],
+      PaymentMethods: [
         {
           index: 1,
-          name:"master/visa"
+          name: "master/visa"
         },
         {
           index: 2,
-          name:"paypal"
+          name: "paypal"
         },
         {
           index: 3,
-          name:"after-pay"
+          name: "after-pay"
         }
-      ]
-      // OrderInfo:[{
-      //   orderNumber:"01",
-      //   orderName:"TurboCharge Pro Wireless Earbuds",
-      //   quality:8
-      // }]
+      ],
+      deliveryAddress: 0,
     }
   },
-  mounted() {
+  async mounted() {
 
-      let price=0;
-      this.itemsData.forEach(item=>
-      {
-        price=price+item.itemPrice
-      })
-      console.log(price);
-      this.totalPrice= parseFloat(price).toFixed(2)
-
+    let price = 0;
+    this.itemsData.forEach(item => {
+      price = price + item.itemPrice
+    })
+    console.log(price);
+    this.totalPrice = parseFloat(price).toFixed(2)
+    await this.initData();
+    console.log(this.$route.params.id == '')
+    if (this.$route.params.id == '') {
+      //shopping cart
+      await this.getList();
+      for (let i = 0; i < this.itemsData.length; i++) {
+        await this.getSellerInfo(this.itemsData[i]["sellerId"], i);
+        await this.getProductInfo(this.itemsData[i]["productId"], i);
+      }
+    } else {
+      //buy now
+      var content = {
+              "productId": this.$route.params.id,
+              "sellerId": '',
+              "sellerName": '',
+              "itemName": '',
+              "itemPrice": 0,
+              "itemImage": '',
+              "sellerAvatar": '',
+              "selected": false
+            };
+      this.itemsData.push(content);
+      await this.getProductInfo(this.itemsData[0]["productId"], 0);
+      await this.getSellerInfo(this.itemsData[0]["sellerId"], 0);
+    }
   },
-  methods:{
-    setSignal(signal)
-    {
-      this.signal= signal;
+  methods: {
+    setSignal(signal) {
+      this.signal = signal;
     },
-    redirect()
-    {
-      if(this.signal)
-      {
+    redirect() {
+      if (this.signal) {
 
       }
-    }
+    },
+    async initData() {
+
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      myHeaders.append("username", this.$store.state.username);
+      myHeaders.append("token", this.$store.state.token);
+
+      var data = '';
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: JSON.stringify(data),
+        redirect: 'follow'
+      };
+
+      await fetch("http://localhost:28888/user/get", requestOptions)
+        .then(response => response.json())
+        .then(data => {
+          this.addressList = data.data['extend']['address'];
+          console.log(this.addressList)
+          for (let i = 0; i < this.addressList.length; i++) {
+            if (this.addressList[i].isDefault) {
+              this.deliveryAddress = i;
+              break;
+            }
+          }
+        })
+        .catch(error => console.log('error', error));
+    },
+    deleteOneItem(productId) {
+
+      let itemDetail = this.itemsData.find(item => item.productId == productId)
+      if (itemDetail.selected) {
+        this.totalPrice = parseFloat(this.totalPrice - itemDetail.itemPrice).toFixed(2)
+        this.selectedCount -= 1
+      }
+
+      this.itemsData = this.itemsData.filter(item => item.productId != productId)
+      this.removeFromCart(productId);
+    },
+    changeAddress(index) {
+      this.deliveryAddress = index;
+    },
+    async getProductInfo(id, input) {
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      myHeaders.append("username", this.$store.state.username);
+      myHeaders.append("token", this.$store.state.token);
+
+      var data = { "id": id };
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: JSON.stringify(data),
+        redirect: 'follow'
+      };
+
+      
+
+      await fetch("http://localhost:28888/product/get", requestOptions)
+        .then(response => response.json())
+        .then(data => {
+          this.itemsData[input]['itemPrice'] = parseInt(data.data['info']["price"]);
+          this.itemsData[input]['itemImage'] = data.data['info']["image"];
+          this.itemsData[input]['sellerId'] = data.data['info']["userId"];
+          this.itemsData[input]['itemName'] = data.data['info']["name"];
+        })
+        .catch(error => console.log('error', error));
+
+        this.totalPrice = Number(Number(this.totalPrice) + Number(parseFloat(this.itemsData[input]['itemPrice']).toFixed(2)))
+    },
+    async getList() {
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      myHeaders.append("username", this.$store.state.username);
+      myHeaders.append("token", this.$store.state.token);
+
+      var data = {};
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: JSON.stringify(data),
+        redirect: 'follow'
+      };
+
+      await fetch("http://localhost:28888/shoppingCart/getList", requestOptions)
+        .then(response => response.json())
+        .then(data => {
+          var ls = []
+          for (let i = 0; i < data.data.length; i++) {
+            var content = {
+              "productId": data.data[i]['productId'],
+              "sellerId": data.data[i]['productUserId'],
+              "sellerName": '',
+              "itemName": data.data[i]['productInfo']['name'],
+              "itemPrice": 0,
+              "itemImage": '',
+              "sellerAvatar": '',
+              "selected": false
+            };
+            ls.push(content);
+          }
+          this.itemsData = ls;
+        })
+        .catch(error => console.log('error', error));
+    },
+    removeFromCart(productId) {
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      myHeaders.append("username", this.$store.state.username);
+      myHeaders.append("token", this.$store.state.token);
+
+      var data = { "productId": productId };
+
+      var requestOptions = {
+        method: 'DELETE',
+        headers: myHeaders,
+        body: JSON.stringify(data),
+        redirect: 'follow'
+      };
+
+      fetch("http://localhost:28888/shoppingCart/remove", requestOptions)
+        .then(response => response.json())
+        .then(data => {
+          this.itemData['addedCart'] = false;
+        })
+        .catch(error => console.log('error', error));
+    },
+
+    getSellerInfo(id, input) {
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      myHeaders.append("username", this.$store.state.username);
+      myHeaders.append("token", this.$store.state.token);
+
+      var data = { userId: id };
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: JSON.stringify(data),
+        redirect: 'follow'
+      };
 
 
+      return fetch("http://localhost:28888/user/getByUserId", requestOptions)
+        .then(response => response.json())
+        .then(data => {
+          this.itemsData[input]['sellerName'] = data.data['username'];
+          this.itemsData[input]['sellerAvatar'] = data.data['avatar'];
+
+        })
+        .catch(error => console.log('error', error));
+    },
   }
 
 }
 </script>
 
 <style scoped>
-
 .address {
   margin-top: 15px;
-  border-radius: 10px;
   overflow: hidden;
-  border: solid black;
 }
-.order{
-  border: solid black;
+
+.order {
   overflow: hidden;
-  border-radius: 10px;
 }
-.payment{
+
+.payment {
   margin-top: 15px;
   display: flex;
   overflow: hidden;
   flex-direction: row;
-  border: solid black;
   margin-bottom: 15px;
-  border-radius: 10px;
 }
-.payment_method{
+
+.payment_method {
   display: flex;
   flex-direction: row;
   margin-left: 15px;
 }
-.method{
-  border: black solid;
+
+.method {
   width: 150px;
   height: 100px;
   margin-left: 150px;
+}
+
+.centerButton {
+  padding: 15px;
+  width: 100%;
+  background-color: rgb(241, 241, 241);
+  /* outline: none; */
+  border: none;
+}
+
+
+.selected {
+  background-color: rgb(209, 209, 209);
+}
+
+.itemField {
+  margin-top: 15px;
+  border-radius: 10px;
+  overflow: hidden;
 }
 </style>

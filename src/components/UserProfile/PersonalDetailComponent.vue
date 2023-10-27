@@ -50,7 +50,7 @@ export default {
                 emailAddress: '',
                 gender: '',
                 mobileNumber: '',
-
+                addressList: [],
             },
           url:'',
 
@@ -68,6 +68,7 @@ export default {
                 var reader = new FileReader();
                 reader.onload = (e) => {
                     this.preview = e.target.result;
+                    console.log(this.preview)
                     var imageBG = document.getElementById("uploadImageField");
                     imageBG.style.backgroundImage = "url(" + this.preview + ")";
                     imageBG.style.backgroundSize = "cover";
@@ -170,6 +171,7 @@ export default {
                 this.uploadData['emailAddress'] = data.data['extend']['email'];
                 this.uploadData['gender'] = data.data['extend']['gender'];
                 this.uploadData['mobileNumber'] = data.data['extend']['mobile'];
+                this.uploadData['addressList'] = data.data['extend']['address'];
                 var imageBG = document.getElementById("uploadImageField");
                 imageBG.style.backgroundImage = "url(" + data.data['avatar'] + ")";
                 imageBG.style.backgroundSize = "cover";

@@ -2,14 +2,17 @@
     <div>
         <div style="margin-top: 20px;">
             <div style="display: flex; height: 500px; width: 100%; justify-content: space-between;">
-                <div id="item-image" style="{height: 500px; width: 500px; background-image:{this.itemData['image']}; border-radius: 25px;}"></div>
+
+                <div id="ProductImage" style="height: 500px; width: 500px; border-radius: 25px;"
+                    @click="showNextImage"></div>
                 <div class="contentField">
                     <div style="display: flex; height: 80px; align-items: center;">
                         <h1 style="width: 60%; text-align: left;">
                             {{ this.itemData.name }}
                         </h1>
                         <div style="width: 40%; display: flex; align-items: center; justify-content: space-around;">
-                            <div id="seller-ava" style="width: 50px; height: 50px; background-image: `url(${this.itemData['seller']['avatar']})`;"></div>
+
+                            <div id="sellerAvatar" style="width: 50px; height: 50px;"></div>
                             <div>{{ this.itemData.seller.username }}</div>
                             <div>{{ this.itemData.seller.rating }}</div>
                         </div>
@@ -17,18 +20,20 @@
                     <div class="description" :title="this.itemData.description">
                         Item description: {{ this.itemData.description }}
                     </div>
-                    <!-- <div class="labelField" style="display: flex;">
-                        <div v-for="(item) in this.itemData.labels" style="padding: 5px;">{{ item }}</div>
-                    </div> -->
                     <div style="text-align: left; font-size: 50px;">
                         ${{ this.itemData.price }}
                     </div>
                     <div style="display: flex; justify-content: space-around;">
-                        <RoundCornerButton style="width: 150px;" :text="$t('BuyNow')" @click="redirect()" ></RoundCornerButton>
-                        <RoundCornerButton v-if="this.itemData['addedCart'] == true" style="width: 200px;" :text="$t('Remove From Cart')" @click="removeFromCart()" ></RoundCornerButton>
-                        <RoundCornerButton v-else style="width: 150px;" :text="$t('AddToCart')" @click="addToCart()" ></RoundCornerButton>
-                        <RoundCornerButton v-if="this.itemData['collected'] == true" style="width: 200px;" :text="$t('Remove From Collection')" @click="removeFromCollection()" ></RoundCornerButton>
-                        <RoundCornerButton v-else style="width: 150px;" :text="$t('Add To Collection')" @click="addToCollection()" ></RoundCornerButton>
+                        <RoundCornerButton style="width: 150px;" :text="$t('BuyNow')" @click="redirect()">
+                        </RoundCornerButton>
+                        <RoundCornerButton v-if="this.itemData['addedCart'] == true" style="width: 200px;"
+                            :text="$t('Remove From Cart')" @click="removeFromCart()"></RoundCornerButton>
+                        <RoundCornerButton v-else style="width: 150px;" :text="$t('AddToCart')" @click="addToCart()">
+                        </RoundCornerButton>
+                        <RoundCornerButton v-if="this.itemData['collected'] == true" style="width: 200px;"
+                            :text="$t('Remove From Collection')" @click="removeFromCollection()"></RoundCornerButton>
+                        <RoundCornerButton v-else style="width: 150px;" :text="$t('AddToCollection')"
+                            @click="addToCollection()"></RoundCornerButton>
                     </div>
                 </div>
             </div>
@@ -51,58 +56,72 @@ export default {
         RoundCornerButton,
         ItemCommentComponent,
     },
-  methods:{
-    redirect()
-      {
-        this.$router.go('/userhome/transactionpage')
-      },
-    Iteminfo(){
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        myHeaders.append("username", this.$store.state.username);
-        myHeaders.append("token", this.$store.state.token);
-
-        var data = {"id": this.$route.params.id};
-
-        var requestOptions = {
-        method: 'POST',
-        headers: myHeaders,
-        body: JSON.stringify(data),
-        redirect: 'follow'
-        };
-
-        return fetch("http://localhost:28888/product/get", requestOptions)
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            this.itemData['name'] = data.data['info']["name"];
-            this.itemData['sellerId'] = data.data['userId'];
-            this.itemData['description'] = data.data['info']["description"];
-            this.itemData['price'] = data.data['info']["price"];
-            this.itemData['collected'] = false;
-            this.itemData['addedCart'] = false;
-            var item_img = document.getElementById("item-image");
-            item_img.style.backgroundImage = 'url('+data.data['info']['images'][0]+')';
-            item_img.style.backgroundSize = "cover";
-
- 
-        })
-        .catch(error => console.log('error', error));
-      },
-        getSellerInfo(input, i){
+    methods: {
+        redirect() {
+            this.$router.push('/userhome/transactionpage/' + this.$route.params.id)
+        },
+        async Iteminfo() {
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("username", this.$store.state.username);
             myHeaders.append("token", this.$store.state.token);
 
-            var data = {userId : input};
+            var data = { "id": this.$route.params.id };
 
 
             var requestOptions = {
-            method: 'POST',
-            headers: myHeaders,
-            body: JSON.stringify(data),
-            redirect: 'follow'
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
+            };
+
+            await fetch("http://localhost:28888/product/get", requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    this.itemData['name'] = data.data['info']["name"];
+                    this.itemData['description'] = data.data['info']["description"];
+                    this.itemData['price'] = data.data['info']["price"];
+                    this.itemData['collected'] = false;
+                    this.itemData['addedCart'] = false;
+                    this.itemData['images'] = data.data['info']['images'];
+                    this.itemData['sellerId'] = data.data['userId'];
+
+                    if (this.itemData['images'].length >= 0) {
+
+                        this.showImageByIndex();
+                    }
+
+                })
+                .catch(error => console.log('error', error));
+        },
+        showImageByIndex() {
+            var imageBG = document.getElementById("ProductImage");
+            imageBG.style.backgroundImage = "url(" + this.itemData['images'][this.showImageIndex] + ")";
+            imageBG.style.backgroundSize = "cover";
+        },
+        showNextImage() {
+            if (this.showImageIndex < this.itemData['images'].length - 1) {
+                this.showImageIndex += 1;
+            } else {
+                this.showImageIndex = 0;
+            }
+            this.showImageByIndex();
+        },
+        getSellerInfo(input, i) {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+
+            var data = { userId: input };
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
             };
 
             return fetch("http://localhost:28888/user/getByUserId", requestOptions)
@@ -335,28 +354,187 @@ export default {
             myHeaders.append("username", this.$store.state.username);
             myHeaders.append("token", this.$store.state.token);
 
-            var data = {userId : input};
+            var data = { "productId": this.$route.params.id };
 
             var requestOptions = {
-            method: 'POST',
-            headers: myHeaders,
-            body: JSON.stringify(data),
-            redirect: 'follow'
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
+            };
+
+            fetch("http://localhost:28888/product/getAvgScore", requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    this.itemData['seller']['rating'] = parseInt(data.data['score']).toFixed();
+                })
+                .catch(error => console.log('error', error));
+        },
+        addToCollection() {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+
+            var data = { "productId": this.$route.params.id };
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
+            };
+
+            fetch("http://localhost:28888/collect/add", requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    this.itemData['collected'] = true;
+                    ;
+                })
+                .catch(error => console.log('error', error));
+        },
+        removeFromCollection() {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+
+            var data = { "productId": this.$route.params.id };
+
+            var requestOptions = {
+                method: 'DELETE',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
+            };
+
+            fetch("http://localhost:28888/collect/remove", requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    this.itemData['collected'] = false;
+                    ;
+                })
+                .catch(error => console.log('error', error));
+        },
+        addToCart() {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+
+            var data = { "productId": this.$route.params.id };
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
+            };
+
+            fetch("http://localhost:28888/shoppingCart/add", requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    this.itemData['addedCart'] = true;
+                    ;
+                })
+                .catch(error => console.log('error', error));
+        },
+        removeFromCart() {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+
+            var data = { "productId": this.$route.params.id };
+
+            var requestOptions = {
+                method: 'DELETE',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
+            };
+
+            fetch("http://localhost:28888/shoppingCart/remove", requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    this.itemData['addedCart'] = false;
+                    ;
+                })
+                .catch(error => console.log('error', error));
+        },
+        async getComments() {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+
+            var data = { "productId": this.$route.params.id };
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
+            };
+
+            await fetch("http://localhost:28888/product/getScoreList", requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    var ls = []
+                    for (let i = 0; i < data.data.length; i++) {
+                        var content = {
+                            "username": '',
+                            "rating": parseInt(data.data[i]['score']).toFixed(),
+                            "comment": data.data[i]['evaluate'],
+                            "commentRating": data.data[i]['score'].toFixed(),
+                            "userAvatar": '',
+                            "userId": data.data[i]['buyUserId'],
+                        }
+                        ls.push(content);
+                    }
+                    this.itemData["comments"] = ls;
+                })
+                .catch(error => console.log('error', error));
+
+            for (let i = 0; i < this.itemData["comments"].length; i++) {
+                this.getSellerInfo(this.itemData["comments"][i]['userId'], i);
+            }
+
+        },
+        async getUsername(input) {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+
+            var data = { userId: input };
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
             };
 
             var name = '';
             var img = '';
 
             await fetch("http://localhost:28888/user/getByUserId", requestOptions)
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                name = data.data['username'];
-                img = data.data['avatar'];
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    name = data.data['username'];
+                    img = data.data['avatar'];
 
-            })
-            .catch(error => console.log('error', error));
-            return [name,img];
+                })
+                .catch(error => console.log('error', error));
+            return [name, img];
         }
   },
   async mounted(){
@@ -369,6 +547,7 @@ export default {
   },
     data() {
         return {
+            showImageIndex: 0,
             itemData: {
                 name: "Leather Bag",
                 description: `
@@ -389,9 +568,9 @@ Elevate your style with this leather bag, a testament to craftsmanship and quali
                     rating: 3.0,
                     avatar: "",
                 },
-                tempComment:{
-                    username:"",
-                    avatar:""
+                tempComment: {
+                    username: "",
+                    avatar: ""
                 },
                 sellerId: '',
                 collected: false,
@@ -507,16 +686,6 @@ Elevate your style with this leather bag, a testament to craftsmanship and quali
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
-
-
-/* 
-.description:hover {
-    overflow: visible;
-    -webkit-line-clamp: unset;
-    height: fit-content;
-    position: absolute;
-    max-width: 600px;
-} */
 
 .labelField>* {
     margin-left: 5px;

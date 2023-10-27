@@ -4,13 +4,13 @@
             <TopSearchBar></TopSearchBar>
         </div>
 
-        <div style="height: 350px; display: flex; align-items: center;">
+        <!-- <div style="height: 350px; display: flex; align-items: center;">
             <div class="block">
                 <CatergoryComponent style="margin: 10px; margin-top: 20px;" v-for="(item, num) in this.CategoryList"
                     :label="item.label" :GoodsNum="item.GoodsNum">
                 </CatergoryComponent>
             </div>
-        </div>
+        </div> -->
 
         <div class="galleryBackground">
             <div>
@@ -170,7 +170,6 @@ export default {
     async created(){
         await this.getRecommend(12);
         await this.getProductInfo();
-        console.log(this.galleryItemData);
     },
     methods: {
         search() {
