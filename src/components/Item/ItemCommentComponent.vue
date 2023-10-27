@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="userProfile">
-            <div style="width: 50px; height: 50px; `background-image:url(${this.comment.userAvatar})`;"></div>
+            <div id="commenterAvatar" style="width: 50px; height: 50px;"></div>
             <div>{{ this.comment.username }}</div>
             <div style="width: 30px; height: 30px; background-color: blue" v-for="index in this.comment.commentRating"></div>
             <div>{{ this.comment.rating }}</div>
@@ -11,10 +11,6 @@
         <div class="comment">
             {{ comment.comment }}
         </div>
-
-        <!-- <div class="commentImg" style="display: flex; margin: 20px">
-            <div style="width: 200px; height: 200px; background-color: blue" v-for="img in this.comment.images"></div>
-        </div> -->
     </div>
 </template>
 
@@ -27,6 +23,11 @@ export default {
         comment: {
             type: Object,
         }
+    },
+    mounted(){
+        var avatar = document.getElementById("commenterAvatar");
+        avatar.style.backgroundImage = `url(${this.comment.userAvatar})`;
+        avatar.style.backgroundSize = "cover";
     }
 }
 </script>

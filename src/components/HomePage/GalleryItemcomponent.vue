@@ -1,6 +1,6 @@
 <template>
     <div class="itemFrame" @click="clickItem()">
-        <div class="itemImg" style="background-image: `url(${this.ItemData.image})` "></div>
+        <div id="firstImg" class="itemImg"></div>
         <div class="itemName">
             {{this.ItemData.name}}
         </div>
@@ -24,6 +24,11 @@ export default {
         clickItem(){
             this.$router.push('/userhome/itemdetailpage/'+this.ItemData.id)
         }
+    },
+    mounted(){
+        var firstImg = document.getElementById("firstImg");
+        firstImg.style.backgroundImage = `url(${this.ItemData.image})`;
+        firstImg.style.backgroundSize = "cover";
     }
 }
 </script>

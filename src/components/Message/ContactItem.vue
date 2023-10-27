@@ -1,7 +1,7 @@
 <template>
     <div class="background">
         <div style="margin: 10px; display: flex; align-items: center;">
-            <div style="width: 48px; height: 48px; background-color: gray;"></div>
+            <div id="avatar" style="width: 48px; height: 48px; background-color: gray;"></div>
             <!-- {{ this.contactDetail }} -->
             <div style="margin-left: 10px; width: calc(100%-48px); overflow: hidden;">
                 <p class="contactName">
@@ -32,13 +32,14 @@ export default {
     },
     props: {
         contactDetail:Object
-        //     {
-        //     contact_name: "",
-        //     last_message: "",
-        //     timestamp: ""
-        // }
     },
     methods: {
+    },
+    mounted(){
+        var avatar = document.getElementById("avatar");
+        avatar.style.backgroundImage = `url(${this.contactDetail.user.avatar})`;
+        avatar.style.backgroundSize = "cover";
+    
     }
 }
 </script>

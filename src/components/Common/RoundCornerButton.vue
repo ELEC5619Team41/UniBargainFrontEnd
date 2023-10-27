@@ -1,5 +1,5 @@
 <template>
-  <button class="button" :style="{'width': width, 'height': height}" @click="$emit('button-click')">{{ text }}</button>
+  <button class="button" type="button" :style="{'width': width, 'height': height}" @click="$emit('button-click')">{{ text }}</button>
 </template>
 
 <script>

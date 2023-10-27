@@ -3,7 +3,7 @@
   <div>
     <top-search-bar></top-search-bar>
     <div style="display: flex">
-      <el-button-group style="width: 30%">
+      <el-button-group style="display:flex; width: 30%; flex-direction: column;">
         <el-button autofocus @click="SetDetail">Detailed</el-button>
         <el-button @click="SetExplore">Explore</el-button>
         <el-button @click="SetMyPost">My Post</el-button>

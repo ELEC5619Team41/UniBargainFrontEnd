@@ -38,23 +38,88 @@ export default {
         }
     },
     methods: {
-        AddEvent(){
-            console.log("Add event")
-            let calendarApi = this.$refs.calendar.getApi()
-            calendarApi.addEvent({
-                title: 'dynamic event',
-                start: '2023-09-11T12:00:00',
-                end: '2023-09-07T13:00:00',
-            })
-            this.calendarOptions.events.url = 'http://localhost:1828/05746f1a-d819-41b8-abeb-21a498419503.ics'
-            calendarApi.render()
+        async previewImage(event) {
+
+            var input = event.target;
+            console.log('preview ' + input.files)
+            if (input.files) {
+                var reader = new FileReader();
+                reader.onload = async (e) => {
+                    console.log('selected')
+                    this.preview = e.target.result;
+                    let calendarApi = this.$refs.calendar.getApi()
+                    this.calendarOptions.events.url = this.preview
+                    await this.uploadTimetable(this.preview)
+                    calendarApi.render()
+                }
+                reader.readAsDataURL(input.files[0]);
+
+            }
+
+
+        },
+        async getTimetable() {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                redirect: 'follow'
+            };
+
+            await fetch("http://localhost:28888/course/get", requestOptions).then(response => response.json()).then(result => {
+                if (result['message'] == 'success') {
+
+                    this.calendarOptions.events.url = result['data']['file']
+                    let calendarApi = this.$refs.calendar.getApi()
+                    calendarApi.render()
+                }
+            }).catch(error => console.log('error', error));
+        },
+        async uploadTimetable(file) {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+
+            var uploadData = { "file": file };
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(uploadData),
+                redirect: 'follow'
+            };
+
+            await fetch("http://localhost:28888/course/set", requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                })
+                .catch(error => console.log('error', error));
         }
     },
+    mounted() {
+        this.getTimetable()
+    }
 }
+
+
 </script>
 <template>
     <div>
         <FullCalendar ref="calendar" :options="calendarOptions" />
-        <RoundCornerButton style="margin-top: 15px;" @button-click="AddEvent()"></RoundCornerButton>
+
+        <div style="width: 100%; display: flex; align-items: center; justify-content: center;">
+            <div id="uploadImageField"
+                style="display: flex; background-color: gray; width: 200px; height: 50px; align-items: center; justify-content: center; margin-top: 10px; border-radius: 10px;">
+                <div>{{$t('UploadNewTimetable')}}</div>
+                <input type="file" accept="text\calendar" @change="previewImage" style="opacity: 0; position: absolute;" />
+                
+            </div>
+        </div>
     </div>
 </template>

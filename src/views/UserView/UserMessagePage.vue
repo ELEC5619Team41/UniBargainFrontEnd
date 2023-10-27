@@ -25,7 +25,14 @@
                     <div :class="[message.sendUserId == this.myUserID ? 'self' : '', 'messageOutLine']"
                         class="messageOutLine" v-for="message in this.ChatInfo">
                         <div class="bubble">
-                            {{ message.message.text }}
+
+
+                            <div v-if="message.message.text.startsWith('data:text/calendar;')">
+                                In Text Calendar
+                                <InTextCalendar :url="message.message.text"></InTextCalendar>
+                            </div>
+                            <div v-else>{{ message.message.text }}</div>
+
                         </div>
                     </div>
                 </div>
@@ -43,10 +50,7 @@
                     <EmojiPicker v-if="this.showEmoji" :native="true" @select="onSelectEmoji"
                         style="position: absolute; margin-top: -200px; margin-left: 50px;" />
                     <div style="height: 30px; width: 30px; background-color: blue; margin-left: 30px;"
-                        @click="datePickerDisplay"></div>
-                    <FullCalendar :options="calendarOptions" v-if="this.showCalendar"
-                        style="position: absolute; background-color: gray; width: 400px; margin-top: -300px; margin-left: 120px; border-radius: 15px;">
-                    </FullCalendar>
+                        @click="dateSelect"></div>
                     <!-- get location -->
                     <div style="height: 30px; width: 30px; background-color: blue; margin-left: 30px;"
                         @click="datePickerDisplay"></div>
@@ -71,6 +75,10 @@ import 'vue3-emoji-picker/css'
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
+import timeGridPlugin from '@fullcalendar/timegrid'
+import iCalendarPlugin from '@fullcalendar/icalendar'
+
+import InTextCalendar from '@/components/Message/InTextCalendar.vue';
 
 
 export default {
@@ -79,7 +87,8 @@ export default {
         MessageSearchBar,
         ContactItem,
         EmojiPicker,
-        FullCalendar
+        FullCalendar,
+        InTextCalendar
     },
     data() {
         return {
@@ -104,71 +113,107 @@ export default {
                 plugins: [interactionPlugin, dayGridPlugin],
                 initialView: 'dayGridMonth',
                 selectable: true,
-                dateClick: this.dateSelect.bind(this)
-            }
+                dateClick: this.dateSelect.bind(this),
+                events: {
+                    format: 'ics',
+                    headers: {
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+                    }
+                }
+            },
+            inTextCalendarOptions: {
+                plugins: [timeGridPlugin, iCalendarPlugin],
+                initialView: 'timeGridWeek',
+                headerToolbar: {
+                    left: 'prev,next',
+                    center: 'title',
+                    right: 'timeGridWeek,timeGridDay' // user can switch between the two
+                },
+                events: {
+                    format: 'ics',
+                    headers: {
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+                    }
+                }
+            },
+            needUpdate: true
         }
     },
-    // mounted() {
-    //     this.windowsHeight = window.innerHeight;
-    // },
     methods: {
         onSelectEmoji(emoji) {
             this.chatInput += (emoji.i);
         },
         emojiPickerDisplay() {
             this.showEmoji = !this.showEmoji;
-            if(this.showEmoji)
-            {
+            if (this.showEmoji) {
                 this.showCalendar = false;
             }
         },
-        datePickerDisplay() {
-            this.showCalendar = !this.showCalendar;
-            if(this.showCalendar)
-            {
-                this.showEmoji = false;
-            }
+        async dateSelect() {
+            await this.SendMessage(this.calendarOptions.events.url);
         },
-        dateSelect(info) {
-            console.log(info.dateStr);
-            this.chatInput += info.dateStr
-            this.showCalendar = false;
+        async getTimetable() {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                redirect: 'follow'
+            };
+
+            await fetch("http://localhost:28888/course/get", requestOptions).then(response => response.json()).then(result => {
+                if (result['message'] == 'success') {
+
+                    this.calendarOptions.events.url = result['data']['file']
+                    let calendarApi = this.$refs.calendar.getApi()
+                    calendarApi.render()
+                }
+            }).catch(error => console.log('error', error));
         },
         async userTextAreaInput(e) {
             console.log("userTextAreaInput" + e);
             if (e.which == 13 && e.shiftKey) {
                 console.log("new line");
-                this.chatInput += "\n";
             } else if (e.which == 13) {
                 e.preventDefault();
                 console.log("send message");
-                var myHeaders = new Headers();
-                myHeaders.append("Content-Type", "application/json");
-                myHeaders.append("username", this.$store.state.username);
-                myHeaders.append("token", this.$store.state.token);
-                const raw = {
-                    opposingUserId: this.Contacts[this.CurrentRoom].user.id,
-                    message:
-                    {
-                        text: this.chatInput
-                    }
-                };
-                var requestOptions = {
-                    method: 'POST',
-                    headers: myHeaders,
-                    body: JSON.stringify(raw),
-                    redirect: 'follow'
-                };
-                console.log(requestOptions);
-
-                await fetch("http://localhost:28888/chat/sendMessage", requestOptions)
-                    .then(response => { response.json(); console.log(response) })
-                    .then(result => this.ChangeChatRoom(this.CurrentRoom))
-                    .catch(error => console.log('error', error));
-                this.chatInput = "";
-                this.showEmoji = false;
+                await this.SendMessage(this.chatInput);
             }
             console.log(this.chatInput);
+
+
+        },
+        async SendMessage(content) {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+            const raw = {
+                opposingUserId: this.Contacts[this.CurrentRoom].user.id,
+                message:
+                {
+                    text: content
+                }
+            };
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(raw),
+                redirect: 'follow'
+            };
+            console.log(requestOptions);
+
+            await fetch("http://localhost:28888/chat/sendMessage", requestOptions)
+                .then(response => { response.json(); console.log(response) })
+                .then(result => this.ChangeChatRoom(this.CurrentRoom))
+                .catch(error => console.log('error', error));
+            this.chatInput = "";
+            this.showEmoji = false;
 
         },
         ChangeChatRoom(num) {
@@ -194,10 +239,11 @@ export default {
 
             fetch("http://localhost:28888/chat/getListByOpposingUserId", requestOptions)
                 .then(response => response.json())
-                .then(result => { this.ChatInfo = result.data; console.log(result); this.Show = true; this.ChatInfo = this.ChatInfo.reverse() })
+                .then(result => { this.needUpdate = true; this.ChatInfo = result.data; console.log(result); this.Show = true; this.ChatInfo = this.ChatInfo.reverse() })
                 .catch(error => console.log('error', error));
         },
         onScroll({ target: { scrollTop, offsetHeight, scrollHeight } }) {
+            console.log(scrollTop)
             if (scrollTop == 0) {
                 console.log("Top!");
                 const div = document.getElementById("scrollBar");
@@ -346,14 +392,18 @@ export default {
     },
 
     updated() {
-        // if (!this.needUpdate) {
-        //     return
-        // }
-        const div = document.getElementById("chatWindow");
-        console.log("update")
-        div.scrollTop = div.scrollHeight - this.restHeight;
+
+        if (this.needUpdate) {
+            this.needUpdate = false;
+            const div = document.getElementById("chatWindow");
+            console.log("update")
+            div.scrollTop = div.scrollHeight - this.restHeight;
+        }
+
+
     },
-    mounted() {
+    async mounted() {
+        await this.getTimetable()
         const div = document.getElementById("chatWindow");
         div.scrollTop = div.scrollHeight;
         this.windowsHeight = window.innerHeight;
@@ -470,6 +520,10 @@ export default {
     padding: 10px 20px;
     width: fit-content;
     max-width: 60%;
+    text-wrap: break-word;
+    text-align: left;
+    overflow-wrap: break-word;
+    white-space: break-spaces;
 }
 
 
