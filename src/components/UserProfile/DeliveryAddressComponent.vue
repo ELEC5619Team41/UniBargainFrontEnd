@@ -13,7 +13,21 @@
 
         </li>
 
-        <div v-if="!showList" style="display: flex; flex-wrap: wrap; justify-content: space-between; ">
+        <div v-if="!showList & showSearch">     
+            <input v-model="this.addressInput" style="width: 100%;" @change="maptiler" @input="maptiler" >
+            <div style="border-style: solid; border-color: black;">
+                <div v-for="(add, index) in this.possible_address" style="background-color: rgb(156, 152, 152); text-align:left;  border-style: solid; border-color: black;">
+                    <a style="margin-left:5px; color: white">{{ add }}</a>
+                </div>
+            </div>
+            <div style="margin-top:20px;">
+                <p>Can't find you address?</p>
+                <RoundCornerButton  :text="$t('Enter manually')" @button-click="enterManual" style="margin: 5px;">
+                </RoundCornerButton>
+            </div>
+        </div>
+
+        <div v-if="!showList && !showSearch" style="display: flex; flex-wrap: wrap; justify-content: space-between; ">
             <LabelTextFieldHorizontal :text="$t('Name')" v-model:inputText="this.addressUploadData.name"
                 :defaultValue="this.addressUploadData.name" style="width: 43%;">
             </LabelTextFieldHorizontal>
@@ -102,8 +116,10 @@ export default {
             addressList: [
             ],
             showList: true,
+            showSearch : true,
             isModifyData: false,
-            possible_address: []
+            possible_address: [],
+            addressInput : ""
         }
     },
     methods: {
@@ -115,6 +131,9 @@ export default {
                 address.id === e ? { ...address, isDefault: true } : address
             )
             this.updateData()
+        },
+        enterManual(){
+            this.showSearch = false;
         },
         GetDefualtForm() {
             return {
@@ -130,7 +149,8 @@ export default {
                 isDefault: false,
             }
         },
-        maptiler(input){
+        maptiler(){
+            console.log("in")
             var myHeaders = new Headers();
             myHeaders.append("username", this.$store.state.username);
             myHeaders.append("token", this.$store.state.token);
@@ -141,11 +161,12 @@ export default {
                 headers: myHeaders,
                 redirect: 'follow'
             };
-            const url = "http://localhost:28888/maptiler/geocoding/" + input + ".json?language=en&limit=10&country=au";
+            const url = "http://localhost:28888/maptiler/geocoding/" + this.addressInput + ".json?language=en&limit=10&country=au";
 
             fetch(url, requestOptions)
             .then(response => response.json())
             .then(result => {
+                console.log(result);
                 var ls = [];
                 for(let i = 0; i < result.features.length; i++){
                     ls.push(result.features[i]["place_name"]);
@@ -162,6 +183,7 @@ export default {
                     this.addressUploadData = this.GetDefualtForm()
                 }
                 this.showList = false
+                this.showSearch = true
                 return
             } else {
                 if (this.isModifyData) {
@@ -182,12 +204,14 @@ export default {
 
                 this.showList = true
                 this.isModifyData = false
+                this.showSearch = true
             }
             this.updateData()
         },
         CancelAddNewAddress() {
             this.showList = true
             this.isModifyData = false
+            this.showSearch = true
         },
         ModifyData: function (inputData) {
             this.isModifyData = true
@@ -261,6 +285,7 @@ export default {
     mounted(){
         // this.updateData()
         this.initData();
+        // this.maptiler("Empress St");
     }
 }
 </script>
