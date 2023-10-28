@@ -31,7 +31,7 @@
         </div>
       </div>
       <div style="display: flex; margin-top: 15px; margin-right: 15px; margin-bottom: 15px">
-        <round-corner-button style="margin-left: auto" :text="$t('Proceed')" @button-click="this.$router.push('/userhome/transactionendpage/')"></round-corner-button>
+        <round-corner-button style="margin-left: auto" :text="$t('Proceed')" @button-click="processPayment"></round-corner-button>
       </div>
     </div>
 
@@ -127,6 +127,14 @@ export default {
     }
   },
   methods: {
+    processPayment(){
+      this.itemsData.forEach(item => {
+        this.buy(item["productId"]);
+        this.deleteOneItem(item["productId"]);
+      })
+      // this.$router.push('/userhome/transactionendpage/');
+
+    },
     setSignal(signal) {
       this.signal = signal;
     },
@@ -244,7 +252,7 @@ export default {
         })
         .catch(error => console.log('error', error));
     },
-    removeFromCart(productId) {
+    async removeFromCart(productId) {
       var myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
       myHeaders.append("username", this.$store.state.username);
@@ -259,14 +267,14 @@ export default {
         redirect: 'follow'
       };
 
-      fetch("http://localhost:28888/shoppingCart/remove", requestOptions)
+      await fetch("http://localhost:28888/shoppingCart/remove", requestOptions)
         .then(response => response.json())
         .then(data => {
-          this.itemData['addedCart'] = false;
+          // this.itemData['addedCart'] = false;
         })
         .catch(error => console.log('error', error));
     },
-
+    
     getSellerInfo(id, input) {
       var myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
@@ -292,6 +300,28 @@ export default {
         })
         .catch(error => console.log('error', error));
     },
+    async buy(id) {
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      myHeaders.append("username", this.$store.state.username);
+      myHeaders.append("token", this.$store.state.token);
+
+      var data = { "productId": id, "info": null };
+
+      var requestOptions = {
+          method: 'POST',
+          headers: myHeaders,
+          body: JSON.stringify(data),
+          redirect: 'follow'
+      };
+
+      await fetch("http://localhost:28888/buyProduct/add", requestOptions)
+          .then(response => response.json())
+          .then(data => {
+              console.log(data);
+          })
+          .catch(error => console.log('error', error));
+    }
   }
 
 }
