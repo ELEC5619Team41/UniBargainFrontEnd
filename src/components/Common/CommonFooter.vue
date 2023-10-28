@@ -1,8 +1,8 @@
 <template>
     <div class="background" style="display: flex;">
         <div style="width: 30%; height: 100%; justify-content: center; display: flex; align-items: center;">
-            <div style="height: 40px; width: 40px; background-color: white; "></div>
-            <p class="text" style="padding-left: 30px;">Unibargain</p>
+            <div class="footerLogo" style="height: 40px; width: 70px; "></div>
+            <p class="text" style="padding-left: 30px;"></p>
         </div>
         <div style="width: 70%; display: flex; align-items: center; justify-content: right; margin-right: 50px;">
             <ClickableText class="text" :text="this.$t('ContactUs')"></ClickableText>
@@ -45,5 +45,10 @@ export default {
 .text{
     color: white;
     margin-right: 80px;
+}
+
+.footerLogo{
+    background-image: url("../../assets/unibargain logo.png");
+    background-size: 100% 100%;
 }
 </style>

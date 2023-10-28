@@ -15,7 +15,7 @@
         </li>
 
 
-        <div v-if="!showList" style="display: flex; flex-wrap: wrap; justify-content: space-between;">
+        <div v-if="!showList" style="display: flex; flex-wrap: wrap; justify-content: space-between; ">
             <LabelTextFieldHorizontal :text="$t('Name')" v-model:inputText="this.addressUploadData.name"
                 :defaultValue="this.addressUploadData.name" style="width: 43%;">
             </LabelTextFieldHorizontal>
@@ -55,7 +55,7 @@
 
 
 
-        <div style="margin-top: 35px;">
+        <div style="margin-top: 35px; padding-bottom:70px;">
             <RoundCornerButton v-if="!showList" :text="$t('Back')" @button-click="CancelAddNewAddress" style="margin: 5px;">
             </RoundCornerButton>
             <RoundCornerButton :text="this.isModifyData ? $t('UpdateNewAddress') : $t('AddNewAddress')"
@@ -200,14 +200,16 @@ export default {
             fetch("http://localhost:28888/user/get", requestOptions)
                 .then(response => response.json())
                 .then(data => {
+                    console.log("data");
+
                     console.log(data);
                     this.uploadData['firstname'] = data.data['name'].split(' ')[0];
                     this.uploadData['lastname'] = data.data['name'].split(' ')[1];
                     this.uploadData['emailAddress'] = data.data['extend']['email'];
                     this.uploadData['gender'] = data.data['extend']['gender'];
                     this.uploadData['mobileNumber'] = data.data['extend']['mobile'];
-                    this.uploadData['addressList'] = data.data['extend']['address'];
-                    this.addressList = data.data['extend']['address'];
+                    this.addressList = 'address' in data.data['extend'] ? data.data['extend']['address']: [];
+                    this.uploadData['addressList'] = this.addressList;
                 })
                 .catch(error => console.log('error', error));
         },

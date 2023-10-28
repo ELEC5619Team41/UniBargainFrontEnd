@@ -1,7 +1,7 @@
 <template>
     <div class="background" style="display: flex;">
         <div style="width: 20%; height: 100%; justify-content: center; display: flex; align-items: center;">
-            <div style="height: 40px; width: 40px; background-color: white; "></div>
+            <div class="headerLogo" style="height: 40px; width: 70px;"></div>
         </div>
         <div style="width: 60%; height: 100%; display: flex;">
             <button v-for="(item, index) in this.itemNames" @click="buttonOnClick(index, item)"
@@ -100,5 +100,10 @@ export default {
 
 .selected {
     background-color: rgb(196, 196, 196);
+}
+
+.headerLogo{
+    background-image: url("../../assets/unibargain logo.png");
+    background-size: 100% 100%;
 }
 </style>

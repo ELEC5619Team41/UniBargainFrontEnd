@@ -1,6 +1,5 @@
 <template>
   <div style="padding-bottom: 5rem">
-    <top-search-bar style="margin-top: 15px;"></top-search-bar>
     <div style="display: flex; margin-top: 15px;">
       <el-button-group style="display:flex; width: 10%; flex-direction: column;">
         <el-button @click="SetExplore">Explore</el-button>
@@ -24,7 +23,6 @@
 </template>
 
 <script>
-import TopSearchBar from "@/components/Common/TopSearchBar";
 import UserPost from "@/components/Message/UserPost";
 import SeekTradeComponent from "@/components/SeekTrade/SeekTradeComponent";
 
@@ -32,7 +30,7 @@ export default {
   name: "SeekTradeItem",
 
   components: {
-    TopSearchBar, UserPost,
+    UserPost,
     SeekTradeComponent
 
   },

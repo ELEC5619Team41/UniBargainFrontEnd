@@ -68,7 +68,7 @@ export default {
                 .then(response => response.text())
                 .then(result => {
                     console.log(result)
-                    this.$router.go()
+                    // this.$router.go()
                 })
                 .catch(error => console.log('error', error));
         }

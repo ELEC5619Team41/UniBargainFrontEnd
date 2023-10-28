@@ -226,6 +226,7 @@ export default {
             await fetch("http://localhost:28888/collect/getList", requestOptions)
                 .then(response => response.json())
                 .then(async (data) => {
+                    console.log(data)
                     var ls = [];
                     for (let i = 0; i < data.data.length; i++) {
                         var user = await this.getUser(data.data[i]['productUserId']);
@@ -262,7 +263,7 @@ export default {
             myHeaders.append("username", this.$store.state.username);
             myHeaders.append("token", this.$store.state.token);
 
-            var data = { userId: input };
+            var data = { "userId": input };
 
             var requestOptions = {
                 method: 'POST',
@@ -287,7 +288,7 @@ export default {
             myHeaders.append("username", this.$store.state.username);
             myHeaders.append("token", this.$store.state.token);
 
-            var data = { id: productId };
+            var data = { "id": productId };
 
             var requestOptions = {
                 method: 'POST',
@@ -370,7 +371,7 @@ export default {
             myHeaders.append("username", this.$store.state.username);
             myHeaders.append("token", this.$store.state.token);
 
-            var raw = { productId: deleteItem.productId };
+            var raw = { "productId": deleteItem.productId };
             var requestOptions = {
                 method: 'DELETE',
                 headers: myHeaders,
@@ -383,6 +384,7 @@ export default {
                     return response.text();
                 })
                 .then(result => {
+                    console.log(result)
                     var resultJson = JSON.parse(result);
                     if (resultJson.code == 200) {
                         this.items = this.items.filter(item => (item.productId != deleteItem.productId || item.tag != "collection"));

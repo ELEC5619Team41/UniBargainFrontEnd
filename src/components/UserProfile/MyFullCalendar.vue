@@ -113,7 +113,7 @@ export default {
     <div>
         <FullCalendar ref="calendar" :options="calendarOptions" />
 
-        <div style="width: 100%; display: flex; align-items: center; justify-content: center;">
+        <div style="width: 100%; display: flex; align-items: center; justify-content: center; padding-bottom:70px;">
             <div 
                 style="display: flex; background-color: gray; width: 200px; height: 50px; align-items: center; justify-content: center; margin-top: 10px; border-radius: 10px;">
                 <div>{{$t('UploadNewTimetable')}}</div>

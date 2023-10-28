@@ -11,8 +11,8 @@
             <!-- content -->
             <div style="width: 75%; height: fit-content; ">
                 <PersonalDetailComponent v-if="selectedButton == 0"></PersonalDetailComponent>
-                <DeliveryAddressComponent v-else-if="selectedButton == 2"></DeliveryAddressComponent>
-                <MyFullCalendar v-else-if="selectedButton == 3"></MyFullCalendar>
+                <DeliveryAddressComponent v-else-if="selectedButton == 1"></DeliveryAddressComponent>
+                <MyFullCalendar v-else-if="selectedButton == 2"></MyFullCalendar>
             </div>
         </div>
     </div>
@@ -34,7 +34,7 @@ export default {
         return {
             selectedButton: 0,
             itemNames: [
-                this.$t('PersonalDetail'), this.$t('PaymentSetup'), this.$t('DeliveryAddress'), this.$t('ClassSchedule'),
+                this.$t('PersonalDetail'), this.$t('DeliveryAddress'), this.$t('ClassSchedule'),
             ]
         }
     },

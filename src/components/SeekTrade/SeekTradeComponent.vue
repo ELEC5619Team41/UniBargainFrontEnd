@@ -156,16 +156,16 @@ export default {
             myHeaders.append("username", this.$store.state.username);
             myHeaders.append("token", this.$store.state.token);
 
-            var data = { id: id };
+            var data = { "id": id };
 
             var requestOptions = {
-                method: 'POST',
+                method: 'DELETE',
                 headers: myHeaders,
                 body: JSON.stringify(data),
                 redirect: 'follow'
             };
 
-            await fetch("http://localhost:28888/thingsComments/getList", requestOptions)
+            await fetch("http://localhost:28888/thingsComments/delete", requestOptions)
                 .then(response => response.json())
                 .then(data => {
                     console.log(data);

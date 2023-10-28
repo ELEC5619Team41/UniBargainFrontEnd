@@ -90,6 +90,7 @@ export default {
       fetch("http://localhost:28888/user/login", requestOptions)
         .then(response => response.json())
         .then(data => {
+          console.log(data)
           this.$store.commit('update',{"username":this.email, "token":data.data['token'],"id":data.data.id});
           this.$router.push('/userhome/userhomepage');
         })

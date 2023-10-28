@@ -51,8 +51,9 @@
                     </el-icon>
 
 
-                    <EmojiPicker v-if="this.showEmoji" :native="true" @select="onSelectEmoji"
+                    <div style="background-color:white"><EmojiPicker v-if="this.showEmoji" :native="true" @select="onSelectEmoji"
                         style="position: absolute; margin-top: -200px; margin-left: 50px;" />
+                    </div>
 
                     <el-icon :size="'30px'" style="margin-left: 30px;" @click="dateSelect">
                         <Calendar />
@@ -327,7 +328,7 @@ export default {
                 this.searchRaw = {};
             }
             else {
-                this.searchRaw = { "searchname": this.searchInput };
+                this.searchRaw = { "searchName": this.searchInput };
             }
 
 
