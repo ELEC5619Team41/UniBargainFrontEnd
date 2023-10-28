@@ -11,9 +11,7 @@
             <AddressBlockComponent v-for="(item, index) in this.addressList" :inputData="item"
                 @set-as-default="SetAsDefault" @modify-data="ModifyData" @delete-data="DeleteData"></AddressBlockComponent>
 
-
         </li>
-
 
         <div v-if="!showList" style="display: flex; flex-wrap: wrap; justify-content: space-between; ">
             <LabelTextFieldHorizontal :text="$t('Name')" v-model:inputText="this.addressUploadData.name"
@@ -105,6 +103,7 @@ export default {
             ],
             showList: true,
             isModifyData: false,
+            possible_address: []
         }
     },
     methods: {
@@ -130,6 +129,32 @@ export default {
                 mobileNumber: '',
                 isDefault: false,
             }
+        },
+        maptiler(input){
+            var myHeaders = new Headers();
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+            myHeaders.append("Content-Type", "application/json");
+
+            var requestOptions = {
+                method: 'GET',
+                headers: myHeaders,
+                redirect: 'follow'
+            };
+            const url = "http://localhost:28888/maptiler/geocoding/" + input + ".json?language=en&limit=10&country=au";
+
+            fetch(url, requestOptions)
+            .then(response => response.json())
+            .then(result => {
+                var ls = [];
+                for(let i = 0; i < result.features.length; i++){
+                    ls.push(result.features[i]["place_name"]);
+                }
+                this.possible_address = ls;
+            })
+            .catch(error => console.log('error', error));
+
+                
         },
         AddNewAddress() {
             if (this.showList) {
@@ -200,9 +225,6 @@ export default {
             fetch("http://localhost:28888/user/get", requestOptions)
                 .then(response => response.json())
                 .then(data => {
-                    console.log("data");
-
-                    console.log(data);
                     this.uploadData['firstname'] = data.data['name'].split(' ')[0];
                     this.uploadData['lastname'] = data.data['name'].split(' ')[1];
                     this.uploadData['emailAddress'] = data.data['extend']['email'];
@@ -232,14 +254,13 @@ export default {
             await fetch("http://localhost:28888/user/setExtend", requestOptions)
             .then(response => response.json())
             .then(data => {
-                console.log(data);
             })
             .catch(error => console.log('error', error));
         }
     },
     mounted(){
         // this.updateData()
-        this.initData()
+        this.initData();
     }
 }
 </script>

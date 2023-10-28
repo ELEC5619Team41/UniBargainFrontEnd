@@ -102,11 +102,9 @@ export default {
 
       const url = "http://localhost:28888/kickbox/check?email=" + this.form.email;
 
-      console.log("getMyRequestList")
       await fetch(url, requestOptions)
         .then(response => response.json())
         .then(result => {
-          console.log(result);
           if(result.code==400){
             alert("this email is invalid. please try another one.");
             this.emailv = false;
