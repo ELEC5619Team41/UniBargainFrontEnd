@@ -1,10 +1,10 @@
 <template>
-    <div>
+    <div style="padding-bottom: 8rem">
         <div style="margin-top: 20px;">
             <div style="display: flex; height: 500px; width: 100%; justify-content: space-between;">
 
-                <div ref="ProductImage" style="height: 500px; width: 500px; border-radius: 25px;"
-                    @click="showNextImage"></div>
+                <div ref="ProductImage" style="height: 500px; width: 500px; border-radius: 25px;" @click="showNextImage">
+                </div>
                 <div class="contentField">
                     <div style="display: flex; height: 80px; align-items: center;">
                         <h1 style="width: 60%; text-align: left;">
@@ -40,8 +40,15 @@
         </div>
 
         <div class="commentField" style="margin-top: 20px; padding-bottom: 5rem;">
+
             <ItemCommentComponent v-for="commentData in this.itemData.comments" :comment="commentData">
             </ItemCommentComponent>
+
+            <div style="width: 100%; height: 1px; background-color: black;"></div>
+
+            <div style="border: 1 solid; border-color: black;">
+                <ItemCommentInputComponent></ItemCommentInputComponent>
+            </div>
         </div>
     </div>
 </template>
@@ -50,11 +57,13 @@
 import RoundCornerButton from '@/components/Common/RoundCornerButton.vue';
 import ItemCommentComponent from '@/components/Item/ItemCommentComponent.vue';
 import routes from '@/router/index';
+import ItemCommentInputComponent from '@/components/Item/ItemCommentInputComponent.vue';
 export default {
     name: "ItemDetailPage",
     components: {
         RoundCornerButton,
         ItemCommentComponent,
+        ItemCommentInputComponent
     },
     methods: {
         redirect() {
@@ -88,7 +97,7 @@ export default {
                     this.itemData['images'] = data.data['info']['images'];
                     this.itemData['sellerId'] = data.data['userId'];
 
-                    if (this.itemData['images'].length >= 0) {
+                    if ('images' in this.itemData && this.itemData['images'] && this.itemData['images'].length >= 0) {
 
                         this.showImageByIndex();
                     }
@@ -102,6 +111,9 @@ export default {
             imageBG.style.backgroundSize = "cover";
         },
         showNextImage() {
+            if(!('images' in this.itemData) || this.itemData['images'] == null || this.itemData['images'].length == 0){
+                return
+            }
             if (this.showImageIndex < this.itemData['images'].length - 1) {
                 this.showImageIndex += 1;
             } else {
@@ -125,230 +137,210 @@ export default {
             };
 
             return fetch("http://localhost:28888/user/getByUserId", requestOptions)
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                if( i == "seller"){
-                    this.itemData['seller']['username'] = data.data['username'];
-                    this.itemData['seller']['avatar'] = data.data['avatar'];
-                    var sellerAvatar = this.$refs.sellerAvatar;
-                    sellerAvatar.style.backgroundImage = "url(" + data.data['avatar'] + ")";
-                    sellerAvatar.style.backgroundSize = "cover";
-                }else{
-                    this.itemData["comments"][i]['username'] = data.data['username'];
-                    this.itemData["comments"][i]['userAvatar'] = data.data['avatar'];
-                }
-            })
-            .catch(error => console.log('error', error));
-      },
-      itemScore(){
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        myHeaders.append("username", this.$store.state.username);
-        myHeaders.append("token", this.$store.state.token);
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    if (i == "seller") {
+                        this.itemData['seller']['username'] = data.data['username'];
+                        this.itemData['seller']['avatar'] = data.data['avatar'];
+                        var sellerAvatar = this.$refs.sellerAvatar;
+                        sellerAvatar.style.backgroundImage = "url(" + data.data['avatar'] + ")";
+                        sellerAvatar.style.backgroundSize = "cover";
+                    } else {
+                        this.itemData["comments"][i]['username'] = data.data['username'];
+                        this.itemData["comments"][i]['userAvatar'] = data.data['avatar'];
+                    }
+                })
+                .catch(error => console.log('error', error));
+        },
+        itemScore() {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
 
-        var data = {"productId": this.$route.params.id};
+            var data = { "productId": this.$route.params.id };
 
-        var requestOptions = {
-        method: 'POST',
-        headers: myHeaders,
-        body: JSON.stringify(data),
-        redirect: 'follow'
-        };
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
+            };
 
-        return fetch("http://localhost:28888/product/getAvgScore", requestOptions)
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            this.itemData['seller']['rating']= parseInt(data.data['score']).toFixed();
-        })
-        .catch(error => console.log('error', error));
-      },
-      addToCollection(){
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        myHeaders.append("username", this.$store.state.username);
-        myHeaders.append("token", this.$store.state.token);
+            return fetch("http://localhost:28888/product/getAvgScore", requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    this.itemData['seller']['rating'] = parseInt(data.data['score']).toFixed();
+                })
+                .catch(error => console.log('error', error));
+        },
+        addToCollection() {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
 
-        var data = {"productId": this.$route.params.id};
+            var data = { "productId": this.$route.params.id };
 
-        var requestOptions = {
-        method: 'POST',
-        headers: myHeaders,
-        body: JSON.stringify(data),
-        redirect: 'follow'
-        };
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
+            };
 
-        fetch("http://localhost:28888/collect/add", requestOptions)
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            this.itemData['collected'] = true;
-;        })
-        .catch(error => console.log('error', error));
-      },      
-      removeFromCollection(){
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        myHeaders.append("username", this.$store.state.username);
-        myHeaders.append("token", this.$store.state.token);
-
-        var data = {"productId": this.$route.params.id};
-
-        var requestOptions = {
-        method: 'DELETE',
-        headers: myHeaders,
-        body: JSON.stringify(data),
-        redirect: 'follow'
-        };
-
-        fetch("http://localhost:28888/collect/remove", requestOptions)
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            this.itemData['collected'] = false;
-;        })
-        .catch(error => console.log('error', error));
-      },
-      addToCart(){
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        myHeaders.append("username", this.$store.state.username);
-        myHeaders.append("token", this.$store.state.token);
-
-        var data = {"productId": this.$route.params.id};
-
-        var requestOptions = {
-        method: 'POST',
-        headers: myHeaders,
-        body: JSON.stringify(data),
-        redirect: 'follow'
-        };
-
-        fetch("http://localhost:28888/shoppingCart/add", requestOptions)
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            this.itemData['addedCart'] = true;
-;        })
-        .catch(error => console.log('error', error));
-      },      
-      removeFromCart(){
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        myHeaders.append("username", this.$store.state.username);
-        myHeaders.append("token", this.$store.state.token);
-
-        var data = {"productId": this.$route.params.id};
-
-        var requestOptions = {
-        method: 'DELETE',
-        headers: myHeaders,
-        body: JSON.stringify(data),
-        redirect: 'follow'
-        };
-
-        fetch("http://localhost:28888/shoppingCart/remove", requestOptions)
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            this.itemData['addedCart'] = false;
-;        })
-        .catch(error => console.log('error', error));
-      },
-      async findCollection(){
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        myHeaders.append("username", this.$store.state.username);
-        myHeaders.append("token", this.$store.state.token);
-
-        var data = {};
-
-        var requestOptions = {
-        method: 'POST',
-        headers: myHeaders,
-        body: JSON.stringify(data),
-        redirect: 'follow'
-        };
-        await fetch("http://localhost:28888/collect/getList", requestOptions)
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);  
-            data.data.forEach((i)=>{
-                if(i["productId"] == this.$route.params.id){
+            fetch("http://localhost:28888/collect/add", requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
                     this.itemData['collected'] = true;
-                }
-            })
-        })
-        
-      },
-      async findCartAdded(){
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        myHeaders.append("username", this.$store.state.username);
-        myHeaders.append("token", this.$store.state.token);
+                    ;
+                })
+                .catch(error => console.log('error', error));
+        },
+        removeFromCollection() {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
 
-        var data = {};
+            var data = { "productId": this.$route.params.id };
 
-        var requestOptions = {
-        method: 'POST',
-        headers: myHeaders,
-        body: JSON.stringify(data),
-        redirect: 'follow'
-        };
-        await fetch("http://localhost:28888/shoppingCart/getList", requestOptions)
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);  
-            data.data.forEach((i)=>{
-                if(i["productId"] == this.$route.params.id){
+            var requestOptions = {
+                method: 'DELETE',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
+            };
+
+            fetch("http://localhost:28888/collect/remove", requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    this.itemData['collected'] = false;
+                    ;
+                })
+                .catch(error => console.log('error', error));
+        },
+        addToCart() {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+
+            var data = { "productId": this.$route.params.id };
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
+            };
+
+            fetch("http://localhost:28888/shoppingCart/add", requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
                     this.itemData['addedCart'] = true;
-                }
-            })
-        })
-        
-      },
-    async getComments(){
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        myHeaders.append("username", this.$store.state.username);
-        myHeaders.append("token", this.$store.state.token);
+                    ;
+                })
+                .catch(error => console.log('error', error));
+        },
+        async findCollection() {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
 
-        var data = {"productId": this.$route.params.id};
+            var data = {};
 
-        var requestOptions = {
-        method: 'POST',
-        headers: myHeaders,
-        body: JSON.stringify(data),
-        redirect: 'follow'
-        };
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
+            };
+            await fetch("http://localhost:28888/collect/getList", requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    data.data.forEach((i) => {
+                        if (i["productId"] == this.$route.params.id) {
+                            this.itemData['collected'] = true;
+                        }
+                    })
+                })
 
-        await fetch("http://localhost:28888/product/getScoreList", requestOptions)
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            var ls =[]
-            for(let i = 0; i<data.data.length; i++){
-                var content = {
-                    "username": '',
-                    "rating": parseInt(data.data[i]['score']).toFixed(),
-                    "comment": data.data[i]['evaluate'],
-                    "commentRating": parseInt(data.data[i]['score']).toFixed(),
-                    "userAvatar" : '',
-                    "userId": data.data[i]['buyUserId'],
-                }
-                ls.push(content);
-            } 
-            this.itemData["comments"] = ls;
-        })
-        .catch(error => console.log('error', error));
+        },
+        async findCartAdded() {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
 
-        for(let i = 0; i<this.itemData["comments"].length; i++){
-            await this.getSellerInfo(this.itemData["comments"][i]['userId'],i);
-        }
+            var data = {};
 
-      },
-      async getUsername(input){
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
+            };
+            await fetch("http://localhost:28888/shoppingCart/getList", requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    data.data.forEach((i) => {
+                        if (i["productId"] == this.$route.params.id) {
+                            this.itemData['addedCart'] = true;
+                        }
+                    })
+                })
+
+        },
+        async getComments() {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+
+            var data = { "productId": this.$route.params.id };
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
+            };
+
+            await fetch("http://localhost:28888/product/getScoreList", requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    var ls = []
+                    for (let i = 0; i < data.data.length; i++) {
+                        var content = {
+                            "username": '',
+                            "rating": parseInt(data.data[i]['score']).toFixed(),
+                            "comment": data.data[i]['evaluate'],
+                            "commentRating": parseInt(data.data[i]['score']).toFixed(),
+                            "userAvatar": '',
+                            "userId": data.data[i]['buyUserId'],
+                        }
+                        ls.push(content);
+                    }
+                    this.itemData["comments"] = ls;
+                })
+                .catch(error => console.log('error', error));
+
+            for (let i = 0; i < this.itemData["comments"].length; i++) {
+                await this.getSellerInfo(this.itemData["comments"][i]['userId'], i);
+            }
+
+        },
+        async getUsername(input) {
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("username", this.$store.state.username);
@@ -467,46 +459,6 @@ export default {
                 })
                 .catch(error => console.log('error', error));
         },
-        async getComments() {
-            var myHeaders = new Headers();
-            myHeaders.append("Content-Type", "application/json");
-            myHeaders.append("username", this.$store.state.username);
-            myHeaders.append("token", this.$store.state.token);
-
-            var data = { "productId": this.$route.params.id };
-
-            var requestOptions = {
-                method: 'POST',
-                headers: myHeaders,
-                body: JSON.stringify(data),
-                redirect: 'follow'
-            };
-
-            await fetch("http://localhost:28888/product/getScoreList", requestOptions)
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    var ls = []
-                    for (let i = 0; i < data.data.length; i++) {
-                        var content = {
-                            "username": '',
-                            "rating": parseInt(data.data[i]['score']).toFixed(),
-                            "comment": data.data[i]['evaluate'],
-                            "commentRating": data.data[i]['score'].toFixed(),
-                            "userAvatar": '',
-                            "userId": data.data[i]['buyUserId'],
-                        }
-                        ls.push(content);
-                    }
-                    this.itemData["comments"] = ls;
-                })
-                .catch(error => console.log('error', error));
-
-            for (let i = 0; i < this.itemData["comments"].length; i++) {
-                this.getSellerInfo(this.itemData["comments"][i]['userId'], i);
-            }
-
-        },
         async getUsername(input) {
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
@@ -536,15 +488,15 @@ export default {
                 .catch(error => console.log('error', error));
             return [name, img];
         }
-  },
-  async mounted(){
-    await this.Iteminfo();
-    await this.getSellerInfo(this.itemData['sellerId'],"seller");
-    await this.itemScore();
-    await this.getComments();
-    await this.findCollection();
-    await this.findCartAdded();
-  },
+    },
+    async mounted() {
+        await this.Iteminfo();
+        await this.getSellerInfo(this.itemData['sellerId'], "seller");
+        await this.itemScore();
+        await this.getComments();
+        await this.findCollection();
+        await this.findCartAdded();
+    },
     data() {
         return {
             showImageIndex: 0,

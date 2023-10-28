@@ -8,7 +8,7 @@
       </el-button-group>
       <div style="width: 85%">
 
-        <div v-if="Explore"
+        <div
           style="display: flex; max-width: 1124px; flex-wrap: wrap; justify-content:space-around;width: 100%">
           <div style="width: 100%;" v-for="item in this.postItem">
             <SeekTradeComponent :ItemData="item"></SeekTradeComponent>
@@ -37,13 +37,16 @@ export default {
 
   },
   methods: {
-    SetExplore() {
+    async SetExplore() {
       this.Explore = true;
       this.MyPost = false;
+      await this.getRequestList();
     },
-    SetMyPost() {
+    async SetMyPost() {
       this.Explore = false;
       this.MyPost = true;
+      
+      await this.getMyRequestList();
     },
     async getRequestList() {
       var myHeaders = new Headers();
@@ -64,8 +67,29 @@ export default {
         .then(response => response.json())
         .then(result => {
           this.postItem = result.data;
-          console.log(result.data.length)
-          console.log(result.data)
+        })
+        .catch(error => console.log('error', error));
+    },
+    async getMyRequestList() {
+      var myHeaders = new Headers();
+      myHeaders.append("username", this.$store.state.username);
+      myHeaders.append("token", this.$store.state.token);
+      myHeaders.append("Content-Type", "application/json");
+
+      var raw = { isShow: -1 };
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: JSON.stringify(raw),
+        redirect: 'follow'
+      };
+      console.log("getMyRequestList")
+      fetch("http://localhost:28888/things/getMyList", requestOptions)
+        .then(response => response.json())
+        .then(result => {
+          this.postItem = result.data;
+          console.log(this.postItem.length)
         })
         .catch(error => console.log('error', error));
     },

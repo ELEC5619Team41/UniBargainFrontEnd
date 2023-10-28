@@ -22,30 +22,30 @@
                 style="margin-left: 25px; width: 100px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; text-align: left;">
                 {{ this.user.username }}</div>
             <el-button v-if="this.isNotSelf" @click="goChat">Chat Now</el-button>
+            <el-button v-else @click="deletePost">Delete Post</el-button>
         </div>
     </div>
     <div class="commentFrame">
 
-        <div style="width:100%; height:30px; background-color: white; display: flex; ">
-            <input style="width:80%" />
-            <el-button style="width:20%">Comment</el-button>
+        <div v-if="this.isNotSelf" style="width:100%; height:30px; background-color: white; display: flex; ">
+            <input style="width:80%" v-model="this.commentInput" />
+            <el-button style="width:20%" @click="leaveComment">Comment</el-button>
         </div>
 
-        <div style="width:100%; background-color: white; display: flex; margin-top: 5px; word-wrap: break-word; text-align: left">
-            someone: awieofiuewahuiawwwwwwwwwwwww wwwwwwwwwwwwwwwwwwwwwwwwwwwnewaigol neeeeeeeeeeeeeeeeeeeeee eeeeeeeeeeeeeeeeeeeeeee qdwdqwd
+
+
+        <div style="display: flex;" v-for="comment in this.commentList">
+            <div style="background-color: white; display: flex; margin-top: 5px; word-wrap: break-word; text-align: left"
+                :style="{'width': comment.info.username == this.$store.state.username ? '95%' : '100%'}">
+                {{ comment.info.username + ": " + comment.info.commentContent}}
+            </div>
+            <div v-if="comment.info.username == this.$store.state.username" style=" display: flex; width: 5%; align-items: center; justify-content: center;">
+                <el-icon @click="deleteComment(comment.id)">
+                    <Delete />
+                </el-icon>
+            </div>
         </div>
 
-        <div style="width:100%; background-color: white; display: flex; margin-top: 5px; word-wrap: break-word; text-align: left">
-            someone: awieofiuewahuiawwwwwwwwwwwww wwwwwwwwwwwwwwwwwwwwwwwwwwwnewaigol neeeeeeeeeeeeeeeeeeeeee eeeeeeeeeeeeeeeeeeeeeee qdwdqwd
-        </div>
-
-        <div style="width:100%; background-color: white; display: flex; margin-top: 5px; word-wrap: break-word; text-align: left">
-            someone: awieofiuewahuiawwwwwwwwwwwww wwwwwwwwwwwwwwwwwwwwwwwwwwwnewaigol neeeeeeeeeeeeeeeeeeeeee eeeeeeeeeeeeeeeeeeeeeee qdwdqwd
-        </div>
-
-        <div style="width:100%; background-color: white; display: flex; margin-top: 5px; word-wrap: break-word; text-align: left">
-            someone: awieofiuewahuiawwwwwwwwwwwww wwwwwwwwwwwwwwwwwwwwwwwwwwwnewaigol neeeeeeeeeeeeeeeeeeeeee eeeeeeeeeeeeeeeeeeeeeee qdwdqwd
-        </div>
     </div>
 </template>
 
@@ -60,13 +60,12 @@ export default {
     data: function () {
         return {
             user: Object,
-            isNotSelf: false
+            isNotSelf: false,
+            commentInput: '',
+            commentList: []
         }
     },
     methods: {
-        clickItem() {
-            this.$router.push('/userhome/itemdetailpage/' + this.ItemData.id)
-        },
         async getUser(input) {
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
@@ -95,6 +94,115 @@ export default {
         goChat() {
             this.$router.push('usermessagepage/' + this.ItemData.userId)
         },
+        async deletePost(){
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+            myHeaders.append("Access-Control-Allow-Origin", '*');
+            myHeaders.append("Access-Control-Allow-Methods", 'GET, POST, PUT, DELETE, OPTIONS');
+
+            var data = { id: this.ItemData.id };
+
+            var requestOptions = {
+                method: 'DELETE',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
+            };
+
+            await fetch("http://localhost:28888/things/delete", requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    this.$router.go()
+                })
+                .catch(error => console.log('error', error));
+        },
+        leaveComment() {
+
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+
+            var data = { thingsId: this.ItemData.id, info: { commentContent: this.commentInput } };
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
+            };
+
+            var user = '';
+
+            fetch("http://localhost:28888/thingsComments/add", requestOptions)
+                .then(response => response.json())
+                .then(data => {
+
+                    console.log(data);
+                    data.data.info.username = this.$store.state.username;
+                    this.commentList.push(data.data);
+                    this.commentInput = ''
+                })
+                .catch(error => console.log('error', error));
+            return user;
+        },
+        async deleteComment(id){
+            //todo: cannot delete from api
+            console.log(id);
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+
+            var data = { id: id };
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
+            };
+
+            await fetch("http://localhost:28888/thingsComments/getList", requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    this.commentList = this.commentList.filter((item) => {
+                        return item.id != id;
+                    })
+                })
+                .catch(error => console.log('error', error));
+        },
+        async getComment(input) {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+
+            var data = { thingsId: input };
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
+            };
+
+            var user = '';
+
+            await fetch("http://localhost:28888/thingsComments/getList", requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    user = data.data;
+                })
+                .catch(error => console.log('error', error));
+            return user;
+        },
+        goChat() {
+            this.$router.push('usermessagepage/' + this.ItemData.userId)
+        },
     },
     mounted() {
         this.getUser(this.ItemData.userId).then((data) => {
@@ -107,14 +215,19 @@ export default {
                 uploaderAvatar.style.backgroundSize = "cover";
             }
         })
+        this.getComment(this.ItemData.id).then(async (data) => {
 
-        // if (('image' in this.ItemData) && this.ItemData.image != '') {
-        //     console.log('this.ItemData', this.ItemData)
-        //     var firstImg = this.$refs.firstImg
-        //     this.text='load'
-        //     firstImg.style.backgroundImage = "url(" + this.ItemData.image + ")";
-        //     firstImg.style.backgroundSize = "cover";
-        // }
+            this.commentList = data;
+            for (var i = 0; i < this.commentList.length; i++) {
+                var user = await this.getUser(this.commentList[i].userId);
+                this.commentList[i].info.username = user.username;
+            }
+            this.commentList.reverse();
+            console.log(this.ItemData.id, data);
+        })
+    },
+    updated(){
+        
     }
 }
 </script>
@@ -159,5 +272,9 @@ export default {
     text-align: left;
 
     font-size: 30px;
+}
+
+.selfComment {
+    width: 100%;
 }
 </style>
