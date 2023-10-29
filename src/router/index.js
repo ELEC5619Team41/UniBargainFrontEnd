@@ -15,6 +15,7 @@ import TransactionPage from "@/views/UserView/TransactionPage";
 import TransactionEndPage from "@/views/UserView/TransactionEndPage";
 import SearchResultPage from "@/views/UserView/SearchResultPage";
 import complain from "@/views/complain";
+import contact from "@/views/contact";
 
 const routes = [
   {
@@ -95,6 +96,10 @@ const routes = [
         path:'makeComplaints',
         component: complain
       },
+      {
+        path:'contact',
+        component: contact
+      }
     ]
   }
 ]

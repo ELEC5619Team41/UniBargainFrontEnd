@@ -5,8 +5,8 @@
             <p class="text" style="padding-left: 30px;"></p>
         </div>
         <div style="width: 70%; display: flex; align-items: center; justify-content: right; margin-right: 50px;">
-            <ClickableText class="text" :text="this.$t('ContactUs')"></ClickableText>
-            <ClickableText class="text" :text="this.$t('Complain')"></ClickableText>
+            <ClickableText class="text" :text="this.$t('ContactUs')" v-on:click="this.$router.push('contact')"></ClickableText>
+            <ClickableText class="text" :text="this.$t('Complain')" v-on:click="this.$router.push('makeComplaints')"></ClickableText>
             <ClickableText class="text" :text="this.$t('Report')"></ClickableText>
         </div>
     </div>

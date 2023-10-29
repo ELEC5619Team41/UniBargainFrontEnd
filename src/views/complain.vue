@@ -1,6 +1,6 @@
 <template>
 <div style="margin-top: 10%">
-  <el-text class="mx-5" type="primary" tag="b" size="large">Hello,Welcome to contact us. you can choose to call us or through an Email. We value your feed back .</el-text>
+  <el-text class="mx-5" type="primary" tag="b" size="large">We are sorry for causing issues for you. You can choose to contact our agent by number or send an email to us. We will do our best to solve the issues. </el-text>
 
   <el-row style="margin-top: 10%" :gutter="130">
     <el-col :span=" 12">
