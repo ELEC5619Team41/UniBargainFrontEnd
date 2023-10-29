@@ -24,7 +24,7 @@ export default {
   },
   async mounted() {
     await this.getlist(this.$route.params.search);
-    await this.getProductInfo();
+    // await this.getProductInfo();
     this.GalleryItem = this.PreGalleryItem;
   },
   methods: {
@@ -53,19 +53,87 @@ export default {
 
       await fetch("http://localhost:28888/product/getList", requestOptions)
         .then(response => response.json())
-        .then(data => {
+        .then(async (data) => {
           // console.log(data);
           var ls = []
-          for (let i = 0; i < data.data.length; i++) {
+          var dataArray = data.data;
+          for (let i = 0; i < dataArray.length; i++) {
             var content = {
-              id: data.data[i]["id"],
-              name: data.data[i]["info"]["name"],
+              id: dataArray[i]["id"],
+              name: dataArray[i]["info"]["name"],
               uploader: "",
-              uploaderId: data.data[i]["userId"],
+              uploaderId: dataArray[i]["userId"],
               rating: 0,
               image: "",
               uploaderAvatar: "",
             }
+
+            var data = { "productId": dataArray[i]["id"] };
+
+            var requestOptions = {
+              method: 'POST',
+              headers: myHeaders,
+              body: JSON.stringify(data),
+              redirect: 'follow'
+            };
+
+            await fetch("http://localhost:28888/product/getAvgScore", requestOptions)
+              .then(response => response.json())
+              .then(data => {
+                // console.log(data);
+                if (data.data['score'] != null) {
+                  dataArray[i]["rating"] = parseInt(data.data['score']).toFixed();
+                } else {
+                  dataArray[i]["rating"] = "No ratings";
+                }
+              })
+              .catch(error => console.log('error', error));
+
+            var data = { "userId": dataArray[i]["uploaderId"] };
+
+            var requestOptions = {
+              method: 'POST',
+              headers: myHeaders,
+              body: JSON.stringify(data),
+              redirect: 'follow'
+            };
+
+            await fetch("http://localhost:28888/user/getByUserId", requestOptions)
+              .then(response => response.json())
+              .then(data => {
+                console.log(data);
+                dataArray[i]["uploader"] = data.data['username'];
+
+                if (!('avatar' in data.data) || data.data['avatar'] == null) {
+                  dataArray[i]["uploaderAvatar"] = '';
+                } else {
+                  dataArray[i]["uploaderAvatar"] = data.data["avatar"];
+                  console.log('save')
+                }
+              })
+              .catch(error => console.log('error', error));
+
+            var data = { "id": dataArray[i]["id"] };
+
+            var requestOptions = {
+              method: 'POST',
+              headers: myHeaders,
+              body: JSON.stringify(data),
+              redirect: 'follow'
+            };
+
+            await fetch("http://localhost:28888/product/get", requestOptions)
+              .then(response => response.json())
+              .then(data => {
+                // console.log(data);
+                if (!('images' in data.data['info']) || data.data['info']['images'].length == 0) {
+                  dataArray[i]["image"] = '';
+                } else {
+                  dataArray[i]["image"] = data.data['info']['images'][0];
+                }
+              })
+              .catch(error => console.log('error', error));
+
             ls.push(content);
           }
           this.PreGalleryItem = ls;
