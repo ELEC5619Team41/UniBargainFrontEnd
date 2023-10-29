@@ -14,7 +14,7 @@ import SeekTradeItem from "@/views/UserView/SeekTradeItem";
 import TransactionPage from "@/views/UserView/TransactionPage";
 import TransactionEndPage from "@/views/UserView/TransactionEndPage";
 import SearchResultPage from "@/views/UserView/SearchResultPage";
-import complain from "@/components/complain";
+import complain from "@/views/complain";
 
 const routes = [
   {
