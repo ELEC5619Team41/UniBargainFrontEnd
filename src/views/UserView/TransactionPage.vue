@@ -15,12 +15,11 @@
       <div class="itemField">
         <div v-for="(itemData, index) in this.itemsData"
           style="width: 100%; align-items: center; justify-content: center; display: flex; flex-direction: column; background-color: rgb(241, 241, 241);">
-          <ItemShoppingCartComponent :showToggle="false"
-            @delete-cart-item="deleteOneItem" :item="itemData">
+          <ItemShoppingCartComponent :showToggle="false" @delete-cart-item="deleteOneItem" :item="itemData">
           </ItemShoppingCartComponent>
         </div>
       </div>
-      <div style="text-align: right; font-size: 25px; color: green;">{{ $t('TotalPrice')+  this.totalPrice }}</div>
+      <div style="text-align: right; font-size: 25px; color: green;">{{ $t('TotalPrice') + this.totalPrice }}</div>
     </div>
 
     <div class="payment" style="display: flex; flex-direction: column">
@@ -31,7 +30,8 @@
         </div>
       </div>
       <div style="display: flex; margin-top: 15px; margin-right: 15px; margin-bottom: 15px">
-        <round-corner-button style="margin-left: auto" :text="$t('Proceed')" @button-click="processPayment"></round-corner-button>
+        <round-corner-button style="margin-left: auto" :text="$t('Proceed')"
+          @button-click="processPayment"></round-corner-button>
       </div>
     </div>
 
@@ -111,220 +111,239 @@ export default {
       }
     } else {
       //buy now
-      var content = {
-              "productId": this.$route.params.id,
-              "sellerId": '',
-              "sellerName": '',
-              "itemName": '',
-              "itemPrice": 0,
-              "itemImage": '',
-              "sellerAvatar": '',
-              "selected": false
-            };
-      this.itemsData.push(content);
-      await this.getProductInfo(this.itemsData[0]["productId"], 0);
-      await this.getSellerInfo(this.itemsData[0]["sellerId"], 0);
-    }
-  },
-  methods: {
-    processPayment(){
-      this.itemsData.forEach(item => {
-        this.buy(item["productId"]);
-        this.deleteOneItem(item["productId"]);
-      })
-      // this.$router.push('/userhome/transactionendpage/');
+      let itemParamArray = JSON.parse(this.$route.params.id)
+      console.log(itemParamArray)
+      for (let i = 0; i < itemParamArray.length; i++) {
+        var content = {
+          "productId": itemParamArray[i],
+          "sellerId": '',
+          "sellerName": '',
+          "itemName": '',
+          "itemPrice": 0,
+          "itemImage": '',
+          "sellerAvatar": '',
+          "selected": false
+        };
+        this.itemsData.push(content);
+        await this.getProductInfo(this.itemsData[i]["productId"], i);
+        console.log(this.itemsData[i])
+        await this.getSellerInfo(this.itemsData[i]["sellerId"], i);
+      }
 
-    },
-    setSignal(signal) {
-      this.signal = signal;
-    },
-    redirect() {
-      if (this.signal) {
-
+        // var content = {
+        //   "productId": this.$route.params.id,
+        //   "sellerId": '',
+        //   "sellerName": '',
+        //   "itemName": '',
+        //   "itemPrice": 0,
+        //   "itemImage": '',
+        //   "sellerAvatar": '',
+        //   "selected": false
+        // };
+        // this.itemsData.push(content);
+        // await this.getProductInfo(this.itemsData[0]["productId"], 0);
+        // await this.getSellerInfo(this.itemsData[0]["sellerId"], 0);
       }
     },
+    methods: {
+      processPayment(){
+        this.itemsData.forEach(item => {
+          this.buy(item["productId"]);
+          this.deleteOneItem(item["productId"]);
+        })
+        // this.$router.push('/userhome/transactionendpage/');
+
+      },
+      setSignal(signal) {
+        this.signal = signal;
+      },
+      redirect() {
+        if (this.signal) {
+
+        }
+      },
     async initData() {
 
-      var myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("username", this.$store.state.username);
-      myHeaders.append("token", this.$store.state.token);
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("username", this.$store.state.username);
+        myHeaders.append("token", this.$store.state.token);
 
-      var data = '';
+        var data = '';
 
-      var requestOptions = {
-        method: 'POST',
-        headers: myHeaders,
-        body: JSON.stringify(data),
-        redirect: 'follow'
-      };
-
-      await fetch("http://localhost:28888/user/get", requestOptions)
-        .then(response => response.json())
-        .then(data => {
-          this.addressList = data.data['extend']['address'];
-          console.log(this.addressList)
-          for (let i = 0; i < this.addressList.length; i++) {
-            if (this.addressList[i].isDefault) {
-              this.deliveryAddress = i;
-              break;
-            }
-          }
-        })
-        .catch(error => console.log('error', error));
-    },
-    deleteOneItem(productId) {
-
-      let itemDetail = this.itemsData.find(item => item.productId == productId)
-      if (itemDetail.selected) {
-        this.totalPrice = parseFloat(this.totalPrice - itemDetail.itemPrice).toFixed(2)
-        this.selectedCount -= 1
-      }
-
-      this.itemsData = this.itemsData.filter(item => item.productId != productId)
-      this.removeFromCart(productId);
-    },
-    changeAddress(index) {
-      this.deliveryAddress = index;
-    },
-    async getProductInfo(id, input) {
-      var myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("username", this.$store.state.username);
-      myHeaders.append("token", this.$store.state.token);
-
-      var data = { "id": id };
-
-      var requestOptions = {
-        method: 'POST',
-        headers: myHeaders,
-        body: JSON.stringify(data),
-        redirect: 'follow'
-      };
-
-      
-
-      await fetch("http://localhost:28888/product/get", requestOptions)
-        .then(response => response.json())
-        .then(data => {
-          this.itemsData[input]['itemPrice'] = parseInt(data.data['info']["price"]);
-          this.itemsData[input]['itemImage'] = data.data['info']["image"];
-          this.itemsData[input]['sellerId'] = data.data['info']["userId"];
-          this.itemsData[input]['itemName'] = data.data['info']["name"];
-        })
-        .catch(error => console.log('error', error));
-
-        this.totalPrice = Number(Number(this.totalPrice) + Number(parseFloat(this.itemsData[input]['itemPrice']).toFixed(2)))
-    },
-    async getList() {
-      var myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("username", this.$store.state.username);
-      myHeaders.append("token", this.$store.state.token);
-
-      var data = {};
-
-      var requestOptions = {
-        method: 'POST',
-        headers: myHeaders,
-        body: JSON.stringify(data),
-        redirect: 'follow'
-      };
-
-      await fetch("http://localhost:28888/shoppingCart/getList", requestOptions)
-        .then(response => response.json())
-        .then(data => {
-          var ls = []
-          for (let i = 0; i < data.data.length; i++) {
-            var content = {
-              "productId": data.data[i]['productId'],
-              "sellerId": data.data[i]['productUserId'],
-              "sellerName": '',
-              "itemName": data.data[i]['productInfo']['name'],
-              "itemPrice": 0,
-              "itemImage": '',
-              "sellerAvatar": '',
-              "selected": false
-            };
-            ls.push(content);
-          }
-          this.itemsData = ls;
-        })
-        .catch(error => console.log('error', error));
-    },
-    async removeFromCart(productId) {
-      var myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("username", this.$store.state.username);
-      myHeaders.append("token", this.$store.state.token);
-
-      var data = { "productId": productId };
-
-      var requestOptions = {
-        method: 'DELETE',
-        headers: myHeaders,
-        body: JSON.stringify(data),
-        redirect: 'follow'
-      };
-
-      await fetch("http://localhost:28888/shoppingCart/remove", requestOptions)
-        .then(response => response.json())
-        .then(data => {
-          // this.itemData['addedCart'] = false;
-        })
-        .catch(error => console.log('error', error));
-    },
-    
-    getSellerInfo(id, input) {
-      var myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("username", this.$store.state.username);
-      myHeaders.append("token", this.$store.state.token);
-
-      var data = { userId: id };
-
-      var requestOptions = {
-        method: 'POST',
-        headers: myHeaders,
-        body: JSON.stringify(data),
-        redirect: 'follow'
-      };
-
-
-      return fetch("http://localhost:28888/user/getByUserId", requestOptions)
-        .then(response => response.json())
-        .then(data => {
-          this.itemsData[input]['sellerName'] = data.data['username'];
-          this.itemsData[input]['sellerAvatar'] = data.data['avatar'];
-
-        })
-        .catch(error => console.log('error', error));
-    },
-    async buy(id) {
-      var myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("username", this.$store.state.username);
-      myHeaders.append("token", this.$store.state.token);
-
-      var data = { "productId": id, "info": null };
-
-      var requestOptions = {
+        var requestOptions = {
           method: 'POST',
           headers: myHeaders,
           body: JSON.stringify(data),
           redirect: 'follow'
-      };
+        };
 
-      await fetch("http://localhost:28888/buyProduct/add", requestOptions)
+        await fetch("http://localhost:28888/user/get", requestOptions)
           .then(response => response.json())
           .then(data => {
-              console.log(data);
+            this.addressList = data.data['extend']['address'];
+            console.log(this.addressList)
+            for (let i = 0; i < this.addressList.length; i++) {
+              if (this.addressList[i].isDefault) {
+                this.deliveryAddress = i;
+                break;
+              }
+            }
           })
           .catch(error => console.log('error', error));
-    }
-  }
+      },
+      deleteOneItem(productId) {
 
-}
+        let itemDetail = this.itemsData.find(item => item.productId == productId)
+        if (itemDetail.selected) {
+          this.totalPrice = parseFloat(this.totalPrice - itemDetail.itemPrice).toFixed(2)
+          this.selectedCount -= 1
+        }
+
+        this.itemsData = this.itemsData.filter(item => item.productId != productId)
+        this.removeFromCart(productId);
+      },
+      changeAddress(index) {
+        this.deliveryAddress = index;
+      },
+    async getProductInfo(id, input) {
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("username", this.$store.state.username);
+        myHeaders.append("token", this.$store.state.token);
+
+        var data = { "id": id };
+
+        var requestOptions = {
+          method: 'POST',
+          headers: myHeaders,
+          body: JSON.stringify(data),
+          redirect: 'follow'
+        };
+
+
+
+        await fetch("http://localhost:28888/product/get", requestOptions)
+          .then(response => response.json())
+          .then(data => {
+            this.itemsData[input]['itemPrice'] = parseInt(data.data['info']["price"]);
+            this.itemsData[input]['itemImage'] = data.data['info']["image"];
+            this.itemsData[input]['sellerId'] = data.data["userId"];
+            this.itemsData[input]['itemName'] = data.data['info']["name"];
+          })
+          .catch(error => console.log('error', error));
+
+        this.totalPrice = Number(Number(this.totalPrice) + Number(parseFloat(this.itemsData[input]['itemPrice']).toFixed(2)))
+      },
+    async getList() {
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("username", this.$store.state.username);
+        myHeaders.append("token", this.$store.state.token);
+
+        var data = {};
+
+        var requestOptions = {
+          method: 'POST',
+          headers: myHeaders,
+          body: JSON.stringify(data),
+          redirect: 'follow'
+        };
+
+        await fetch("http://localhost:28888/shoppingCart/getList", requestOptions)
+          .then(response => response.json())
+          .then(data => {
+            var ls = []
+            for (let i = 0; i < data.data.length; i++) {
+              var content = {
+                "productId": data.data[i]['productId'],
+                "sellerId": data.data[i]['productUserId'],
+                "sellerName": '',
+                "itemName": data.data[i]['productInfo']['name'],
+                "itemPrice": 0,
+                "itemImage": '',
+                "sellerAvatar": '',
+                "selected": false
+              };
+              ls.push(content);
+            }
+            this.itemsData = ls;
+          })
+          .catch(error => console.log('error', error));
+      },
+    async removeFromCart(productId) {
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("username", this.$store.state.username);
+        myHeaders.append("token", this.$store.state.token);
+
+        var data = { "productId": productId };
+
+        var requestOptions = {
+          method: 'DELETE',
+          headers: myHeaders,
+          body: JSON.stringify(data),
+          redirect: 'follow'
+        };
+
+        await fetch("http://localhost:28888/shoppingCart/remove", requestOptions)
+          .then(response => response.json())
+          .then(data => {
+            // this.itemData['addedCart'] = false;
+          })
+          .catch(error => console.log('error', error));
+      },
+
+      getSellerInfo(id, input) {
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("username", this.$store.state.username);
+        myHeaders.append("token", this.$store.state.token);
+
+        var data = { userId: id };
+
+        var requestOptions = {
+          method: 'POST',
+          headers: myHeaders,
+          body: JSON.stringify(data),
+          redirect: 'follow'
+        };
+
+
+        return fetch("http://localhost:28888/user/getByUserId", requestOptions)
+          .then(response => response.json())
+          .then(data => {
+            this.itemsData[input]['sellerName'] = data.data['username'];
+            this.itemsData[input]['sellerAvatar'] = data.data['avatar'];
+
+          })
+          .catch(error => console.log('error', error));
+      },
+    async buy(id) {
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("username", this.$store.state.username);
+        myHeaders.append("token", this.$store.state.token);
+
+        var data = { "productId": id, "info": null };
+
+        var requestOptions = {
+          method: 'POST',
+          headers: myHeaders,
+          body: JSON.stringify(data),
+          redirect: 'follow'
+        };
+
+        await fetch("http://localhost:28888/buyProduct/add", requestOptions)
+          .then(response => response.json())
+          .then(data => {
+            console.log(data);
+          })
+          .catch(error => console.log('error', error));
+      }
+    }
+
+  }
 </script>
 
 <style scoped>

@@ -67,7 +67,7 @@ export default {
     },
     methods: {
         redirect() {
-            this.$router.push('/userhome/transactionpage/' + this.$route.params.id)
+            this.$router.push('/userhome/transactionpage/' + JSON.stringify([this.$route.params.id]))
         },
         async Iteminfo() {
             var myHeaders = new Headers();

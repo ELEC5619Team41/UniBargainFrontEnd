@@ -4,12 +4,12 @@
 
         <div style="display: flex; position: relative; height: 80px; align-items: center;">
             <div>
-                {{ $t('ShoppingCart') }} ({{ this.itemsData.length  }})
+                {{ $t('ShoppingCart') }} ({{ this.itemsData.length }})
             </div>
             <div style="position: absolute; right: 0; display: flex; align-items: center;">
                 <div style="margin-right: 30px;">{{ this.totalPrice }} $</div>
                 <RoundCornerButton :height="'50px'" :width="'150px'" :text="$t('Settle')"
-                    @button-click="this.$router.push('/userhome/transactionpage/')"></RoundCornerButton>
+                    @button-click="goCheckOut"></RoundCornerButton>
             </div>
         </div>
 
@@ -51,6 +51,23 @@ export default {
         ItemShoppingCartComponent
     },
     methods: {
+        goCheckOut(){
+            let selectedItem = [];
+            for(var key in this.checkStatus){
+                if(this.checkStatus[key].checked){
+                    selectedItem.push(this.checkStatus[key].id);
+                }
+            }
+            if(selectedItem.length == 0){
+                this.$message({
+                    message: this.$t('PleaseSelectItem'),
+                    type: 'warning'
+                });
+                return;
+            }
+            this.$router.push('/userhome/transactionpage/' + JSON.stringify(selectedItem))
+            // console.log(selectedItem)
+        },
         selectAllItem() {
             this.totalPrice = 0
             if (this.allItemSelect)
@@ -265,6 +282,7 @@ export default {
                 this.selectedCount += 1
             }
         })
+        console.log(this.checkStatus)
         this.totalPrice = parseFloat(this.totalPrice).toFixed(2)
     },
     data() {
@@ -277,56 +295,6 @@ export default {
             allItemSelect: false,
             selectedCount: 0,
             itemsData: [
-                {
-                    //     "orderNumber": "12345",
-                    //     "username": "john_doe",
-                    //     "itemName": "Product AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-                    //     "orderDate": "2023-09-18",
-                    //     "itemPrice": 19.99,
-                    //     "tag": "posted",
-                    //     "status": "unshipped",
-                    //     "selected": true
-                    // },
-                    // {
-                    //     "orderNumber": "67890",
-                    //     "username": "jane_smith",
-                    //     "itemName": "Product B",
-                    //     "orderDate": "2023-09-19",
-                    //     "itemPrice": 24.99,
-                    //     "tag": "bought",
-                    //     "status": "unreceived",
-                    //     "selected": false
-                    // },
-                    // {
-                    //     "orderNumber": "54321",
-                    //     "username": "bob_jones",
-                    //     "itemName": "Product C",
-                    //     "orderDate": "2023-09-20",
-                    //     "itemPrice": 14.99,
-                    //     "tag": "sold",
-                    //     "status": "unrated",
-                    //     "selected": true
-                    // },
-                    // {
-                    //     "orderNumber": "98765",
-                    //     "username": "alice_smith",
-                    //     "itemName": "Product D",
-                    //     "orderDate": "2023-09-21",
-                    //     "itemPrice": 29.99,
-                    //     "tag": "collection",
-                    //     "status": "refund",
-                    //     "selected": false
-                    // },
-                    // {
-                    //     "orderNumber": "24680",
-                    //     "username": "sam_jackson",
-                    //     "itemName": "Product E",
-                    //     "orderDate": "2023-09-22",
-                    //     "itemPrice": 39.99,
-                    //     "tag": "posted",
-                    //     "status": "unshipped",
-                    //     "selected": true
-                }
             ]
         }
     }
