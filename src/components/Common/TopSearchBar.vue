@@ -56,7 +56,7 @@ export default {
 .clearButton {
     height: 30px;
     border-radius: 20px;
-    background-color: black;
+    background-color: #1e95d4;
 }
 
 .buttonText {
@@ -70,7 +70,7 @@ export default {
 .searchButton {
     height: 30px;
     border-radius: 30px;
-    background-color: black;
+    background-color: #1e95d4;
     right: 20px;
     position: absolute
 }

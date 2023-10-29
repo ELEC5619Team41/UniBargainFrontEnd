@@ -3,7 +3,7 @@
         <div class="userProfile">
             <div ref="commenterAvatar" style="width: 50px; height: 50px;"></div>
             <div>{{ this.comment.username }}</div>
-            <div style="width: 30px; height: 30px; background-color: blue" v-for="index in this.comment.commentRating"></div>
+            <div style="width: 30px; height: 30px; " v-for="index in this.comment.commentRating"></div>
             <div>{{ this.comment.rating }}</div>
 
             <!-- <div style="margin-left: auto;">2023-Sep-13 16:47</div> -->

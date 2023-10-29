@@ -168,11 +168,12 @@ export default {
             const ls = input.split(", ");
             this.addressUploadData.address = ls[0];
             this.addressUploadData.city = ls[1];
-            this.addressUploadData.state = ls[2].split(" ")[0];
-            this.addressUploadData.zip = ls[2].split(" ")[1];
+            this.addressUploadData.state = ls[2].split(" ").slice(0,-1);
+            this.addressUploadData.zip = ls[2].split(" ")[-1];
             this.addressUploadData.country = ls[3];
             var addItem = document.getElementById("address "+index);
             addItem.style.backgroundColor="black";
+            console.log(this.addressUploadData);
             if(this.lastSelected!= -1){
                 var lastItem = document.getElementById("address "+this.lastSelected);
                 lastItem.style.backgroundColor="rgb(156, 152, 152)";

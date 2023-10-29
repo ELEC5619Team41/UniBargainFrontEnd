@@ -166,8 +166,13 @@ export default {
             .then(response => response.json())
             .then(data => {
                 console.log(data);
-                this.uploadData['firstname'] = data.data['name'].split(' ')[0];
-                this.uploadData['lastname'] = data.data['name'].split(' ')[1];
+                if(data.data['name']!='' && data.data['name']!=null){
+                    this.uploadData['firstname'] = data.data['name'].split(' ')[0];
+                    this.uploadData['lastname'] = data.data['name'].split(' ')[1];
+                }else{
+                    this.uploadData['firstname'] = '';
+                    this.uploadData['lastname'] = '';
+                }
                 this.uploadData['emailAddress'] = data.data['extend']['email'];
                 this.uploadData['gender'] = data.data['extend']['gender'];
                 this.uploadData['mobileNumber'] = data.data['extend']['mobile'];

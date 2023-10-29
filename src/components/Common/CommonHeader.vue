@@ -7,9 +7,11 @@
             <button v-for="(item, index) in this.itemNames" @click="buttonOnClick(index, item)"
                 :class="'centerButton ' + (selectedButton == index ? 'selected' : '')">{{ item.title }}</button>
         </div>
-        <div style="width: 20%; height: 100%; justify-content: center; display: flex; align-items: center;">
+        <div style="width: 5%; height: 100%; justify-content: center; display: flex; align-items: center;">
             <div ref="uploadImageField" style="height: 30px; width: 30px; "
                 @click="buttonOnClick(-1, { title: this.$t('UserProfile'), link: '/userhome/userprofilepage' })"></div>
+        </div>
+        <div style="width: 5%; height: 100%; color: white; justify-content: center; display: flex; align-items: center;" @click="logout()">Log Out
         </div>
     </div>
 </template>
@@ -45,14 +47,18 @@ export default {
                     imageBG.style.backgroundSize = "cover";
                 })
                 .catch(error => console.log('error', error));
-        }
+        },
+        logout(){
+        this.$store.commit('update', { "username": '', "token": '', "id": ''});
+        this.$router.push('/loginregister');    
+    }
     },
     data() {
         return {
             selectedButton: 0,
             itemNames: [
                 { title: this.$t('Home'), link: '/userhome/userhomepage' }, { title: this.$t('Trading'), link: '/userhome/usertradingpage' }, { title: this.$t('Shopping Cart'), link: '/userhome/usershoppingcartpage' }, { title: this.$t('Message'), link: '/userhome/usermessagepage' },
-                { title: this.$t('Transaction'), link: '/userhome/transactionpage' }, { title: this.$t('Publish Item'), link: '/userhome/publishidlepage' }, { title: this.$t('Seek Trade'), link: '/userhome/seektradepage' }
+                { title: this.$t('Publish Item'), link: '/userhome/publishidlepage' }, { title: this.$t('Seek Trade'), link: '/userhome/seektradepage' }
             ]
         }
     },
@@ -80,6 +86,7 @@ export default {
     mounted() {
         this.SendRequest();
     },
+
 }
 </script>
 
@@ -87,23 +94,27 @@ export default {
 .background {
     width: 100%;
     height: 50px;
-    background-color: rgb(87, 87, 87);
+    background-color: #1e95d4;
 }
 
 .centerButton {
     height: 100%;
     width: 20%;
-    background-color: rgb(87, 87, 87);
+    background-color: #1e95d4;
     outline: none;
     border: none;
 }
 
 .selected {
-    background-color: rgb(196, 196, 196);
+    background-color: #7dd1df;
 }
 
 .headerLogo{
     background-image: url("../../assets/unibargain logo.png");
     background-size: 100% 100%;
+}
+
+button{
+    color:white;
 }
 </style>

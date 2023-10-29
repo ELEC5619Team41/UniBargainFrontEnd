@@ -7,7 +7,6 @@
         <div style="width: 70%; display: flex; align-items: center; justify-content: right; margin-right: 50px;">
             <ClickableText class="text" :text="this.$t('ContactUs')" v-on:click="this.$router.push('contact')"></ClickableText>
             <ClickableText class="text" :text="this.$t('Complain')" v-on:click="this.$router.push('makeComplaints')"></ClickableText>
-            <ClickableText class="text" :text="this.$t('Report')"></ClickableText>
         </div>
     </div>
 </template>
@@ -25,7 +24,7 @@ export default {
 .background {
     width: 100%;
     height: 50px;
-    background-color: rgb(87, 87, 87);
+    background-color: #1e95d4;
     bottom: 0;
     position: fixed;
 }
@@ -33,13 +32,13 @@ export default {
 .centerButton {
     height: 100%;
     width: 20%;
-    background-color: rgb(87, 87, 87);
+    background-color: #1e95d4;
     outline: none;
     border: none;
 }
 
 .selected {
-    background-color: rgb(196, 196, 196);
+    background-color: #b5e5e7;
 }
 
 .text{

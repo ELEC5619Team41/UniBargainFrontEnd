@@ -3,28 +3,28 @@
         <div style="display: flex;">
             <div style="text-align: right; margin-left: auto; display: flex;">
                 <div ref="avatar" style="width: 35px; height: 35px; background-color: blue; margin-right: 5px;"></div>
-                <div style="height: 35px; display: flex; align-items: center;">
+                <div style="height: 35px; display: flex; align-items: center; color: white; ">
                     {{ this.item.username }}
                 </div>
             </div>
             <div v-if="this.item.tag == 'collection'"
-                style="width: 65px; height: 35px; background-color: white; margin-left: 5px; align-items: center; text-align: center; display: flex; border-radius: 5px;"
+                style="width: 65px; color:white; height: 35px; background-color: #1e95d4; margin-left: 5px; align-items: center; text-align: center; display: flex; border-radius: 5px;"
                 @click="$emit('remove-collection')">
                 Remove
             </div>
         </div>
 
         <div style="margin-top: 10px; display: flex;">
-            <div ref="previewImage" style="width: 15%; aspect-ratio: 1/1; background-color: aqua;"></div>
+            <div ref="previewImage" style="width: 15%; aspect-ratio: 1/1; "></div>
             <div class="textField" style="width: 85%;">
                 <ClickableText :text="this.item.itemName" :size="'20px'" @text-trigger="jumpToItem"></ClickableText>
                 <div>{{ this.item.orderDate }}</div>
 
                 <div style="position: absolute;bottom: 0; display: flex; width: 100%;">
-                    <div>${{ this.item.itemPrice }}</div>
-                    <RoundCornerButton style="right: 0px; bottom: 0px; position: absolute;" :width="'100px'" :height="'40px'"
-                        :text="tagKeyPairs[this.item.status]"></RoundCornerButton>
-                    <RoundCornerButton v-if="this.comment" style="right: 0px; bottom: -43px; position: absolute;" :width="'100px'" :height="'40px'"
+                    <div style="color:white">${{ this.item.itemPrice }}</div>
+                    <!-- <RoundCornerButton style="right: 0px; bottom: 0px; position: absolute;" :width="'100px'" :height="'40px'"
+                        :text="tagKeyPairs[this.item.status]"></RoundCornerButton> -->
+                    <RoundCornerButton v-if="this.comment" style="right: 0px; bottom: -30px; position: absolute;" :width="'100px'" :height="'40px'"
                         :text="'Comment'"></RoundCornerButton>
                         
                 </div>
@@ -76,7 +76,9 @@ export default {
 
             var previewImage = this.$refs.previewImage;
             previewImage.style.backgroundImage = `url(${this.item.image})`;
-            previewImage.style.backgroundSize = "cover";
+            previewImage.style.backgroundSize = "contain";
+            previewImage.style.backgroundRepeat = "no-repeat";
+
         } else {
             console.log('no img')
             var previewImage = this.$refs.previewImage;
@@ -86,7 +88,7 @@ export default {
         if('avatar' in this.item){
             var avatar = this.$refs.avatar;
             avatar.style.backgroundImage = `url(${this.item.avatar})`;
-            avatar.style.backgroundSize = "cover";
+            avatar.style.backgroundSize = "contain";
         }
 
 

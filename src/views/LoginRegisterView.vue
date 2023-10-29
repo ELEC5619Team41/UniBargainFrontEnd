@@ -1,6 +1,6 @@
 <template>
   <div class="horizontal-layout">
-    <div style="width: 35%; height: 100%; background-color: rgb(180, 180, 180)"></div>
+    <div style="width: 35%; height: 100%; background-color: #1e95d4"></div>
     <div class="parent-container" style="width: 65%; height: 100%; background-color: white">
       <LoginComponent v-if="isLoginInterface" @change-to-login="setLoginRegister"></LoginComponent>
       <RegisterComponent v-else @change-to-login="setLoginRegister"></RegisterComponent>
@@ -27,7 +27,10 @@ export default {
       this.isLoginInterface = !this.isLoginInterface
     },
 
-  }
+  },
+  // created(){
+  //   this.$router.go();
+  // }
 };
 </script>
 

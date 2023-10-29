@@ -39,9 +39,9 @@
             </div>
         </div>
 
-        <div class="commentField" style="margin-top: 20px; padding-bottom: 5rem;">
+        <div class="commentField" style="margin-top: 20px; padding-bottom: 5rem;" v-for="commentData in this.itemData.comments">
 
-            <ItemCommentComponent v-for="commentData in this.itemData.comments" :comment="commentData">
+            <ItemCommentComponent  :comment="commentData">
             </ItemCommentComponent>
 
             <div style="width: 100%; height: 1px; background-color: black;"></div>
@@ -199,54 +199,6 @@ export default {
                 })
                 .catch(error => console.log('error', error));
         },
-        removeFromCollection() {
-            var myHeaders = new Headers();
-            myHeaders.append("Content-Type", "application/json");
-            myHeaders.append("username", this.$store.state.username);
-            myHeaders.append("token", this.$store.state.token);
-
-            var data = { "productId": this.$route.params.id };
-
-            var requestOptions = {
-                method: 'DELETE',
-                headers: myHeaders,
-                body: JSON.stringify(data),
-                redirect: 'follow'
-            };
-
-            fetch("http://localhost:28888/collect/remove", requestOptions)
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    this.itemData['collected'] = false;
-                    ;
-                })
-                .catch(error => console.log('error', error));
-        },
-        addToCart() {
-            var myHeaders = new Headers();
-            myHeaders.append("Content-Type", "application/json");
-            myHeaders.append("username", this.$store.state.username);
-            myHeaders.append("token", this.$store.state.token);
-
-            var data = { "productId": this.$route.params.id };
-
-            var requestOptions = {
-                method: 'POST',
-                headers: myHeaders,
-                body: JSON.stringify(data),
-                redirect: 'follow'
-            };
-
-            fetch("http://localhost:28888/shoppingCart/add", requestOptions)
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    this.itemData['addedCart'] = true;
-                    ;
-                })
-                .catch(error => console.log('error', error));
-        },
         async findCollection() {
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
@@ -362,30 +314,6 @@ export default {
                 })
                 .catch(error => console.log('error', error));
         },
-        addToCollection() {
-            var myHeaders = new Headers();
-            myHeaders.append("Content-Type", "application/json");
-            myHeaders.append("username", this.$store.state.username);
-            myHeaders.append("token", this.$store.state.token);
-
-            var data = { "productId": this.$route.params.id };
-
-            var requestOptions = {
-                method: 'POST',
-                headers: myHeaders,
-                body: JSON.stringify(data),
-                redirect: 'follow'
-            };
-
-            fetch("http://localhost:28888/collect/add", requestOptions)
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    this.itemData['collected'] = true;
-                    ;
-                })
-                .catch(error => console.log('error', error));
-        },
         removeFromCollection() {
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
@@ -430,7 +358,6 @@ export default {
                 .then(data => {
                     console.log(data);
                     this.itemData['addedCart'] = true;
-                    ;
                 })
                 .catch(error => console.log('error', error));
         },

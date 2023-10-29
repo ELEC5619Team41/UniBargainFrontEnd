@@ -9,7 +9,7 @@
             </div>
 
             <div style="width: 75%; height: fit-content;">
-                <div
+                <!-- <div
                     style="display: flex; height: fit-content; border-radius: 15px; overflow: hidden; margin-top: 20px; justify-content: space-around;">
 
                     <div v-for="(item, index) in this.itemStatusTags" style="width: 100%; display: flex;">
@@ -20,24 +20,24 @@
                             <div style="width: 1px; height: 75%; background: black;"></div>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
                 <div class="itemField">
                     <div v-for="(itemData, index) in this.displayItems"
-                        style="width: 100%; align-items: center; justify-content: center; display: flex; flex-direction: column; background-color: rgb(241, 241, 241);">
+                        style="width: 100%; align-items: center; justify-content: center; display: flex; flex-direction: column; background-color: #b5e5e7;">
                         <ItemRecordComponent :item="itemData" :comment="this.categorySelectedButton==1" @remove-collection="removeFromCollection(itemData)">
                         </ItemRecordComponent>
                         <div class="commentField" v-if="this.categorySelectedButton==1" style="width:95%; margin-top: 20px; margin-bottom: 15px;">
 
-                            <div style="width: 100%; height: 1px; background-color: black;"></div>
+                            <div style="width: 100%; height: 1px; background-color: white;"></div>
 
-                            <div style="margin-top:20px; border: 1 solid; border-color: black;">
-                                <ItemCommentInputComponent :id="itemData['id']"></ItemCommentInputComponent>
+                            <div style="margin-top:20px; border: 1 solid; border-color: white;">
+                                <ItemCommentInputComponent :info="itemData"></ItemCommentInputComponent>
                             </div>
                         </div>
                         <div v-if="index !== this.displayItems.length - 1"
                             style=" display: flex; width: 100%; height: 1px; background: rgb(241, 241, 241); justify-content: center; align-items: center;">
-                            <div style="width: 95%; height: 1px; background: black;"></div>
+                            <div style="width: 95%; height: 1px; background: white;"></div>
                         </div>
                     </div>
 
@@ -428,14 +428,16 @@ export default {
 .centerButton {
     padding: 15px;
     width: 100%;
-    background-color: rgb(241, 241, 241);
+    background-color: #b5e5e7;
     /* outline: none; */
     border: none;
+    color:white;
 }
 
 
 .selected {
-    background-color: rgb(209, 209, 209);
+    background-color: #7dd1df;
+    color:white;
 }
 
 .itemField {

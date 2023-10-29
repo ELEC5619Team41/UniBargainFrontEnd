@@ -5,7 +5,7 @@
             <el-form :model="form" label-width="120px">
 
                 <el-form-item label="Item Rating">
-                    <el-input v-model="this.form.rating" :type="'number'" :min="1" :max="10"/>
+                    <el-input v-model="this.form.rating" :type="'number'" :min="1" :max="5"/>
                 </el-form-item>
 
                 <el-form-item label="Your Comment">
@@ -48,7 +48,7 @@ export default {
             myHeaders.append("token", this.$store.state.token);
 
             var data = {
-                id: this.id,
+                id: this.info.id,
                 evaluate: this.form.description,
                 score: this.form.rating
             };
@@ -70,6 +70,10 @@ export default {
                     // this.$router.go()
                 })
                 .catch(error => console.log('error', error));
+            
+            this.$router.push({
+                path:'itemdetailpage/'+this.info.productId
+            })
         }
     },
     data() {
@@ -82,7 +86,7 @@ export default {
         }
     },
     props:{
-        id: {
+        info: {
             type: Object,
             required: true
         }

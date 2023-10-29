@@ -64,9 +64,11 @@ export default {
               uploader: "",
               uploaderId: dataArray[i]["userId"],
               rating: 0,
-              image: "",
+              productImage: "",
               uploaderAvatar: "",
             }
+
+            var flag = false;
 
             var data = { "productId": dataArray[i]["id"] };
 
@@ -80,16 +82,15 @@ export default {
             await fetch("http://localhost:28888/product/getAvgScore", requestOptions)
               .then(response => response.json())
               .then(data => {
-                // console.log(data);
                 if (data.data['score'] != null) {
-                  dataArray[i]["rating"] = parseInt(data.data['score']).toFixed();
+                  content["rating"] = parseInt(data.data['score']).toFixed();
                 } else {
-                  dataArray[i]["rating"] = "No ratings";
+                  content["rating"] = "No ratings";
                 }
               })
               .catch(error => console.log('error', error));
 
-            var data = { "userId": dataArray[i]["uploaderId"] };
+            var data = { "userId": dataArray[i]["userId"] };
 
             var requestOptions = {
               method: 'POST',
@@ -101,13 +102,12 @@ export default {
             await fetch("http://localhost:28888/user/getByUserId", requestOptions)
               .then(response => response.json())
               .then(data => {
-                console.log(data);
-                dataArray[i]["uploader"] = data.data['username'];
+                content["uploader"] = data.data['username'];
 
                 if (!('avatar' in data.data) || data.data['avatar'] == null) {
-                  dataArray[i]["uploaderAvatar"] = '';
+                  content["uploaderAvatar"] = '';
                 } else {
-                  dataArray[i]["uploaderAvatar"] = data.data["avatar"];
+                  content["uploaderAvatar"] = data.data["avatar"];
                   console.log('save')
                 }
               })
@@ -125,108 +125,31 @@ export default {
             await fetch("http://localhost:28888/product/get", requestOptions)
               .then(response => response.json())
               .then(data => {
-                // console.log(data);
                 if (!('images' in data.data['info']) || data.data['info']['images'].length == 0) {
-                  dataArray[i]["image"] = '';
+                  content["productImage"] = '';
                 } else {
-                  dataArray[i]["image"] = data.data['info']['images'][0];
+                  if(data.data['info']['images'][0].includes(this.$route.params.search)){
+                    flag = true;
+                  }else{
+                    content["productImage"] = data.data['info']['images'][0];
+                  }
                 }
               })
               .catch(error => console.log('error', error));
-
-            ls.push(content);
+            if(!flag){
+              ls.push(content);
+            }
           }
           this.PreGalleryItem = ls;
         })
         .catch(error => console.log('error', error));
-    },
-    async getProductInfo() {
-      var myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("username", this.$store.state.username);
-      myHeaders.append("token", this.$store.state.token);
-
-
-      for (let i = 0; i < this.PreGalleryItem.length; i++) {
-
-        var data = { "productId": this.PreGalleryItem[i]["id"] };
-
-        var requestOptions = {
-          method: 'POST',
-          headers: myHeaders,
-          body: JSON.stringify(data),
-          redirect: 'follow'
-        };
-
-        await fetch("http://localhost:28888/product/getAvgScore", requestOptions)
-          .then(response => response.json())
-          .then(data => {
-            // console.log(data);
-            if (data.data['score'] != null) {
-              this.PreGalleryItem[i]["rating"] = parseInt(data.data['score']).toFixed();
-            } else {
-              this.PreGalleryItem[i]["rating"] = "No ratings";
-            }
-          })
-          .catch(error => console.log('error', error));
-
-        var data = { "userId": this.PreGalleryItem[i]["uploaderId"] };
-
-        var requestOptions = {
-          method: 'POST',
-          headers: myHeaders,
-          body: JSON.stringify(data),
-          redirect: 'follow'
-        };
-
-        await fetch("http://localhost:28888/user/getByUserId", requestOptions)
-          .then(response => response.json())
-          .then(data => {
-            console.log(data);
-            this.PreGalleryItem[i]["uploader"] = data.data['username'];
-
-            if (!('avatar' in data.data) || data.data['avatar'] == null) {
-              this.PreGalleryItem[i]["uploaderAvatar"] = '';
-            } else {
-              this.PreGalleryItem[i]["uploaderAvatar"] = data.data["avatar"];
-              console.log('save')
-            }
-          })
-          .catch(error => console.log('error', error));
-
-        var data = { "id": this.PreGalleryItem[i]["id"] };
-
-        var requestOptions = {
-          method: 'POST',
-          headers: myHeaders,
-          body: JSON.stringify(data),
-          redirect: 'follow'
-        };
-
-        await fetch("http://localhost:28888/product/get", requestOptions)
-          .then(response => response.json())
-          .then(data => {
-            // console.log(data);
-            if (!('images' in data.data['info']) || data.data['info']['images'].length == 0) {
-              this.PreGalleryItem[i]["image"] = '';
-            } else {
-              this.PreGalleryItem[i]["image"] = data.data['info']['images'][0];
-            }
-          })
-          .catch(error => console.log('error', error));
-      }
     }
 
   },
   data() {
     return {
       searchText: '',
-      PreGalleryItem: [{
-        id: "1a2b3c4d",
-        description: "A breathtaking view of a colorful and serene sunset over the calm ocean waves, creating a mesmerizing blend of orange, pink, and purple hues that stretch across the horizon. Captured by JohnDoe123.",
-        uploader: "JohnDoe123",
-        rating: 9.5
-      },],
+      PreGalleryItem: [],
       GalleryItem: []
     }
   }

@@ -5,7 +5,7 @@
     </p>
     <div style="display: flex">
       <div>
-        <LabelTextField :text="$t('EmailAddress')" v-model:inputText="this.email"></LabelTextField>
+        <LabelTextField :text="$t('Username')" v-model:inputText="this.email"></LabelTextField>
         <LabelTextField :text="$t('Password')" :isPassword="true" v-model:inputText="password"></LabelTextField>
 
         <div style="display: flex; margin: 10px; margin-top: 30px">
@@ -26,7 +26,7 @@
               margin-right: 20px;
               flex-shrink: 0;
             "></div>
-          <ClickableText @text-trigger="$emit('change-to-login')" :text="$t('NotHaveAccount')"></ClickableText>
+          <ClickableText @text-trigger="$emit('change-to-login')" :text="$t('NotHaveAccount')" :color="'#b5e5e7'"></ClickableText>
         </div>
       </div>
     </div>
@@ -57,7 +57,7 @@ export default {
   emits: ["change-to-login"],
   methods: {
     requestLogin() {
-      console.log('email', this.email, ', password', this.password);
+      // console.log('email', this.email, ', password', this.password);
       this.SendLoginRequest();
 
 

@@ -179,7 +179,7 @@ export default {
                 .then(response => response.json())
                 .then(data => {
                     this.itemsData[input]['itemPrice'] = parseInt(data.data['info']["price"]);
-                    this.itemsData[input]['itemImage'] = data.data['info']["image"];
+                    this.itemsData[input]['itemImage'] = data.data['info']["images"][0];
                 })
                 .catch(error => console.log('error', error));
         },
@@ -201,7 +201,7 @@ export default {
             fetch("http://localhost:28888/buyProduct/add", requestOptions)
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
+                    // console.log(data);
                 })
                 .catch(error => console.log('error', error));
         },
@@ -224,6 +224,7 @@ export default {
                 .then(response => response.json())
                 .then(data => {
                     var ls = []
+                    // console.log(data);
                     for (let i = 0; i < data.data.length; i++) {
                         var content = {
                             "productId": data.data[i]['productId'],
@@ -238,6 +239,7 @@ export default {
                         ls.push(content);
                     }
                     this.itemsData = ls;
+                    
                 })
                 .catch(error => console.log('error', error));
         },
@@ -282,8 +284,8 @@ export default {
                 this.selectedCount += 1
             }
         })
-        console.log(this.checkStatus)
-        this.totalPrice = parseFloat(this.totalPrice).toFixed(2)
+        // console.log(this.checkStatus)
+        this.totalPrice = parseFloat(this.totalPrice).toFixed(2);
     },
     data() {
         return {

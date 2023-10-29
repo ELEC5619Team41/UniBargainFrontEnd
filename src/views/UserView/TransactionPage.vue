@@ -151,7 +151,7 @@ export default {
           this.buy(item["productId"]);
           this.deleteOneItem(item["productId"]);
         })
-        // this.$router.push('/userhome/transactionendpage/');
+        this.$router.push('/userhome/transactionendpage/');
 
       },
       setSignal(signal) {
@@ -227,7 +227,7 @@ export default {
           .then(response => response.json())
           .then(data => {
             this.itemsData[input]['itemPrice'] = parseInt(data.data['info']["price"]);
-            this.itemsData[input]['itemImage'] = data.data['info']["image"];
+            this.itemsData[input]['itemImage'] = data.data['info']["images"][0];
             this.itemsData[input]['sellerId'] = data.data["userId"];
             this.itemsData[input]['itemName'] = data.data['info']["name"];
           })

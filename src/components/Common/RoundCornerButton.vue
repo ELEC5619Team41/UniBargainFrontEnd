@@ -25,7 +25,7 @@ export default {
 
 <style scoped>
 .button {
-  background-color: rgb(88, 88, 88);
+  background-color: #7dd1df;
   border: none;
   outline: none;
   width: 300px;

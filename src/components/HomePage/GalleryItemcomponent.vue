@@ -1,7 +1,7 @@
 <template>
     <div class="itemFrame" @click="clickItem()">
         <div ref="firstImg" class="itemImg"></div>
-        <div class="itemName">
+        <div class="itemName" style="font-size:larger;">
             {{ this.ItemData.name }}
         </div>
         <div style="display: flex; align-items: center;">
@@ -31,18 +31,13 @@ export default {
         }
     },
     mounted() {
-        console.log(this.ItemData);
-        console.log(this.ItemData.rating);
-        console.log(this.ItemData.uploader);
-        console.log(this.ItemData.uploaderId);
-        console.log(this.ItemData.uploaderAvatar);
         if (('productImage' in this.ItemData) && this.ItemData.productImage != '') {
             // console.log('this.ItemData', this.ItemData)
             var firstImg = this.$refs.firstImg;
             this.text='load';
             firstImg.style.backgroundImage = "url(" + this.ItemData.productImage + ")";
             firstImg.style.backgroundSize = "contain";
-            console.log(firstImg.style);
+            firstImg.style.backgroundRepeat = "no-repeat";
         }
 
         if(('uploaderAvatar' in this.ItemData) &&this.ItemData.uploaderAvatar != ''){
@@ -73,7 +68,7 @@ export default {
     top: 10px;
     border-radius: 10px;
 
-    background-color: gray;
+    background-color: white;
 }
 
 .itemName {

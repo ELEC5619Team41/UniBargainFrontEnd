@@ -98,53 +98,8 @@ export default {
   },
   data() {
     return {
-      PostData: [{
-        UserName: "DJ",
-        UserID: "13",
-        ItemId: '1',
-        UserImageUrl: "../1.webp",
-        PostName: "Relx5",
-        PostMsg: "idle relx5,good price and quality",
-        ItemUrl: '../assets/logo.png',
-        Comment:
-          [
-            {
-              name: "wang ape",
-              content: "traditional cigar is better.",
-              time: "2023-9-10"
-            },
-            {
-              name: "love0",
-              content: "need this in usa",
-              time: "2023-9-12"
-
-            }
-
-          ]
-      },
-      {
-        UserName: "DJ",
-        ItemId: '2',
-        UserID: "12",
-        UserImageUrl: "./assets/logo.png",
-        PostName: "Relx5",
-        PostMsg: "idle relx5,good price and quality",
-        Comment:
-          [
-            {
-              name: "wang ape",
-              content: "traditional cigar is better.",
-              time: "2023-9-10"
-            },
-            {
-              name: "love0",
-              content: "need this in usa",
-              time: "2023-9-12"
-
-            }
-
-          ]
-      }],
+      PostData: [
+      ],
       postItem: [],
       MyItems: [],
       Explore: true,

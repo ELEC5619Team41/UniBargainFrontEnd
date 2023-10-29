@@ -1,0 +1,77 @@
+Unibargain is a Vue 3 application designed as interface of localized second-hand market for university students. This README provides an overview of the project setup, dependencies, and scripts available.
+
+
+
+Unibargain uses several dependencies to provide its features:
+•	UI Components: element-plus, bootstrap, bootstrap-vue, bootstrap-vue-next
+•	Calendar Features: @fullcalendar/*
+•	Internationalization: vue-i18n
+•	Networking: axios
+•	State Management: vuex, vuex-persistedstate
+
+the detailed libray is listed below:
+
+Dependencies:
+
+@element-plus/icons-vue: ^2.1.0
+@fullcalendar/core: ^6.1.8
+@fullcalendar/icalendar: ^6.1.8
+@fullcalendar/interaction: ^6.1.8
+@fullcalendar/list: ^6.1.8
+@fullcalendar/timegrid: ^6.1.8
+@fullcalendar/vue3: ^6.1.8
+@popperjs/core: ^2.11.8
+axios: ^1.5.1
+bootstrap: ^5.3.2
+bootstrap-vue: ^2.23.1
+bootstrap-vue-next: ^0.14.9
+core-js: ^3.8.3
+element-plus: ^2.4.1
+express: ^4.18.2
+ical.js: ^1.5.0
+socket.io: ^4.7.2
+socket.io-client: ^4.7.2
+vue: ^3.3.4
+vue-i18n: ^9.2.2
+vue-router: ^4.0.3
+vue-socket.io: ^3.0.10
+vue3-emoji-picker: ^1.1.8
+vuex: ^4.0.2
+vuex-persistedstate: ^4.1.0
+DevDependencies:
+
+@intlify/vue-i18n-loader: ^3.0.0
+@vue/cli-plugin-babel: ~5.0.0
+@vue/cli-plugin-router: ~5.0.0
+@vue/cli-service: ~5.0.0
+unplugin-auto-import: ^0.16.6
+unplugin-vue-components: ^0.25.2
+vue-cli-plugin-i18n: ~2.3.2
+
+a few dependencies is not used in the project. they installed in previous development of the project.
+
+To set up and instruction of use
+
+cd UniBargainFrontEnd 
+
+npm install
+
+npm run serve
+
+Using localhost:8081/ to access the front end application (e.g. http://localhost:8081/loginregister)
+
+to make sure the front end work properly. please download and run the corresponding back-end and set up environment according to the instruction.
+to start the application.
+please open http://localhost:(the number of port where service run)/loginregister to login or register to start.
+the function of the project includes register and login.
+Set user profile at http://localhost:( the number of the port  where service run)/userhome/userprofilepage. Basic personal information including username, email address and delivery address could be set. Users can also upload their calendar.
+Explore and search products at http://localhost:( the number of the port  where service run)/userhome/userhomepage. Using search function at search bar at the header. Click product block to explore the detailed information of products.
+See all the orders and their status at http://localhost:( the number of the port  where service run)/userhome/usertradingpage. Using the toggle button group to select orders.
+Manage shopping cart at http://localhost:( the number of the port  where service run)/userhome/usershoppingcartpage. Using the tick box to select the products. Either to buy them or remove them based on users need.
+Manage chat at http://localhost:( the number of the port  where service run)/userhome/usermessagepage. Users can see the information come from others. Users can also send message to other users.
+Manage transactions at http://localhost:( the number of the port  where service run)/userhome/transactionpage. Users can see all the information for purchase including price and product. They can choose delivery address and payment method.
+Publish item or request post at http://localhost:( the number of the port  where service run)/userhome/publishidlepage. Users can publish the item they do not want with basic information including the pictures of product. They can also publish request post for the item they want.
+Explore the post at http://localhost:( the number of the port  where service run)/userhome/seektradepage. Users can go through the post. And manage their own post.
+Explore item detail at http://localhost:( the number of the port  where service run)/userhome/itemdetailpage/:id. User can watch the comment made others who bought the products. And add it to shopping cart or collection.
+
+  

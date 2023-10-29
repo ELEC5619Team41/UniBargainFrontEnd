@@ -1,8 +1,8 @@
 <template>
     <div class="block">
         <div class="edit-delete">
-            <div style="width: 44px; height: 44px; background-color: gray; cursor: pointer;" @click="$emit('delete-data', this.inputData)"></div>
-            <div style="width: 44px; height: 44px; background-color: black; cursor: pointer;" @click="$emit('modify-data', this.inputData)"></div>
+            <div style="width: 44px; height: 44px; font-size:small; color:white; background-color:  #7dd1df; cursor: pointer;" @click="$emit('delete-data', this.inputData)">Delete</div>
+            <div style="width: 44px; height: 44px; font-size:small; color:white; background-color: #1e95d4; cursor: pointer;" @click="$emit('modify-data', this.inputData)">Edit</div>
         </div>
         <div style="margin-left: 5px;">
             <h3 style="text-align: left;">{{this.inputData.name}}</h3>
@@ -11,7 +11,7 @@
             <h5 style="text-align: left;">{{this.inputData.state}} {{this.inputData.zip}} {{this.inputData.country}}</h5>
             <h5 style="text-align: left;">{{this.inputData.mobileNumber}}</h5>
             <h5 style="text-align: left;">{{this.inputData.emailAddress}}</h5>
-            <ClickableText :text="inputData.isDefault?'default':'set as default'" :size="'20px'" :decoration="inputData.isDefault?'':'underline'" :color="inputData.isDefault? 'green':''" @text-trigger="$emit('set-as-default', this.inputData.id);"></ClickableText>
+            <ClickableText :text="inputData.isDefault?'default':'set as default'" :size="'20px'" :decoration="inputData.isDefault?'':'underline'" :color="inputData.isDefault? '#1e95d4':''" @text-trigger="$emit('set-as-default', this.inputData.id);"></ClickableText>
         </div>
     </div>
 </template>

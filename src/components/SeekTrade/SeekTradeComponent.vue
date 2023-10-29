@@ -2,7 +2,7 @@
     <div class="itemFrame">
         <div style="position: relative; top: 10px; display: flex; overflow: auto">
             <div v-for="img in this.ItemData.info.images" class="itemImg"
-                :style="{ 'background-image': 'url(' + img + ')', 'background-size': 'cover' }"></div>
+                :style="{ 'background-image': 'url(' + img + ')', 'background-size': 'contain', 'background-repeat' : 'no-repeat' }"></div>
             <div ref="firstImg" class="itemImg"></div>
         </div>
 
@@ -60,10 +60,11 @@ export default {
     },
     data: function () {
         return {
-            user: Object,
+            user: {},
             isNotSelf: false,
             commentInput: '',
-            commentList: []
+            commentList: [],
+            productId: -1,
         }
     },
     methods: {
@@ -146,7 +147,7 @@ export default {
                 .then(response => response.json())
                 .then(data => {
 
-                    console.log(data);
+                    // console.log(data);
                     data.data.info.username = this.$store.state.username;
                     this.commentList.push(data.data);
                     this.commentInput = ''
@@ -156,7 +157,7 @@ export default {
         },
         async deleteComment(id) {
             //todo: cannot delete from api
-            console.log(id);
+            // console.log(id);
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("username", this.$store.state.username);
@@ -174,7 +175,7 @@ export default {
             await fetch("http://localhost:28888/thingsComments/delete", requestOptions)
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
+                    // console.log(data);
                     this.commentList = this.commentList.filter((item) => {
                         return item.id != id;
                     })
@@ -207,15 +208,49 @@ export default {
             return user;
         },
     },
-    mounted() {
-        this.getUser(this.ItemData.userId).then((data) => {
+    updated() {
+        console.log(this.ItemData.userId);
+        var userid = this.ItemData.userId;
+        console.log(userid);
+        if(Object.keys(this.user).length==0 || this.user.id != userid){
+            this.getUser(userid).then((data) => {
+                this.user = data;
+                console.log(this.user)
+                this.isNotSelf = this.$store.state.username != this.user.username;
+                // console.log(data);
+                if (('avatar' in this.user) && this.user.avatar != '' && this.user.avatar != null) {
+                    var uploaderAvatar = this.$refs.uploaderAvatar
+                    uploaderAvatar.style.backgroundImage = "url(" + this.user.avatar + ")";
+                    uploaderAvatar.style.backgroundSize = "contain";
+                    uploaderAvatar.style.backgroundRepeat = "no-repeat";
+                }
+            })
+        }
+        if(this.productId == -1 || this.ItemData.id != this.productId){
+            this.getComment(this.ItemData.id).then(async (data) => {
+
+                this.commentList = data;
+                for (var i = 0; i < this.commentList.length; i++) {
+                    var user = await this.getUser(this.commentList[i].userId);
+                    this.commentList[i].info.username = user.username;
+                }
+                this.commentList.reverse();
+                this.productId = this.ItemData.id;
+                // console.log(this.ItemData.id, data);
+            })
+        }
+    },mounted(){
+        var userid = this.ItemData.userId;
+        this.getUser(userid).then((data) => {
             this.user = data;
+            console.log(this.user)
             this.isNotSelf = this.$store.state.username != this.user.username;
-            console.log(data);
+            // console.log(data);
             if (('avatar' in this.user) && this.user.avatar != '' && this.user.avatar != null) {
                 var uploaderAvatar = this.$refs.uploaderAvatar
                 uploaderAvatar.style.backgroundImage = "url(" + this.user.avatar + ")";
-                uploaderAvatar.style.backgroundSize = "cover";
+                uploaderAvatar.style.backgroundSize = "contain";
+                uploaderAvatar.style.backgroundRepeat = "no-repeat";
             }
         })
         this.getComment(this.ItemData.id).then(async (data) => {
@@ -226,11 +261,9 @@ export default {
                 this.commentList[i].info.username = user.username;
             }
             this.commentList.reverse();
-            console.log(this.ItemData.id, data);
+            this.productId = this.ItemData.id;
+            // console.log(this.ItemData.id, data);
         })
-    },
-    updated() {
-
     }
 }
 </script>

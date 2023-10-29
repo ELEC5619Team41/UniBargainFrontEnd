@@ -89,87 +89,15 @@ export default {
                     GoodsNum: "42000+"
                 }
             ],
-            galleryItemData: [
-                {
-                    id: "1a2b3c4d",
-                    description: "A breathtaking view of a colorful and serene sunset over the calm ocean waves, creating a mesmerizing blend of orange, pink, and purple hues that stretch across the horizon. Captured by JohnDoe123.",
-                    uploader: "JohnDoe123",
-                    rating: 9.5
-                },
-                {
-                    id: "5e6f7g8h",
-                    description: "A vintage car show featuring classic automobiles from the golden era of automotive design. Each car tells a unique story of innovation and craftsmanship. Uploaded by CarEnthusiast.",
-                    uploader: "CarEnthusiast",
-                    rating: 8.8
-                },
-                {
-                    id: "9i0j1k2l",
-                    description: "Immerse yourself in the tranquility of nature as you explore lush green forests, listen to the gentle rustling of leaves, and breathe in the crisp, fresh air. NatureLover45 shares this moment of serenity.",
-                    uploader: "NatureLover45",
-                    rating: 9.2
-                },
-                {
-                    id: "3m4n5o6p",
-                    description: "An abstract masterpiece that invites viewers to interpret its intricate patterns and vibrant colors in their own unique ways. Created by the talented artist ArtisticMind.",
-                    uploader: "ArtisticMind",
-                    rating: 7.9
-                },
-                {
-                    id: "7q8r9s0t",
-                    description: "Gaze upon the dazzling lights of a cityscape at night, where skyscrapers reach for the stars and neon signs create a vibrant, bustling atmosphere. UrbanExplorer captures the urban beauty.",
-                    uploader: "UrbanExplorer",
-                    rating: 8.7
-                },
-                {
-                    id: "1u2v3w4x",
-                    description: "Indulge your senses in a delectable food platter featuring a symphony of flavors, textures, and colors. FoodieEats showcases culinary artistry at its finest.",
-                    uploader: "FoodieEats",
-                    rating: 9.6
-                },
-                {
-                    id: "5y6z7a8b",
-                    description: "Embark on an adventurous hike through rugged terrain, where every step leads to breathtaking vistas and a sense of accomplishment. OutdoorAdventurer shares the thrill of exploration.",
-                    uploader: "OutdoorAdventurer",
-                    rating: 9.0
-                },
-                {
-                    id: "9c0d1e2f",
-                    description: "Witness the sheer joy and boundless energy of a cute and playful puppy as it frolics in the sunshine, capturing hearts everywhere. Uploaded by PetLover123.",
-                    uploader: "PetLover123",
-                    rating: 9.8
-                },
-                {
-                    id: "3g4h5i6j",
-                    description: "Experience the glamour and style of a high-fashion runway, where designers showcase their creative visions and models strut their stuff. FashionistaStyle captures the essence of fashion.",
-                    uploader: "FashionistaStyle",
-                    rating: 8.5
-                },
-                {
-                    id: "7k8l9m0n",
-                    description: "Dive into the mysterious underwater world teeming with vibrant marine life, where colorful coral reefs and exotic creatures create a mesmerizing spectacle. Shared by MarineExplorer.",
-                    uploader: "MarineExplorer",
-                    rating: 9.3
-                },
-                {
-                    id: "1o2p3q4r",
-                    description: "Explore a historical landmark that echoes the stories of the past, offering a glimpse into bygone eras and the enduring legacy of human civilization. Shared by HistoryBuff.",
-                    uploader: "HistoryBuff",
-                    rating: 8.9
-                },
-                {
-                    id: "5s6t7u8v",
-                    description: "Peer into the vast, starry night sky, where celestial wonders twinkle and inspire awe. AstroPhotographer captures the beauty of the cosmos in all its splendor.",
-                    uploader: "AstroPhotographer",
-                    rating: 9.7
-                }
-            ]
+            galleryItemData: []
+            
 
 
 
         }
     },
     async created() {
-        await this.getRecommend(12);
+        await this.getRecommend(9);
         // await this.getProductInfo();
     },
     methods: {
@@ -262,9 +190,7 @@ export default {
             await fetch("http://localhost:28888/product/getRecommendList", requestOptions)
                 .then(response => response.json())
                 .then(async(data) => {
-                    console.log(data);
                     var ls = []
-                    console.log(data.data.length)
                     var dataLength = data.data.length;
                     var dataArray = data.data;
                     for (let i = 0; i < dataLength; i++) {
@@ -348,7 +274,7 @@ export default {
 
 <style scoped>
 .searchbarBackground {
-    background-color: rgb(244, 244, 244);
+    background-color: rgb(255, 255, 255);
     height: 60px;
 
     display: flex;
@@ -367,7 +293,7 @@ export default {
 }
 
 .galleryBackground {
-    background-color: rgb(244, 244, 244);
+    background-color: rgb(255, 255, 255);
     /* height: fit-content; */
 
     display: flex;
