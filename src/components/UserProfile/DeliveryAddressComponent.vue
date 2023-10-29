@@ -13,7 +13,7 @@
 
         </li>
 
-        <div v-if="!showList & showSearch">     
+        <!-- <div v-if="!showList & showSearch">     
             <input v-model="this.addressInput" style="width: 100%;" @change="maptiler" @input="maptiler" >
             <div style="border-style: solid; border-color: black;">
                 <div v-for="(add, index) in this.possible_address" style="background-color: rgb(156, 152, 152); text-align:left;  border-style: solid; border-color: black;">
@@ -25,13 +25,28 @@
                 <RoundCornerButton  :text="$t('Enter manually')" @button-click="enterManual" style="margin: 5px;">
                 </RoundCornerButton>
             </div>
+        </div> -->
+
+        <div v-if="!showList " style="display: flex width:100%">
+            <input v-model="this.addressInput" style="width: 100%;" @change="maptiler" @input="maptiler" >
+            <div style="border-style: solid; border-color: black;">
+                <div v-for="(addr, index) in this.possible_address" style="background-color: rgb(156, 152, 152); text-align:left;  border-style: solid; border-color: black;">
+                    <a style="margin-left:5px; color: white" @click="fillAddr(addr)">{{ addr }}</a>
+                </div>
+            </div>
         </div>
 
-        <div v-if="!showList && !showSearch" style="display: flex; flex-wrap: wrap; justify-content: space-between; ">
-            <LabelTextFieldHorizontal :text="$t('Name')" v-model:inputText="this.addressUploadData.name"
+        <div v-if="!showList " style="display: flex; flex-wrap: wrap; justify-content: space-between; ">
+            
+            <LabelTextFieldHorizontal :text="$t('Prefered Name')" v-model:inputText="this.addressUploadData.name"
                 :defaultValue="this.addressUploadData.name" style="width: 43%;">
             </LabelTextFieldHorizontal>
-            <LabelTextFieldHorizontal :text="$t('Address')" v-model:inputText="this.addressUploadData.address"
+            <!-- <div style="margin-top:20px;">
+                <p>Can't find you address?</p>
+                <RoundCornerButton  :text="$t('Enter manually')" @button-click="enterManual" style="margin: 5px;">
+                </RoundCornerButton>
+            </div> -->
+            <!-- <LabelTextFieldHorizontal :text="$t('Address')" v-model:inputText="this.addressUploadData.address"
                 :defaultValue="this.addressUploadData.address" style="width: 43%;">
             </LabelTextFieldHorizontal>
             <LabelTextFieldHorizontal :text="$t('City')" v-model:inputText="this.addressUploadData.city"
@@ -45,7 +60,7 @@
             </LabelTextFieldHorizontal>
             <LabelTextFieldHorizontal :text="$t('Country')" v-model:inputText="this.addressUploadData.country"
                 :defaultValue="this.addressUploadData.country" style="width: 43%;">
-            </LabelTextFieldHorizontal>
+            </LabelTextFieldHorizontal> -->
             <LabelTextFieldHorizontal :text="$t('MobileNumber')" v-model:inputText="this.addressUploadData.mobileNumber"
                 :defaultValue="this.addressUploadData.mobileNumber" style="width: 43%;">
             </LabelTextFieldHorizontal>
@@ -116,7 +131,6 @@ export default {
             addressList: [
             ],
             showList: true,
-            showSearch : true,
             isModifyData: false,
             possible_address: [],
             addressInput : ""
@@ -132,9 +146,9 @@ export default {
             )
             this.updateData()
         },
-        enterManual(){
-            this.showSearch = false;
-        },
+        // enterManual(){
+        //     this.showSearch = false;
+        // },
         GetDefualtForm() {
             return {
                 id: -1,
@@ -148,6 +162,14 @@ export default {
                 mobileNumber: '',
                 isDefault: false,
             }
+        },
+        fillAddr(input){
+            const ls = input.split(", ");
+            this.addressUploadData.address = ls[0];
+            this.addressUploadData.city = ls[1];
+            this.addressUploadData.state = ls[2].split(" ")[0];
+            this.addressUploadData.zip = ls[2].split(" ")[1];
+            this.addressUploadData.country = ls[3];
         },
         maptiler(){
             console.log("in")
@@ -169,7 +191,10 @@ export default {
                 console.log(result);
                 var ls = [];
                 for(let i = 0; i < result.features.length; i++){
-                    ls.push(result.features[i]["place_name"]);
+                    if(result.features[i]["place_name"].split(", ").length==4){
+                        ls.push(result.features[i]["place_name"]);
+                    }
+                    
                 }
                 this.possible_address = ls;
             })
@@ -183,7 +208,7 @@ export default {
                     this.addressUploadData = this.GetDefualtForm()
                 }
                 this.showList = false
-                this.showSearch = true
+                // this.showSearch = true
                 return
             } else {
                 if (this.isModifyData) {
@@ -204,14 +229,14 @@ export default {
 
                 this.showList = true
                 this.isModifyData = false
-                this.showSearch = true
+                // this.showSearch = true
             }
             this.updateData()
         },
         CancelAddNewAddress() {
             this.showList = true
             this.isModifyData = false
-            this.showSearch = true
+            // this.showSearch = true
         },
         ModifyData: function (inputData) {
             this.isModifyData = true
@@ -256,6 +281,7 @@ export default {
                     this.uploadData['mobileNumber'] = data.data['extend']['mobile'];
                     this.addressList = 'address' in data.data['extend'] ? data.data['extend']['address']: [];
                     this.uploadData['addressList'] = this.addressList;
+                    console.log(this.addressList);
                 })
                 .catch(error => console.log('error', error));
         },

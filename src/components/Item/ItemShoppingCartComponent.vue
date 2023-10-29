@@ -7,7 +7,7 @@
 
         <div class="commentField">
             <div style="margin-top: 10px; display: flex; height: 95%; width: 100%;">
-                <div style="width: 175px; height: 175px; aspect-ratio: 1/1; background-image: `url(${this.item.itemImage})`;"></div>
+                <div ref="ProductImage" style="width: 175px; height: 175px; aspect-ratio: 1/1; ;"></div>
                 <div class="textField" style="max-width: 70%; width: 80%; min-width: 20%">
                     <div style="width: 80%; overflow-wrap: break-word; overflow: hidden; max-height: 70%;">{{
                         this.item.itemName }}</div>
@@ -22,7 +22,7 @@
 
         <div style=" margin-top: 10px; width: 15%; height: 95%; position: absolute; right: 0;">
             <div style="display: flex;  align-items: center;">
-                <div style="width: 48px; height: 48px; background-image: `url(${this.item.sellerAvater})`;"></div>
+                <div ref="sellerAvatar" style="width: 48px; height: 48px;"></div>
                 <div style="margin-left: 10px;">{{this.item.sellerName}}</div>
             </div>
             <div style="display: flex; position: absolute; bottom: 0; align-items: center;">
@@ -68,6 +68,20 @@ export default {
                 "unrated": this.$t('Unrated'),
                 "refund": this.$t('Refund')
             },
+        }
+    },
+    updated(){
+        if (('itemImage' in this.item) && this.item.itemImage != '') {  
+            console.log(this.item);    
+            var imageBG = this.$refs.ProductImage;
+            imageBG.style.backgroundImage = "url(" + this.item["itemImage"] + ")";
+            imageBG.style.backgroundSize = "cover";
+        }
+        if (('sellerAvatar' in this.item) && this.item.sellerAvatar != '') { 
+            console.log(this.item);
+            var sellerAvatar = this.$refs.sellerAvatar;
+            sellerAvatar.style.backgroundImage = "url(" + this.item["sellerAvatar"] + ")";
+            sellerAvatar.style.backgroundSize = "cover";
         }
     },
     computed: {

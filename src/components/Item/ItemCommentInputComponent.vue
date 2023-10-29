@@ -1,25 +1,24 @@
 <template>
     <div>
-        <div style="margin-top: 25px; display: flex; align-items: center; justify-content: space-between; ">
-            <div style="width: 50%; font-size: 45px;">{{ $t('TellUsYourFeelings') }}</div>
-            <div>
-                <RoundCornerButton :width="'50px'" @button-click="Submit" :text="$t('Post')"></RoundCornerButton>
-            </div>
-        </div>
+
         <div class="commentField">
             <el-form :model="form" label-width="120px">
 
                 <el-form-item label="Item Rating">
-                    <el-input v-model="this.form.rating" :type="'number'" />
+                    <el-input v-model="this.form.rating" :type="'number'" :min="1" :max="10"/>
                 </el-form-item>
 
-                <el-form-item label="Description">
+                <el-form-item label="Your Comment">
                     <el-input v-model="this.form.description" type="textarea" :autosize="true" />
                 </el-form-item>
 
-
-
             </el-form>
+        </div>
+        <div style=" display: flex; align-items: center; justify-content: space-between; flex-direction: row-reverse;">
+            <!-- <div style="width: 50%; font-size: 45px;">{{ $t('TellUsYourFeelings') }}</div> -->
+            <div>
+                <RoundCornerButton :width="'50px'" @button-click="Submit" :text="$t('Post')"></RoundCornerButton>
+            </div>
         </div>
 
     </div>
@@ -49,7 +48,7 @@ export default {
             myHeaders.append("token", this.$store.state.token);
 
             var data = {
-                id: this.$route.params.id,
+                id: this.id,
                 evaluate: this.form.description,
                 score: this.form.rating
             };
@@ -76,10 +75,16 @@ export default {
     data() {
         return {
             form: {
-                rating: 0,
+                rating: 1,
                 description: '',
                 images: [],
             },
+        }
+    },
+    props:{
+        id: {
+            type: Object,
+            required: true
         }
     }
 }
@@ -95,7 +100,7 @@ export default {
 .commentField {
     align-items: left;
     width: 100%;
-    height: 180px;
+    height: 100px;
     margin-bottom: 5px;
     margin-top: 5px;
 }

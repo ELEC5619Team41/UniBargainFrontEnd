@@ -107,7 +107,7 @@ export default {
             myHeaders.append("username", this.$store.state.username);
             myHeaders.append("token", this.$store.state.token);
 
-            var data = {"extend":{"email": this.uploadData['emailAddress'], "gender": this.uploadData['gender'], "mobile": this.uploadData['mobileNumber']}};
+            var data = {"extend":{"email": this.uploadData['emailAddress'], "gender": this.uploadData['gender'], "mobile": this.uploadData['mobileNumber'], "address": this.uploadData['addressList']}};
 
             var requestOptions = {
             method: 'POST',

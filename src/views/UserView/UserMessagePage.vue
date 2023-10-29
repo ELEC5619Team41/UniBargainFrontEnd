@@ -15,7 +15,7 @@
         </div>
         <div class="rightSection">
             <div class="chatHeader">
-                <div style="width: 48px; height: 48px; background-color: white;"></div>
+                <div ref="UserAvatar" style="width: 48px; height: 48px; background-color: white;"></div>
                 <div onclick="" v-if="this.Show">{{ this.Contacts[CurrentRoom].user.name }}</div>
 
             </div>

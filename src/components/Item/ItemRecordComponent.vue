@@ -1,9 +1,6 @@
 <template>
     <div class="commentField" style="margin-left: 20px; margin-left: 20px;">
         <div style="display: flex;">
-            <div style="height: 35px; display: flex; align-items: center;">
-                {{ $t('OrderNumber') }} {{ this.item.orderNumber }}
-            </div>
             <div style="text-align: right; margin-left: auto; display: flex;">
                 <div ref="avatar" style="width: 35px; height: 35px; background-color: blue; margin-right: 5px;"></div>
                 <div style="height: 35px; display: flex; align-items: center;">
@@ -24,14 +21,15 @@
                 <div>{{ this.item.orderDate }}</div>
 
                 <div style="position: absolute;bottom: 0; display: flex; width: 100%;">
-                    <div>{{ this.item.itemPrice }}</div>
-                    <!-- <div style="right: 0; position: absolute;">Hello</div> -->
-                    <RoundCornerButton style="right: 0; bottom: 0; position: absolute;" :width="'100px'" :height="'40px'"
+                    <div>${{ this.item.itemPrice }}</div>
+                    <RoundCornerButton style="right: 0px; bottom: 0px; position: absolute;" :width="'100px'" :height="'40px'"
                         :text="tagKeyPairs[this.item.status]"></RoundCornerButton>
+                    <RoundCornerButton v-if="this.comment" style="right: 0px; bottom: -43px; position: absolute;" :width="'100px'" :height="'40px'"
+                        :text="'Comment'"></RoundCornerButton>
+                        
                 </div>
 
             </div>
-
 
         </div>
 
@@ -50,6 +48,10 @@ export default {
     },
     props: {
         item: {
+            type: Object,
+            required: true
+        },
+        comment:{
             type: Object,
             required: true
         }

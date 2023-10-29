@@ -25,8 +25,16 @@
                 <div class="itemField">
                     <div v-for="(itemData, index) in this.displayItems"
                         style="width: 100%; align-items: center; justify-content: center; display: flex; flex-direction: column; background-color: rgb(241, 241, 241);">
-                        <ItemRecordComponent :item="itemData" @remove-collection="removeFromCollection(itemData)">
+                        <ItemRecordComponent :item="itemData" :comment="this.categorySelectedButton==1" @remove-collection="removeFromCollection(itemData)">
                         </ItemRecordComponent>
+                        <div class="commentField" v-if="this.categorySelectedButton==1" style="width:95%; margin-top: 20px; margin-bottom: 15px;">
+
+                            <div style="width: 100%; height: 1px; background-color: black;"></div>
+
+                            <div style="margin-top:20px; border: 1 solid; border-color: black;">
+                                <ItemCommentInputComponent :id="itemData['id']"></ItemCommentInputComponent>
+                            </div>
+                        </div>
                         <div v-if="index !== this.displayItems.length - 1"
                             style=" display: flex; width: 100%; height: 1px; background: rgb(241, 241, 241); justify-content: center; align-items: center;">
                             <div style="width: 95%; height: 1px; background: black;"></div>
@@ -43,11 +51,13 @@
 <script>
 import TopSearchBar from '@/components/Common/TopSearchBar.vue';
 import ItemRecordComponent from '@/components/Item/ItemRecordComponent.vue';
+import ItemCommentInputComponent from "@/components/Item/ItemCommentInputComponent.vue";
 export default {
     name: "UserTradingPage",
     components: {
         TopSearchBar,
-        ItemRecordComponent
+        ItemRecordComponent,
+        ItemCommentInputComponent
     },
     data() {
         return {
@@ -131,6 +141,7 @@ export default {
                         var user = await this.getUser(data.data[i]['productUserId']);
                         var product = await this.getProductInfo(data.data[i]['productId']);
                         var content = {
+                            "id" : data.data[i]["id"],
                             "productId": data.data[i]['productId'],
                             "username": user['username'],
                             "itemName": data.data[i]['productInfo']['name'],
@@ -182,6 +193,7 @@ export default {
                         var product = await this.getProductInfo(data.data[i]['productId']);
 
                         var content = {
+                            "id" : data.data[i]["id"],
                             "productId": data.data[i]['productId'],
                             "username": user['username'],
                             "itemName": data.data[i]['productInfo']['name'],
@@ -331,7 +343,7 @@ export default {
                         var productDetail = await this.getProductInfo(data.data[i]['id']);
                         var content = {
                             "productId": data.data[i]['id'],
-                            "username": user['name'],
+                            "username": user['username'],
                             "itemName": productDetail.data.info["name"],
                             "orderDate": "",
                             "itemPrice": productDetail.data.info["price"],
@@ -358,7 +370,6 @@ export default {
         searchByItemNameAndUserName() {
             this.searchItems = [];
             for (let i = 0; i < this.items.length; i++) {
-                // console.log(this.items[i].itemName.includes(this.searchText));
                 if (this.items[i].username.includes(this.searchText) || this.items[i].itemName.includes(this.searchText)) { this.searchItems.push(this.items[i]); console.log("add") }
 
             }
