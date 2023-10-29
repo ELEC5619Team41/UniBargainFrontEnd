@@ -5,7 +5,7 @@
             <!-- {{ this.contactDetail }} -->
             <div style="margin-left: 10px; width: calc(100%-48px); overflow: hidden;">
                 <p class="contactName">
-                    {{ this.contactDetail.user.name }}</p>
+                    {{ this.contactDetail.user.username }}</p>
                 <p class="contactMessage">
                     {{ this.contactDetail.message.text }}</p>
             </div>

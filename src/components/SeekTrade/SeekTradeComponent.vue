@@ -257,7 +257,7 @@ export default {
     margin-left: 10px;
     border-radius: 10px;
     flex: 0 0 240px;
-    background-color: gray;
+    /* background-color: gray; */
 
 
 }

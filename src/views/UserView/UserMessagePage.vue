@@ -16,7 +16,7 @@
         <div class="rightSection">
             <div class="chatHeader">
                 <div ref="UserAvatar" style="width: 48px; height: 48px; background-color: white;"></div>
-                <div onclick="" v-if="this.Show">{{ this.Contacts[CurrentRoom].user.name }}</div>
+                <div onclick="" v-if="this.Show">{{ this.Contacts[CurrentRoom].user.username }}</div>
 
             </div>
 
@@ -51,7 +51,7 @@
                     </el-icon>
 
 
-                    <div style="background-color:white">
+                    <div style="background-color:white"> 
                         <EmojiPicker v-if="this.showEmoji" :native="true" @select="onSelectEmoji"
                             style="position: absolute; margin-top: -200px; margin-left: 50px;" />
                     </div>
