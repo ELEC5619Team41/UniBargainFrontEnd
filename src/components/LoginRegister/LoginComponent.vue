@@ -6,38 +6,27 @@
     <div style="display: flex">
       <div>
         <LabelTextField :text="$t('EmailAddress')" v-model:inputText="this.email"></LabelTextField>
-        <LabelTextField
-          :text="$t('Password')"
-          :isPassword="true"
-          v-model:inputText="password"
-        ></LabelTextField>
+        <LabelTextField :text="$t('Password')" :isPassword="true" v-model:inputText="password"></LabelTextField>
 
         <div style="display: flex; margin: 10px; margin-top: 30px">
-          <div
-            style="
+          <div style="
               width: 300px;
               text-align: right;
               margin-top: 8px;
               margin-right: 20px;
               flex-shrink: 0;
-            "
-          ></div>
+            "></div>
           <RoundCornerButton :text="'Login'" @button-click="requestLogin"></RoundCornerButton>
         </div>
 
         <div style="display: flex; margin: 10px">
-          <div
-            style="
+          <div style="
               width: 300px;
               text-align: right;
               margin-right: 20px;
               flex-shrink: 0;
-            "
-          ></div>
-          <ClickableText
-            @text-trigger="$emit('change-to-login')"
-            :text="$t('NotHaveAccount')"
-          ></ClickableText>
+            "></div>
+          <ClickableText @text-trigger="$emit('change-to-login')" :text="$t('NotHaveAccount')"></ClickableText>
         </div>
       </div>
     </div>
@@ -60,25 +49,25 @@ export default {
   },
   data() {
     return {
-        email: '',
-        password: '',
-        url:'/user/login'
+      email: '',
+      password: '',
+      url: '/user/login'
     };
   },
   emits: ["change-to-login"],
-  methods:{
-    requestLogin(){
-        console.log('email', this.email, ', password', this.password);
-        this.SendLoginRequest();
-        
+  methods: {
+    requestLogin() {
+      console.log('email', this.email, ', password', this.password);
+      this.SendLoginRequest();
+
 
     },
-    SendLoginRequest(){
+    SendLoginRequest() {
 
       var myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
 
-      var data = {"username": this.email,"password": this.password};
+      var data = { "username": this.email, "password": this.password };
 
       var requestOptions = {
         method: 'POST',
@@ -90,8 +79,15 @@ export default {
       fetch("http://localhost:28888/user/login", requestOptions)
         .then(response => response.json())
         .then(data => {
+          if (data.code == 400) {
+            this.$message({
+              message: 'Wrong username or password',
+              type: 'warning'
+            });
+            return;
+          }
           console.log(data)
-          this.$store.commit('update',{"username":this.email, "token":data.data['token'],"id":data.data.id});
+          this.$store.commit('update', { "username": this.email, "token": data.data['token'], "id": data.data.id });
           this.$router.push('/userhome/userhomepage');
         })
         .catch(error => console.log('error', error));

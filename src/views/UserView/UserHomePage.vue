@@ -16,7 +16,8 @@
             <div>
                 <h1>Homepage Gallery</h1>
                 <div class="galleryContentBlock">
-                    <GalleryItemcomponent v-for="(item, num) in this.galleryItemData" :ItemData="item"></GalleryItemcomponent>
+                    <GalleryItemcomponent v-for="(item, num) in this.galleryItemData" :ItemData="item">
+                    </GalleryItemcomponent>
                 </div>
             </div>
 
@@ -167,117 +168,179 @@ export default {
 
         }
     },
-    async created(){
+    async created() {
         await this.getRecommend(12);
-        await this.getProductInfo();
+        // await this.getProductInfo();
     },
     methods: {
-        search(){
-            var url = '/userhome/search/'+this.searchText;
+        search() {
+            var url = '/userhome/search/' + this.searchText;
             this.$router.push(url);
         },
-        async getProductInfo(){
+        async getProductInfo() {
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("username", this.$store.state.username);
             myHeaders.append("token", this.$store.state.token);
 
 
-            for(let i = 0; i<this.galleryItemData.length; i++){
-                
-                var data = {"productId": this.galleryItemData[i]["id"]};
+            for (let i = 0; i < this.galleryItemData.length; i++) {
+
+                var data = { "productId": this.galleryItemData[i]["id"] };
 
                 var requestOptions = {
-                method: 'POST',
-                headers: myHeaders,
-                body: JSON.stringify(data),
-                redirect: 'follow'
+                    method: 'POST',
+                    headers: myHeaders,
+                    body: JSON.stringify(data),
+                    redirect: 'follow'
                 };
 
                 await fetch("http://localhost:28888/product/getAvgScore", requestOptions)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.data['score']!= null){
-                        this.galleryItemData[i]["rating"] = parseInt(data.data['score']).toFixed();
-                    }else{
-                        this.galleryItemData[i]["rating"] = "No ratings";
-                    }
-                })
-                .catch(error => console.log('error', error));
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.data['score'] != null) {
+                            this.galleryItemData[i]["rating"] = parseInt(data.data['score']).toFixed();
+                        } else {
+                            this.galleryItemData[i]["rating"] = "No ratings";
+                        }
+                    })
+                    .catch(error => console.log('error', error));
 
-                var data = {"userId": this.galleryItemData[i]["uploaderId"]};
+                var data = { "userId": this.galleryItemData[i]["uploaderId"] };
 
                 var requestOptions = {
-                method: 'POST',
-                headers: myHeaders,
-                body: JSON.stringify(data),
-                redirect: 'follow'
+                    method: 'POST',
+                    headers: myHeaders,
+                    body: JSON.stringify(data),
+                    redirect: 'follow'
                 };
 
                 await fetch("http://localhost:28888/user/getByUserId", requestOptions)
-                .then(response => response.json())
-                .then(data => {
-                    this.galleryItemData[i]["uploader"] = data.data['username'];
-                    this.galleryItemData[i]["uploaderAvatar"] = data.data["avatar"];
-                })
-                .catch(error => console.log('error', error));
+                    .then(response => response.json())
+                    .then(data => {
+                        this.galleryItemData[i]["uploader"] = data.data['username'];
+                        this.galleryItemData[i]["uploaderAvatar"] = data.data["avatar"];
+                    })
+                    .catch(error => console.log('error', error));
 
-                var data = {"id": this.galleryItemData[i]["id"]};
+                var data = { "id": this.galleryItemData[i]["id"] };
 
                 var requestOptions = {
-                method: 'POST',
-                headers: myHeaders,
-                body: JSON.stringify(data),
-                redirect: 'follow'
+                    method: 'POST',
+                    headers: myHeaders,
+                    body: JSON.stringify(data),
+                    redirect: 'follow'
                 };
 
                 await fetch("http://localhost:28888/product/get", requestOptions)
-                .then(response => response.json())
-                .then(data => {
-                    if(data.data['info']['images'] == undefined){
-                        this.galleryItemData[i]["productImage"] = '';
-                    }else{
-                        this.galleryItemData[i]["productImage"] = data.data['info']['images'][0];
-                    }
-                })
-                .catch(error => console.log('error', error));
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.data['info']['images'] == undefined) {
+                            this.galleryItemData[i]["productImage"] = '';
+                        } else {
+                            this.galleryItemData[i]["productImage"] = data.data['info']['images'][0];
+                        }
+                    })
+                    .catch(error => console.log('error', error));
             }
         },
-        async getRecommend(count){
+        async getRecommend(count) {
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("username", this.$store.state.username);
             myHeaders.append("token", this.$store.state.token);
 
-            var data = {"count" : count};
+            var data = { "count": count };
 
             var requestOptions = {
-            method: 'POST',
-            headers: myHeaders,
-            body: JSON.stringify(data),
-            redirect: 'follow'
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(data),
+                redirect: 'follow'
             };
-            
+
             await fetch("http://localhost:28888/product/getRecommendList", requestOptions)
-            .then(response => response.json())
-            .then( data => {
-                console.log(data);
-                var ls =[]
-                for(let i = 0; i<data.data.length; i++){
-                    var content = {
-                        id: data.data[i]["id"],
-                        name : data.data[i]["info"]["name"],
-                        uploader: "",
-                        uploaderId: data.data[i]["userId"],
-                        rating: 0,
-                        productImage: "",
-                        uploaderAvatar: "",
+                .then(response => response.json())
+                .then(async(data) => {
+                    console.log(data);
+                    var ls = []
+                    console.log(data.data.length)
+                    var dataLength = data.data.length;
+                    var dataArray = data.data;
+                    for (let i = 0; i < dataLength; i++) {
+                        var content = {
+                            id: dataArray[i]["id"],
+                            name: dataArray[i]["info"]["name"],
+                            uploader: "",
+                            uploaderId: dataArray[i]["userId"],
+                            rating: 0,
+                            productImage: "",
+                            uploaderAvatar: "",
+                        }
+
+                        var data = { "productId": content["id"] };
+
+                        var requestOptions = {
+                            method: 'POST',
+                            headers: myHeaders,
+                            body: JSON.stringify(data),
+                            redirect: 'follow'
+                        };
+
+                        await fetch("http://localhost:28888/product/getAvgScore", requestOptions)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.data['score'] != null) {
+                                    content["rating"] = parseInt(data.data['score']).toFixed();
+                                } else {
+                                    content["rating"] = "No ratings";
+                                }
+                            })
+                            .catch(error => console.log('error', error));
+
+                        var data = { "userId": content["uploaderId"] };
+
+                        var requestOptions = {
+                            method: 'POST',
+                            headers: myHeaders,
+                            body: JSON.stringify(data),
+                            redirect: 'follow'
+                        };
+
+                        await fetch("http://localhost:28888/user/getByUserId", requestOptions)
+                            .then(response => response.json())
+                            .then(data => {
+                                content["uploader"] = data.data['username'];
+                                content["uploaderAvatar"] = data.data["avatar"];
+                            })
+                            .catch(error => console.log('error', error));
+
+                        var data = { "id": content["id"] };
+
+                        var requestOptions = {
+                            method: 'POST',
+                            headers: myHeaders,
+                            body: JSON.stringify(data),
+                            redirect: 'follow'
+                        };
+
+                        await fetch("http://localhost:28888/product/get", requestOptions)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.data['info']['images'] == undefined) {
+                                    content["productImage"] = '';
+                                } else {
+                                    content["productImage"] = data.data['info']['images'][0];
+                                }
+                            })
+                            .catch(error => console.log('error', error));
+
+
+                        ls.push(content);
                     }
-                    ls.push(content);
-                } 
-                this.galleryItemData = ls;
-            })
-            .catch(error => console.log('error', error));
+                    this.galleryItemData = ls;
+                })
+                .catch(error => console.log('error', error));
         }
     }
 }
