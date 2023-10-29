@@ -51,7 +51,7 @@
                     </el-icon>
 
 
-                    <div style="background-color:white"> 
+                    <div style="background-color:white">
                         <EmojiPicker v-if="this.showEmoji" :native="true" @select="onSelectEmoji"
                             style="position: absolute; margin-top: -200px; margin-left: 50px;" />
                     </div>
@@ -61,7 +61,7 @@
                     </el-icon>
                     <!-- get location -->
 
-                    <el-icon size="30px" style="margin-left: 30px;" @click="this.chatInput += this.deliveryAddress">
+                    <el-icon size="30px" style="margin-left: 30px;" @click="sendAddress">
                         <Location />
                     </el-icon>
 
@@ -113,6 +113,8 @@ export default {
             ],
             ChatInfo: {
             },
+            haveAddress: false,
+            haveTimetable: false,
             chatInput: "",
             myUserID: 1, // should be store in vuex, get when login
             restHeight: 0,
@@ -168,7 +170,18 @@ export default {
             }
         },
         async dateSelect() {
+            if (this.calendarOptions.events.url == null) {
+                alert('Please add your timetable first');
+                return;
+            }
             await this.SendMessage(this.calendarOptions.events.url);
+        },
+        sendAddress() {
+            if (!this.haveAddress) {
+                alert('Please add your address first');
+                return;
+            }
+            this.chatInput += this.deliveryAddress
         },
         async getTimetable() {
             var myHeaders = new Headers();
@@ -207,9 +220,10 @@ export default {
             await fetch("http://localhost:28888/user/get", requestOptions)
                 .then(response => response.json())
                 .then(data => {
-                    if (!('address' in data.data['extend']) || data.data['extend']['address'].length == 0) {
-                        alert('Please add your address first');
-                        return;
+                    if ('address' in data.data['extend'] && data.data['extend']['address'].length != 0) {
+                        this.haveAddress = true;
+                    } else {
+                        return
                     }
                     var addressList = data.data['extend']['address'];
                     for (let i = 0; i < addressList.length; i++) {
@@ -357,15 +371,118 @@ export default {
 
                 })
                 .catch(error => console.log('error', error));
+        },
+        initData(id) {
+            this.myUserID = this.$store.state.id;
+            console.log('chat-id', this.$route.params.id == '')
+
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("username", this.$store.state.username);
+            myHeaders.append("token", this.$store.state.token);
+            var raw = this.searchRaw
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(raw),
+                redirect: 'follow'
+            };
+
+            fetch("http://localhost:28888/chat/getPreviewList", requestOptions)
+                .then(response => response.json())
+                .then(async (result) => {
+                    this.Contacts = result.data;
+                    console.log(this.Contacts)
+                    var exist = false;
+
+                    console.log(id == null)
+                    console.log(id)
+
+                    if (id != null) {
+
+                        for (let i = 0; i < this.Contacts.length; i++) {
+                            console.log(this.Contacts[i])
+                            if (this.Contacts[i].user.id == id) {
+                                exist = true;
+                                break;
+                            }
+                        }
+                        if (!exist) {
+                            var myHeaders = new Headers();
+                            myHeaders.append("Content-Type", "application/json");
+                            myHeaders.append("username", this.$store.state.username);
+                            myHeaders.append("token", this.$store.state.token);
+                            console.log(id)
+                            const raw = {
+                                opposingUserId: id,
+                                message:
+                                {
+                                    text: 'Hello, I want to talk about trade'
+                                }
+                            };
+                            var requestOptions = {
+                                method: 'POST',
+                                headers: myHeaders,
+                                body: JSON.stringify(raw),
+                                redirect: 'follow'
+                            };
+
+                            await fetch("http://localhost:28888/chat/sendMessage", requestOptions)
+                                .then(response => {
+                                    console.log(response);
+                                    if (response.status == 200) {
+                                        this.initData();
+                                    }
+                                    return response.json()
+                                })
+                        } else {
+                            this.initData();
+                        }
+                        return
+                    }
+
+                    if (this.Contacts != null && this.Contacts.length != 0) {
+                        console.log('here')
+                        this.ChangeChatRoom(this.FindChatRoom(this.CurrentTalkTo), true)
+
+                        setInterval(() => {
+                            var myHeaders = new Headers();
+                            myHeaders.append("Content-Type", "application/json");
+                            myHeaders.append("username", this.$store.state.username);
+                            myHeaders.append("token", this.$store.state.token);
+
+                            var raw = this.searchRaw
+                            var requestOptions = {
+                                method: 'POST',
+                                headers: myHeaders,
+                                body: JSON.stringify(raw),
+                                redirect: 'follow'
+                            };
+
+                            fetch("http://localhost:28888/chat/getPreviewList", requestOptions)
+                                .then(response => response.json())
+                                .then(result => { this.Contacts = result.data; this.ChangeChatRoom(this.FindChatRoom(this.CurrentTalkTo), false) })
+                                .catch(error => console.log('error', error));
+                        }, 1000)
+
+                        await this.getTimetable()
+                        await this.getAddress()
+
+                    }
+                    if (this.Contacts == null || this.Contacts.length == 0) {
+                        alert('No message found, why not go to the homepage and find someone to talk to?')
+                        this.$router.push('/userhome/userhomepage')
+                        return
+                    }
+                })
+                .catch(error => console.log('error', error));
+            this.windowsHeight = window.innerHeight;
         }
 
 
 
 
-
-    },
-
-    created() {
 
     },
 
@@ -378,105 +495,8 @@ export default {
         }
     },
     async mounted() {
-        this.myUserID = this.$store.state.id;
-        console.log('chat-id', this.$route.params.id == '')
-
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        myHeaders.append("username", this.$store.state.username);
-        myHeaders.append("token", this.$store.state.token);
-        var raw = this.searchRaw
-
-        var requestOptions = {
-            method: 'POST',
-            headers: myHeaders,
-            body: JSON.stringify(raw),
-            redirect: 'follow'
-        };
-
-        fetch("http://localhost:28888/chat/getPreviewList", requestOptions)
-            .then(response => response.json())
-            .then(async (result) => {
-                this.Contacts = result.data;
-                console.log(this.Contacts)
-
-                if (this.$route.params.id != '') {
-                    var exist = false;
-                    for (let i = 0; i < this.Contacts.length; i++) {
-                        if (this.Contacts[i].user.id == this.$route.params.id) {
-                            exist = true;
-                            break;
-                        }
-                    }
-                    if (!exist) {
-                        var myHeaders = new Headers();
-                        myHeaders.append("Content-Type", "application/json");
-                        myHeaders.append("username", this.$store.state.username);
-                        myHeaders.append("token", this.$store.state.token);
-                        const raw = {
-                            opposingUserId: this.$route.params.id,
-                            message:
-                            {
-                                text: 'Hello, I want to talk about trade'
-                            }
-                        };
-                        var requestOptions = {
-                            method: 'POST',
-                            headers: myHeaders,
-                            body: JSON.stringify(raw),
-                            redirect: 'follow'
-                        };
-
-                        await fetch("http://localhost:28888/chat/sendMessage", requestOptions)
-                            .then(response => {
-                                console.log(response); 
-                                if(response.status == 200){
-                                    this.$router.push('/userhome/usermessagepage/')
-                                    this.$router.go()
-                                }
-                                response.json()
-                            })
-                    }
-                } else if (this.Contacts != null && this.Contacts.length != 0) {
-                    this.ChangeChatRoom(this.FindChatRoom(this.CurrentTalkTo), true)
-
-                    setInterval(() => {
-                        var myHeaders = new Headers();
-                        myHeaders.append("Content-Type", "application/json");
-                        myHeaders.append("username", this.$store.state.username);
-                        myHeaders.append("token", this.$store.state.token);
-
-                        var raw = this.searchRaw
-                        var requestOptions = {
-                            method: 'POST',
-                            headers: myHeaders,
-                            body: JSON.stringify(raw),
-                            redirect: 'follow'
-                        };
-
-                        fetch("http://localhost:28888/chat/getPreviewList", requestOptions)
-                            .then(response => response.json())
-                            .then(result => { this.Contacts = result.data; this.ChangeChatRoom(this.FindChatRoom(this.CurrentTalkTo), false) })
-                            .catch(error => console.log('error', error));
-                    }, 1000)
-
-                    await this.getTimetable()
-                    await this.getAddress()
-
-                } else {
-                    alert('No message found, why not go to the homepage and find someone to talk to?')
-                    this.$router.push('/userhome/userhomepage')
-                    return
-                }
-
-            })
-            .catch(error => console.log('error', error));
-
-
-
-
-
-        this.windowsHeight = window.innerHeight;
+        console.log(this.$route.query.id)
+        this.initData(this.$route.query.id)
     }
 }
 </script>

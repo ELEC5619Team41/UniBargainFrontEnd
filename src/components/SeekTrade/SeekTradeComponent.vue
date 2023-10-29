@@ -36,10 +36,11 @@
 
         <div style="display: flex;" v-for="comment in this.commentList">
             <div style="background-color: white; display: flex; margin-top: 5px; word-wrap: break-word; text-align: left"
-                :style="{'width': comment.info.username == this.$store.state.username ? '95%' : '100%'}">
-                {{ comment.info.username + ": " + comment.info.commentContent}}
+                :style="{ 'width': comment.info.username == this.$store.state.username ? '95%' : '100%' }">
+                {{ comment.info.username + ": " + comment.info.commentContent }}
             </div>
-            <div v-if="comment.info.username == this.$store.state.username" style=" display: flex; width: 5%; align-items: center; justify-content: center;">
+            <div v-if="comment.info.username == this.$store.state.username"
+                style=" display: flex; width: 5%; align-items: center; justify-content: center;">
                 <el-icon @click="deleteComment(comment.id)">
                     <Delete />
                 </el-icon>
@@ -92,9 +93,14 @@ export default {
             return user;
         },
         goChat() {
-            this.$router.push('usermessagepage/' + this.ItemData.userId)
+            this.$router.push({
+                path: 'usermessagepage/',
+                query: {
+                    id: this.ItemData.userId
+                }
+            })
         },
-        async deletePost(){
+        async deletePost() {
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("username", this.$store.state.username);
@@ -148,7 +154,7 @@ export default {
                 .catch(error => console.log('error', error));
             return user;
         },
-        async deleteComment(id){
+        async deleteComment(id) {
             //todo: cannot delete from api
             console.log(id);
             var myHeaders = new Headers();
@@ -200,9 +206,6 @@ export default {
                 .catch(error => console.log('error', error));
             return user;
         },
-        goChat() {
-            this.$router.push('usermessagepage/' + this.ItemData.userId)
-        },
     },
     mounted() {
         this.getUser(this.ItemData.userId).then((data) => {
@@ -226,8 +229,8 @@ export default {
             console.log(this.ItemData.id, data);
         })
     },
-    updated(){
-        
+    updated() {
+
     }
 }
 </script>
