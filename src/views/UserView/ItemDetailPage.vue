@@ -7,7 +7,7 @@
                 </div>
                 <div class="contentField">
                     <div style="display: flex; height: 80px; align-items: center;">
-                        <h1 style="width: 60%; text-align: left;">
+                        <h1 style="width: 60%; text-align: left; font-size:larger">
                             {{ this.itemData.name }}
                         </h1>
                         <div style="width: 40%; display: flex; align-items: center; justify-content: space-around;">
@@ -45,10 +45,6 @@
             </ItemCommentComponent>
 
             <div style="width: 100%; height: 1px; background-color: black;"></div>
-
-            <div style="border: 1 solid; border-color: black;">
-                <ItemCommentInputComponent></ItemCommentInputComponent>
-            </div>
         </div>
     </div>
 </template>
@@ -57,13 +53,11 @@
 import RoundCornerButton from '@/components/Common/RoundCornerButton.vue';
 import ItemCommentComponent from '@/components/Item/ItemCommentComponent.vue';
 import routes from '@/router/index';
-import ItemCommentInputComponent from '@/components/Item/ItemCommentInputComponent.vue';
 export default {
     name: "ItemDetailPage",
     components: {
         RoundCornerButton,
-        ItemCommentComponent,
-        ItemCommentInputComponent
+        ItemCommentComponent
     },
     methods: {
         redirect() {
@@ -108,7 +102,8 @@ export default {
         showImageByIndex() {
             var imageBG = this.$refs.ProductImage;
             imageBG.style.backgroundImage = "url(" + this.itemData['images'][this.showImageIndex] + ")";
-            imageBG.style.backgroundSize = "cover";
+            imageBG.style.backgroundSize = "contain";
+            imageBG.style.backgroundRepeat = "no-repeat";
         },
         showNextImage() {
             if(!('images' in this.itemData) || this.itemData['images'] == null || this.itemData['images'].length == 0){
@@ -172,7 +167,11 @@ export default {
                 .then(response => response.json())
                 .then(data => {
                     console.log(data);
-                    this.itemData['seller']['rating'] = parseInt(data.data['score']).toFixed();
+                    var rate = "No rating";
+                    if(data.data['score'] != null && data.data['score'] != undefined){
+                        rate = parseInt(data.data['score']).toFixed();
+                    }
+                    this.itemData['seller']['rating'] = rate;
                 })
                 .catch(error => console.log('error', error));
         },

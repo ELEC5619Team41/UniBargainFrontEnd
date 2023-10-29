@@ -24,7 +24,7 @@ export default {
             type: Object,
         }
     },
-    mounted(){
+    updated(){
         var avatar = this.$refs.commenterAvatar;
         avatar.style.backgroundImage = `url(${this.comment.userAvatar})`;
         avatar.style.backgroundSize = "cover";

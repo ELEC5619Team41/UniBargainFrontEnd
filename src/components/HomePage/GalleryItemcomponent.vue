@@ -31,18 +31,23 @@ export default {
         }
     },
     mounted() {
-        
-        if (('image' in this.ItemData) && this.ItemData.image != '') {
-            console.log('this.ItemData', this.ItemData)
-            var firstImg = this.$refs.firstImg
-            this.text='load'
-            firstImg.style.backgroundImage = "url(" + this.ItemData.image + ")";
-            firstImg.style.backgroundSize = "cover";
+        console.log(this.ItemData);
+        console.log(this.ItemData.rating);
+        console.log(this.ItemData.uploader);
+        console.log(this.ItemData.uploaderId);
+        console.log(this.ItemData.uploaderAvatar);
+        if (('productImage' in this.ItemData) && this.ItemData.productImage != '') {
+            // console.log('this.ItemData', this.ItemData)
+            var firstImg = this.$refs.firstImg;
+            this.text='load';
+            firstImg.style.backgroundImage = "url(" + this.ItemData.productImage + ")";
+            firstImg.style.backgroundSize = "contain";
+            console.log(firstImg.style);
         }
 
         if(('uploaderAvatar' in this.ItemData) &&this.ItemData.uploaderAvatar != ''){
-            console.log('this.ItemData', this.ItemData)
-            var uploaderAvatar = this.$refs.uploaderAvatar
+            // console.log('this.ItemData', this.ItemData)
+            var uploaderAvatar = this.$refs.uploaderAvatar;
             uploaderAvatar.style.backgroundImage = "url(" + this.ItemData.uploaderAvatar + ")";
             uploaderAvatar.style.backgroundSize = "cover";
         }

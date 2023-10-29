@@ -176,7 +176,7 @@ export default {
             var url = '/userhome/search/'+this.searchText;
             this.$router.push(url);
         },
-        getProductInfo(){
+        async getProductInfo(){
             var myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("username", this.$store.state.username);
@@ -194,7 +194,7 @@ export default {
                 redirect: 'follow'
                 };
 
-                fetch("http://localhost:28888/product/getAvgScore", requestOptions)
+                await fetch("http://localhost:28888/product/getAvgScore", requestOptions)
                 .then(response => response.json())
                 .then(data => {
                     if (data.data['score']!= null){
@@ -214,7 +214,7 @@ export default {
                 redirect: 'follow'
                 };
 
-                fetch("http://localhost:28888/user/getByUserId", requestOptions)
+                await fetch("http://localhost:28888/user/getByUserId", requestOptions)
                 .then(response => response.json())
                 .then(data => {
                     this.galleryItemData[i]["uploader"] = data.data['username'];
@@ -231,13 +231,13 @@ export default {
                 redirect: 'follow'
                 };
 
-                fetch("http://localhost:28888/product/get", requestOptions)
+                await fetch("http://localhost:28888/product/get", requestOptions)
                 .then(response => response.json())
                 .then(data => {
                     if(data.data['info']['images'] == undefined){
-                        this.galleryItemData[i]["image"] = '';
+                        this.galleryItemData[i]["productImage"] = '';
                     }else{
-                        this.galleryItemData[i]["image"] = data.data['info']['images'][0];
+                        this.galleryItemData[i]["productImage"] = data.data['info']['images'][0];
                     }
                 })
                 .catch(error => console.log('error', error));
@@ -261,7 +261,7 @@ export default {
             await fetch("http://localhost:28888/product/getRecommendList", requestOptions)
             .then(response => response.json())
             .then( data => {
-                
+                console.log(data);
                 var ls =[]
                 for(let i = 0; i<data.data.length; i++){
                     var content = {
@@ -270,7 +270,7 @@ export default {
                         uploader: "",
                         uploaderId: data.data[i]["userId"],
                         rating: 0,
-                        image: "",
+                        productImage: "",
                         uploaderAvatar: "",
                     }
                     ls.push(content);

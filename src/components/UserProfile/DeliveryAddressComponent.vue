@@ -30,8 +30,8 @@
         <div v-if="!showList " style="display: flex width:100%">
             <input v-model="this.addressInput" style="width: 100%;" @change="maptiler" @input="maptiler" >
             <div style="border-style: solid; border-color: black;">
-                <div v-for="(addr, index) in this.possible_address" style="background-color: rgb(156, 152, 152); text-align:left;  border-style: solid; border-color: black;">
-                    <a style="margin-left:5px; color: white" @click="fillAddr(addr)">{{ addr }}</a>
+                <div v-for="(addr, index) in this.possible_address" :id = "'address '+index" style="background-color: rgb(156, 152, 152); text-align:left;  border-style: solid; border-color: black;" @click="fillAddr(addr,index)">
+                    <a style="margin-left:5px; color: white"  >{{ addr }}</a>
                 </div>
             </div>
         </div>
@@ -133,7 +133,8 @@ export default {
             showList: true,
             isModifyData: false,
             possible_address: [],
-            addressInput : ""
+            addressInput : "",
+            lastSelected : -1
         }
     },
     methods: {
@@ -163,13 +164,20 @@ export default {
                 isDefault: false,
             }
         },
-        fillAddr(input){
+        fillAddr(input,index){
             const ls = input.split(", ");
             this.addressUploadData.address = ls[0];
             this.addressUploadData.city = ls[1];
             this.addressUploadData.state = ls[2].split(" ")[0];
             this.addressUploadData.zip = ls[2].split(" ")[1];
             this.addressUploadData.country = ls[3];
+            var addItem = document.getElementById("address "+index);
+            addItem.style.backgroundColor="black";
+            if(this.lastSelected!= -1){
+                var lastItem = document.getElementById("address "+this.lastSelected);
+                lastItem.style.backgroundColor="rgb(156, 152, 152)";
+            }
+            this.lastSelected = index;
         },
         maptiler(){
             console.log("in")
@@ -311,7 +319,6 @@ export default {
     mounted(){
         // this.updateData()
         this.initData();
-        // this.maptiler("Empress St");
     }
 }
 </script>
